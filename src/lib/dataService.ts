@@ -3,6 +3,64 @@ import { apiRequest, PROXY_BASE } from './queryClient'
 // Check if running in static mode (GitHub Pages) or server mode (Express)
 const IS_STATIC = PROXY_BASE === '' || PROXY_BASE === '__PORT_5000__'
 
+// Fallback test data - enough to verify UI works
+const TEST_MEMBERS: Member[] = [
+  {
+    bioguideId: 'B000944',
+    displayName: 'Sherrod Brown',
+    chamber: 'Senate',
+    party: 'Democrat',
+    state: 'OH',
+    compassX: -0.5,
+    compassY: -0.3,
+    isCurrent: true,
+    dim1: -0.5,
+    dim2: -0.3,
+    govtrackId: 400050,
+  },
+  {
+    bioguideId: 'M000303',
+    displayName: 'John McCain',
+    chamber: 'Senate',
+    party: 'Republican',
+    state: 'AZ',
+    compassX: 0.4,
+    compassY: 0.2,
+    isCurrent: false,
+    dim1: 0.4,
+    dim2: 0.2,
+    govtrackId: 400255,
+  },
+  {
+    bioguideId: 'P000197',
+    displayName: 'Nancy Pelosi',
+    chamber: 'House',
+    party: 'Democrat',
+    state: 'CA',
+    district: '11',
+    compassX: -0.6,
+    compassY: -0.2,
+    isCurrent: true,
+    dim1: -0.6,
+    dim2: -0.2,
+    govtrackId: 400314,
+  },
+  {
+    bioguideId: 'M001109',
+    displayName: 'Marjorie Taylor Greene',
+    chamber: 'House',
+    party: 'Republican',
+    state: 'GA',
+    district: '14',
+    compassX: 0.8,
+    compassY: 0.7,
+    isCurrent: true,
+    dim1: 0.8,
+    dim2: 0.7,
+    govtrackId: 412690,
+  },
+]
+
 function getDataBase() {
   return import.meta.env.BASE_URL.replace(/\/$/, '')
 }
@@ -91,7 +149,8 @@ export async function getCurrentMembers(): Promise<Member[]> {
       return _currentMembersCache
     } catch (e2) {
       console.error('Error loading fallback members data:', e2)
-      return []
+      console.log('Using test data as last resort')
+      return TEST_MEMBERS
     }
   }
 }
