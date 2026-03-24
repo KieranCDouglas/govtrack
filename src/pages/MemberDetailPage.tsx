@@ -87,7 +87,7 @@ export default function MemberDetailPage() {
                 <div className="font-semibold">{vote.question}</div>
                 <div className="text-muted-foreground text-xs">{vote.voteDate}</div>
                 <div className="mt-1">
-                  Vote: <span className="font-semibold">{vote.option}</span> (Result: {vote.result})
+                  Voted: <span className="font-semibold">{vote.memberOption || 'No vote'}</span> (Result: {vote.result})
                 </div>
               </div>
             ))}

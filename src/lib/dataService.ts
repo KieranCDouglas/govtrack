@@ -1,70 +1,7 @@
-import { apiRequest, PROXY_BASE } from './queryClient'
-
-// Check if running in static mode (GitHub Pages) or server mode (Express)
-// On GitHub Pages, PROXY_BASE will be empty
-const IS_STATIC = PROXY_BASE === ''
-
-// Fallback test data - enough to verify UI works
-const TEST_MEMBERS: Member[] = [
-  {
-    bioguideId: 'B000944',
-    displayName: 'Sherrod Brown',
-    chamber: 'Senate',
-    party: 'Democrat',
-    state: 'OH',
-    compassX: -0.5,
-    compassY: -0.3,
-    isCurrent: true,
-    dim1: -0.5,
-    dim2: -0.3,
-    govtrackId: 400050,
-  },
-  {
-    bioguideId: 'M000303',
-    displayName: 'John McCain',
-    chamber: 'Senate',
-    party: 'Republican',
-    state: 'AZ',
-    compassX: 0.4,
-    compassY: 0.2,
-    isCurrent: false,
-    dim1: 0.4,
-    dim2: 0.2,
-    govtrackId: 400255,
-  },
-  {
-    bioguideId: 'P000197',
-    displayName: 'Nancy Pelosi',
-    chamber: 'House',
-    party: 'Democrat',
-    state: 'CA',
-    district: '11',
-    compassX: -0.6,
-    compassY: -0.2,
-    isCurrent: true,
-    dim1: -0.6,
-    dim2: -0.2,
-    govtrackId: 400314,
-  },
-  {
-    bioguideId: 'M001109',
-    displayName: 'Marjorie Taylor Greene',
-    chamber: 'House',
-    party: 'Republican',
-    state: 'GA',
-    district: '14',
-    compassX: 0.8,
-    compassY: 0.7,
-    isCurrent: true,
-    dim1: 0.8,
-    dim2: 0.7,
-    govtrackId: 412690,
-  },
-]
-
-function getDataBase() {
-  return import.meta.env.BASE_URL.replace(/\/$/, '')
-}
+/**
+ * Data service for fetching congressional member data and voting records.
+ * Primary sources: Voteview API (ideology scores) and GovTrack API (voting records)
+ */
 
 export interface Member {
   bioguideId: string
@@ -73,19 +10,23 @@ export interface Member {
   party: string
   state: string
   district?: string
-  compassX?: number
-  compassY?: number
+  // Ideology scores (NOMINATE dimensions)
+  dim1?: number // Economic liberty: -1 (state control) to +1 (free market)
+  dim2?: number // Social liberty: -1 (restrictions) to +1 (civil liberties)
+  compassX?: number // Alias for dim1
+  compassY?: number // Alias for dim2
   isCurrent: boolean
-  dim1?: number
-  dim2?: number
   govtrackId?: number
+  photoUrl?: string
 }
 
 export interface VoteRecord {
+  voteId: string
   voteDate: string
   question: string
   result: string
-  option: string
+  memberOption: string // How this member voted
+  description: string
 }
 
 export interface Stats {
@@ -95,84 +36,101 @@ export interface Stats {
   totalHistorical: number
 }
 
-let _currentMembersCache: Member[] | null = null
+interface VoteviewMember {
+  bioguide_id: string
+  firstname: string
+  lastname: string
+  chamber: 'H' | 'S'
+  party: number // 100=D, 200=R
+  state: string
+  district_code?: number
+  nominate_dim1: number
+  nominate_dim2: number
+  congress: number
+  govtrack_id?: number
+}
 
+let membersCache: Member[] | null = null
+let cacheTimestamp = 0
+const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
+
+function isCacheValid() {
+  return membersCache && Date.now() - cacheTimestamp < CACHE_DURATION
+}
+
+/**
+ * Fetch current members from Voteview API
+ * Includes ideology scores (NOMINATE dimensions)
+ */
 export async function getCurrentMembers(): Promise<Member[]> {
-  if (_currentMembersCache) return _currentMembersCache
+  if (isCacheValid()) return membersCache!
 
   try {
-    // Fetch from Voteview API - gets current members with ideology scores
-    console.log('Fetching members from Voteview API...')
+    console.log('[DataService] Fetching members from Voteview API...')
     const resp = await fetch('https://voteviewdata.com/api/v1/members')
-    console.log('Voteview response status:', resp.status)
     
     if (!resp.ok) {
-      throw new Error(`Voteview API returned ${resp.status}`)
+      throw new Error(`Voteview API error: ${resp.status}`)
     }
-    
-    const data = await resp.json()
-    console.log('Voteview data received, total items:', Array.isArray(data) ? data.length : 'not an array')
-    
-    // Filter for current senators and representatives (congress 119 = current)
-    const members: Member[] = (data || [])
-      .filter((m: any) => m.congress === 119 && (m.chamber === 'S' || m.chamber === 'H'))
-      .map((m: any) => ({
-        bioguideId: m.bioguide_id || m.id,
+
+    const voteviewMembers: VoteviewMember[] = await resp.json()
+    console.log(`[DataService] Received ${voteviewMembers.length} members from Voteview`)
+
+    // Filter for current Congress (119) senators and representatives
+    const members: Member[] = voteviewMembers
+      .filter(m => m.congress === 119 && (m.chamber === 'S' || m.chamber === 'H'))
+      .map(m => ({
+        bioguideId: m.bioguide_id,
         displayName: `${m.firstname} ${m.lastname}`,
         chamber: m.chamber === 'S' ? 'Senate' : 'House',
         party: m.party === 100 ? 'Democrat' : m.party === 200 ? 'Republican' : 'Independent',
         state: m.state,
         district: m.district_code ? String(m.district_code) : undefined,
-        compassX: m.nominate_dim1, // X-axis: economic
-        compassY: m.nominate_dim2, // Y-axis: social
+        dim1: m.nominate_dim1, // Economic liberty
+        dim2: m.nominate_dim2, // Social liberty
+        compassX: m.nominate_dim1,
+        compassY: m.nominate_dim2,
         isCurrent: true,
-        dim1: m.nominate_dim1,
-        dim2: m.nominate_dim2,
         govtrackId: m.govtrack_id,
       }))
-    
-    console.log('Filtered members:', members.length)
-    _currentMembersCache = members
+
+    membersCache = members
+    cacheTimestamp = Date.now()
+    console.log(`[DataService] Cached ${members.length} current members`)
     return members
   } catch (e) {
-    console.error('Error fetching from Voteview:', e)
-    // Fallback to local JSON if Voteview fails
-    try {
-      console.log('Falling back to local JSON...')
-      const base = getDataBase()
-      const url = `${base}/data/members-current.json`
-      console.log('Trying to load from:', url)
-      const resp = await fetch(url)
-      console.log('Local JSON response status:', resp.status)
-      const data = await resp.json()
-      _currentMembersCache = Array.isArray(data) ? data : data.members || []
-      console.log('Loaded from local JSON:', _currentMembersCache.length)
-      return _currentMembersCache
-    } catch (e2) {
-      console.error('Error loading fallback members data:', e2)
-      console.log('Using test data as last resort')
-      return TEST_MEMBERS
-    }
+    console.error('[DataService] Error fetching members from Voteview:', e)
+    throw e
   }
 }
 
+/**
+ * Get a single member by bioguide ID
+ */
 export async function getMember(bioguideId: string): Promise<Member | null> {
-  const members = await getCurrentMembers()
-  return members.find(m => m.bioguideId === bioguideId) || null
+  try {
+    const members = await getCurrentMembers()
+    return members.find(m => m.bioguideId === bioguideId) || null
+  } catch (e) {
+    console.error(`[DataService] Error getting member ${bioguideId}:`, e)
+    return null
+  }
 }
 
+/**
+ * Search members with filters
+ */
 export async function searchMembers(params: {
   q?: string
   chamber?: string
   party?: string
   state?: string
-  isCurrent?: boolean
   limit?: number
   offset?: number
 }): Promise<{ members: Member[]; total: number }> {
-  if (IS_STATIC) {
-    const all = await getCurrentMembers()
-    let results = all
+  try {
+    const members = await getCurrentMembers()
+    let results = [...members]
 
     if (params.q) {
       const q = params.q.toLowerCase()
@@ -187,11 +145,11 @@ export async function searchMembers(params: {
       results = results.filter(m => m.chamber === params.chamber)
     }
 
-    if (params.party) {
+    if (params.party && params.party !== 'all') {
       results = results.filter(m => m.party === params.party)
     }
 
-    if (params.state) {
+    if (params.state && params.state !== 'all') {
       results = results.filter(m => m.state === params.state)
     }
 
@@ -200,114 +158,114 @@ export async function searchMembers(params: {
     const paged = results.slice(offset, offset + limit)
 
     return { members: paged, total: results.length }
-  } else {
-    const p = new URLSearchParams()
-    if (params.q) p.set('q', params.q)
-    if (params.chamber) p.set('chamber', params.chamber)
-    if (params.party) p.set('party', params.party)
-    if (params.state) p.set('state', params.state)
-    if (params.limit) p.set('limit', String(params.limit))
-    if (params.offset) p.set('offset', String(params.offset))
-
-    const resp = await apiRequest('GET', `/api/members?${p.toString()}`)
-    return resp.json()
-  }
-}
-
-export async function getMemberVotes(bioguideId: string, govtrackId?: number): Promise<{ votes: VoteRecord[]; source: string }> {
-  try {
-    // Always try to call GovTrack API directly (works from browser - CORS enabled)
-    if (!IS_STATIC && !govtrackId) {
-      // In server mode without govtrackId, try the server API
-      const resp = await apiRequest('GET', `/api/members/${bioguideId}/votes`)
-      const data = await resp.json()
-      return { votes: data.votes || [], source: 'api' }
-    }
-
-    if (govtrackId) {
-      // Fetch recent votes for this member from GovTrack
-      const resp = await fetch(
-        `https://www.govtrack.us/api/v2/person/${govtrackId}/votes?limit=20&order_by=-created`,
-        { headers: { 'User-Agent': 'CongressWatch/1.0' } }
-      )
-      const data = await resp.json()
-      
-      const votes: VoteRecord[] = (data.objects || []).map((vote: any) => ({
-        voteDate: vote.vote?.created?.split('T')[0] || '',
-        question: vote.vote?.question || '',
-        result: vote.vote?.result || '',
-        option: vote.option || '',
-      }))
-      
-      return { votes, source: 'govtrack' }
-    }
-
-    // Fallback: only in server mode
-    if (!IS_STATIC) {
-      const resp = await apiRequest('GET', `/api/members/${bioguideId}/votes`)
-      const data = await resp.json()
-      return { votes: data.votes || [], source: 'api' }
-    }
-    
-    return { votes: [], source: 'no-data' }
   } catch (e) {
-    console.error('Error fetching member votes:', e)
-    return { votes: [], source: 'error' }
+    console.error('[DataService] Error searching members:', e)
+    return { members: [], total: 0 }
   }
 }
 
+/**
+ * Fetch recent votes from GovTrack API
+ */
+export async function getRecentVotes(limit: number = 10): Promise<{ votes: VoteRecord[] }> {
+  try {
+    console.log(`[DataService] Fetching ${limit} recent votes from GovTrack...`)
+    const resp = await fetch(
+      `https://www.govtrack.us/api/v2/vote?congress=119&limit=${limit}&order_by=-created`,
+      { headers: { 'User-Agent': 'CongressWatch/1.0' } }
+    )
+
+    if (!resp.ok) {
+      throw new Error(`GovTrack API error: ${resp.status}`)
+    }
+
+    const data = await resp.json()
+    const votes: VoteRecord[] = (data.objects || []).map((vote: any) => ({
+      voteId: String(vote.id),
+      voteDate: vote.created?.split('T')[0] || '',
+      question: vote.question || '',
+      result: vote.result || '',
+      memberOption: '',
+      description: vote.question || '',
+    }))
+
+    console.log(`[DataService] Fetched ${votes.length} recent votes`)
+    return { votes }
+  } catch (e) {
+    console.error('[DataService] Error fetching recent votes:', e)
+    return { votes: [] }
+  }
+}
+
+/**
+ * Fetch member's voting record from GovTrack API
+ */
+export async function getMemberVotes(
+  bioguideId: string,
+  govtrackId?: number
+): Promise<{ votes: VoteRecord[] }> {
+  try {
+    // If we don't have govtrackId, try to get it
+    if (!govtrackId) {
+      const member = await getMember(bioguideId)
+      govtrackId = member?.govtrackId
+    }
+
+    if (!govtrackId) {
+      console.warn(`[DataService] No govtrackId for member ${bioguideId}`)
+      return { votes: [] }
+    }
+
+    console.log(`[DataService] Fetching votes for member ${bioguideId} (govtrackId=${govtrackId})...`)
+    const resp = await fetch(
+      `https://www.govtrack.us/api/v2/person/${govtrackId}/votes?limit=20&order_by=-created`,
+      { headers: { 'User-Agent': 'CongressWatch/1.0' } }
+    )
+
+    if (!resp.ok) {
+      throw new Error(`GovTrack API error: ${resp.status}`)
+    }
+
+    const data = await resp.json()
+    const votes: VoteRecord[] = (data.objects || []).map((vote: any) => ({
+      voteId: String(vote.vote?.id || ''),
+      voteDate: vote.vote?.created?.split('T')[0] || '',
+      question: vote.vote?.question || '',
+      result: vote.vote?.result || '',
+      memberOption: vote.option || '',
+      description: vote.vote?.question || '',
+    }))
+
+    console.log(`[DataService] Fetched ${votes.length} votes for member`)
+    return { votes }
+  } catch (e) {
+    console.error(`[DataService] Error fetching member votes:`, e)
+    return { votes: [] }
+  }
+}
+
+/**
+ * Calculate statistics
+ */
 export async function getStats(): Promise<Stats> {
   try {
     const members = await getCurrentMembers()
-    const senators = members.filter(m => m.chamber === 'Senate').length
-    const representatives = members.filter(m => m.chamber === 'House').length
-    
+    const senators = members.filter(m => m.chamber === 'Senate')
+    const representatives = members.filter(m => m.chamber === 'House')
+
     return {
       currentMembers: members.length,
-      currentSenators: senators,
-      currentRepresentatives: representatives,
-      totalHistorical: 12000, // Approximate historical count
+      currentSenators: senators.length,
+      currentRepresentatives: representatives.length,
+      totalHistorical: 12000,
     }
   } catch (e) {
-    console.error('Error calculating stats:', e)
+    console.error('[DataService] Error calculating stats:', e)
     return {
       currentMembers: 0,
       currentSenators: 0,
       currentRepresentatives: 0,
       totalHistorical: 0,
     }
-  }
-}
-
-export async function getRecentVotes(limit: number) {
-  try {
-    // Fetch recent votes from GovTrack
-    const resp = await fetch(
-      `https://www.govtrack.us/api/v2/vote?congress=119&limit=${limit}&order_by=-created`,
-      { headers: { 'User-Agent': 'CongressWatch/1.0' } }
-    )
-    
-    const data = await resp.json()
-    
-    const votes = (data.objects || []).map((vote: any) => ({
-      voteDate: vote.created?.split('T')[0] || '',
-      question: vote.question || '',
-      result: vote.result || '',
-      option: '',
-    }))
-    
-    return { votes }
-  } catch (e) {
-    console.error('Error fetching recent votes:', e)
-    // Fallback to server API if CORS fails (only in server mode)
-    if (!IS_STATIC) {
-      try {
-        const resp = await apiRequest('GET', `/api/votes/recent?limit=${limit}`)
-        return resp.json()
-      } catch (e2) {
-        return { votes: [] }
-      }
-    }
-    return { votes: [] }
   }
 }
