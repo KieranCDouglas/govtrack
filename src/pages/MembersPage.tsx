@@ -10,7 +10,6 @@ export default function MembersPage() {
     q: '',
     chamber: 'all' as 'all' | 'Senate' | 'House',
     party: '',
-    current: true,
   })
   const [page, setPage] = useState(0)
 
@@ -21,7 +20,6 @@ export default function MembersPage() {
         q: searchParams.q || undefined,
         chamber: searchParams.chamber === 'all' ? undefined : searchParams.chamber,
         party: searchParams.party || undefined,
-        isCurrent: searchParams.current,
         limit: LIMIT,
         offset: page * LIMIT,
       }),
