@@ -41,18 +41,45 @@ let _currentMembersCache: Member[] | null = null
 export async function getCurrentMembers(): Promise<Member[]> {
   if (_currentMembersCache) return _currentMembersCache
 
-  if (IS_STATIC) {
-    const base = getDataBase()
-    const url = `${base}/data/members-current.json`
-    const resp = await fetch(url)
+  try {
+    // Fetch from Voteview API - gets current members with ideology scores
+    const resp = await fetch('https://voteviewdata.com/api/v1/members')
     const data = await resp.json()
-    _currentMembersCache = Array.isArray(data) ? data : data.members || []
-    return _currentMembersCache
-  } else {
-    const resp = await apiRequest('GET', '/api/members/compass')
-    const data = await resp.json()
-    _currentMembersCache = Array.isArray(data) ? data : data.members || []
-    return _currentMembersCache
+    
+    // Filter for current senators and representatives (congress 119 = current)
+    const members: Member[] = (data || [])
+      .filter((m: any) => m.congress === 119 && (m.chamber === 'S' || m.chamber === 'H'))
+      .map((m: any) => ({
+        bioguideId: m.bioguide_id || m.id,
+        displayName: `${m.firstname} ${m.lastname}`,
+        chamber: m.chamber === 'S' ? 'Senate' : 'House',
+        party: m.party === 100 ? 'Democrat' : m.party === 200 ? 'Republican' : 'Independent',
+        state: m.state,
+        district: m.district_code ? String(m.district_code) : undefined,
+        compassX: m.nominate_dim1, // X-axis: economic
+        compassY: m.nominate_dim2, // Y-axis: social
+        isCurrent: true,
+        dim1: m.nominate_dim1,
+        dim2: m.nominate_dim2,
+        govtrackId: m.govtrack_id,
+      }))
+    
+    _currentMembersCache = members
+    return members
+  } catch (e) {
+    console.error('Error fetching from Voteview:', e)
+    // Fallback to local JSON if Voteview fails
+    try {
+      const base = getDataBase()
+      const url = `${base}/data/members-current.json`
+      const resp = await fetch(url)
+      const data = await resp.json()
+      _currentMembersCache = Array.isArray(data) ? data : data.members || []
+      return _currentMembersCache
+    } catch (e2) {
+      console.error('Error loading fallback members data:', e2)
+      return []
+    }
   }
 }
 
@@ -153,14 +180,25 @@ export async function getMemberVotes(bioguideId: string, govtrackId?: number): P
 }
 
 export async function getStats(): Promise<Stats> {
-  if (IS_STATIC) {
-    const base = getDataBase()
-    const url = `${base}/data/stats.json`
-    const resp = await fetch(url)
-    return resp.json()
-  } else {
-    const resp = await apiRequest('GET', '/api/stats')
-    return resp.json()
+  try {
+    const members = await getCurrentMembers()
+    const senators = members.filter(m => m.chamber === 'Senate').length
+    const representatives = members.filter(m => m.chamber === 'House').length
+    
+    return {
+      currentMembers: members.length,
+      currentSenators: senators,
+      currentRepresentatives: representatives,
+      totalHistorical: 12000, // Approximate historical count
+    }
+  } catch (e) {
+    console.error('Error calculating stats:', e)
+    return {
+      currentMembers: 0,
+      currentSenators: 0,
+      currentRepresentatives: 0,
+      totalHistorical: 0,
+    }
   }
 }
 
