@@ -32,7 +32,7 @@ export default function QuizPage() {
   })
 
   const handleAnswer = (questionId: string, value: number) => {
-    setAnswers({ ...answers, [questionId] = value })
+    setAnswers({ ...answers, [questionId]: value })
   }
 
   const calculateScore = () => {
