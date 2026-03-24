@@ -1,0 +1,177 @@
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700&f[]=cabinet-grotesk@400,500,700,800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==================== CSS VARIABLES - CUSTOMIZE HERE ==================== */
+
+@layer base {
+  :root {
+    /* Color Palette - HSL format (Hue Saturation% Lightness%) */
+    --background: 182 83% 9%;
+    --foreground: 193 69% 88%;
+    --card: 182 70% 12%;
+    --card-foreground: 193 69% 88%;
+    --popover: 182 70% 11%;
+    --popover-foreground: 193 69% 88%;
+    --primary: 189 43% 56%;
+    --primary-foreground: 182 83% 9%;
+    --secondary: 182 50% 17%;
+    --secondary-foreground: 193 60% 75%;
+    --muted: 182 50% 14%;
+    --muted-foreground: 189 30% 52%;
+    --accent: 19 84% 60%;
+    --accent-foreground: 182 83% 9%;
+    --destructive: 11 69% 50%;
+    --destructive-foreground: 193 69% 88%;
+    --border: 182 40% 20%;
+    --input: 182 45% 16%;
+    --ring: 189 43% 56%;
+    --radius: 0.4rem;
+
+    /* Sidebar Colors */
+    --sidebar-background: 182 83% 7%;
+    --sidebar-foreground: 193 60% 80%;
+    --sidebar-primary: 189 43% 56%;
+    --sidebar-primary-foreground: 182 83% 9%;
+    --sidebar-accent: 182 55% 14%;
+    --sidebar-accent-foreground: 193 60% 80%;
+    --sidebar-border: 182 40% 18%;
+    --sidebar-ring: 189 43% 56%;
+
+    /* Political Party Colors - CUSTOMIZE THESE */
+    --dem-color: 214 72% 60%;    /* Democrat Blue */
+    --rep-color: 11 69% 55%;     /* Republican Red */
+    --ind-color: 189 43% 56%;    /* Independent Cyan */
+
+    font-family: Satoshi, system-ui, sans-serif;
+  }
+
+  .light {
+    --background: 193 69% 97%;
+    --foreground: 182 83% 9%;
+    --card: 0 0% 100%;
+    --card-foreground: 182 83% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 182 83% 9%;
+    --primary: 189 43% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 193 60% 90%;
+    --secondary-foreground: 182 60% 15%;
+    --muted: 193 50% 93%;
+    --muted-foreground: 189 30% 40%;
+    --accent: 19 84% 58%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 11 69% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 189 30% 82%;
+    --input: 193 50% 92%;
+    --ring: 189 43% 42%;
+    
+    --sidebar-background: 193 60% 94%;
+    --sidebar-foreground: 182 60% 15%;
+    --sidebar-primary: 189 43% 42%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 193 55% 88%;
+    --sidebar-accent-foreground: 182 60% 15%;
+    --sidebar-border: 189 30% 82%;
+    --sidebar-ring: 189 43% 42%;
+    
+    --dem-color: 214 72% 48%;
+    --rep-color: 11 69% 44%;
+    --ind-color: 189 43% 38%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: Cabinet Grotesk, Satoshi, system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+}
+
+/* ==================== CUSTOM COMPONENTS ==================== */
+
+/* Party color utilities */
+.party-dem {
+  @apply text-[hsl(var(--dem-color))];
+}
+
+.party-rep {
+  @apply text-[hsl(var(--rep-color))];
+}
+
+.party-ind {
+  @apply text-[hsl(var(--ind-color))];
+}
+
+/* Vote badges */
+.vote-yes {
+  @apply rounded px-2 py-0.5 text-xs font-semibold bg-emerald-500/10 text-emerald-400;
+}
+
+.vote-no {
+  @apply rounded px-2 py-0.5 text-xs font-semibold bg-red-500/10 text-red-400;
+}
+
+.vote-not-voting {
+  @apply rounded px-2 py-0.5 text-xs font-semibold bg-slate-500/10 text-slate-400;
+}
+
+.vote-present {
+  @apply rounded px-2 py-0.5 text-xs font-semibold bg-amber-500/10 text-amber-400;
+}
+
+/* Skeleton loading animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  @apply rounded;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--border)),
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ==================== SCROLLBAR STYLING ==================== */
+
+::-webkit-scrollbar {
+  @apply w-1.5 h-1.5;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded bg-border;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground;
+}
