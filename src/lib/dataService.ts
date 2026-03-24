@@ -1,7 +1,8 @@
 import { apiRequest, PROXY_BASE } from './queryClient'
 
 // Check if running in static mode (GitHub Pages) or server mode (Express)
-const IS_STATIC = PROXY_BASE === '' || PROXY_BASE === '__PORT_5000__'
+// On GitHub Pages, PROXY_BASE will be empty
+const IS_STATIC = PROXY_BASE === ''
 
 // Fallback test data - enough to verify UI works
 const TEST_MEMBERS: Member[] = [
@@ -215,9 +216,9 @@ export async function searchMembers(params: {
 
 export async function getMemberVotes(bioguideId: string, govtrackId?: number): Promise<{ votes: VoteRecord[]; source: string }> {
   try {
-    // Try to call GovTrack API directly (works from browser - CORS enabled)
-    if (IS_STATIC && !govtrackId) {
-      // In static mode without govtrackId, try the server API as fallback
+    // Always try to call GovTrack API directly (works from browser - CORS enabled)
+    if (!IS_STATIC && !govtrackId) {
+      // In server mode without govtrackId, try the server API
       const resp = await apiRequest('GET', `/api/members/${bioguideId}/votes`)
       const data = await resp.json()
       return { votes: data.votes || [], source: 'api' }
@@ -241,10 +242,14 @@ export async function getMemberVotes(bioguideId: string, govtrackId?: number): P
       return { votes, source: 'govtrack' }
     }
 
-    // Fallback: server mode
-    const resp = await apiRequest('GET', `/api/members/${bioguideId}/votes`)
-    const data = await resp.json()
-    return { votes: data.votes || [], source: 'api' }
+    // Fallback: only in server mode
+    if (!IS_STATIC) {
+      const resp = await apiRequest('GET', `/api/members/${bioguideId}/votes`)
+      const data = await resp.json()
+      return { votes: data.votes || [], source: 'api' }
+    }
+    
+    return { votes: [], source: 'no-data' }
   } catch (e) {
     console.error('Error fetching member votes:', e)
     return { votes: [], source: 'error' }
@@ -294,12 +299,15 @@ export async function getRecentVotes(limit: number) {
     return { votes }
   } catch (e) {
     console.error('Error fetching recent votes:', e)
-    // Fallback to server API if CORS fails
-    try {
-      const resp = await apiRequest('GET', `/api/votes/recent?limit=${limit}`)
-      return resp.json()
-    } catch (e2) {
-      return { votes: [] }
+    // Fallback to server API if CORS fails (only in server mode)
+    if (!IS_STATIC) {
+      try {
+        const resp = await apiRequest('GET', `/api/votes/recent?limit=${limit}`)
+        return resp.json()
+      } catch (e2) {
+        return { votes: [] }
+      }
     }
+    return { votes: [] }
   }
 }

@@ -12,7 +12,7 @@ export const queryClient = new QueryClient({
 })
 
 // Helper for Express proxy mode on local/Perplexity
-export const PROXY_BASE = '__PORT_5000__'
+export const PROXY_BASE = ''
 
 export async function apiRequest(method: string, path: string, body?: unknown) {
   const url = PROXY_BASE ? `${PROXY_BASE}${path}` : path
