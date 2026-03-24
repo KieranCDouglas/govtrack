@@ -43,8 +43,16 @@ export async function getCurrentMembers(): Promise<Member[]> {
 
   try {
     // Fetch from Voteview API - gets current members with ideology scores
+    console.log('Fetching members from Voteview API...')
     const resp = await fetch('https://voteviewdata.com/api/v1/members')
+    console.log('Voteview response status:', resp.status)
+    
+    if (!resp.ok) {
+      throw new Error(`Voteview API returned ${resp.status}`)
+    }
+    
     const data = await resp.json()
+    console.log('Voteview data received, total items:', Array.isArray(data) ? data.length : 'not an array')
     
     // Filter for current senators and representatives (congress 119 = current)
     const members: Member[] = (data || [])
@@ -64,17 +72,22 @@ export async function getCurrentMembers(): Promise<Member[]> {
         govtrackId: m.govtrack_id,
       }))
     
+    console.log('Filtered members:', members.length)
     _currentMembersCache = members
     return members
   } catch (e) {
     console.error('Error fetching from Voteview:', e)
     // Fallback to local JSON if Voteview fails
     try {
+      console.log('Falling back to local JSON...')
       const base = getDataBase()
       const url = `${base}/data/members-current.json`
+      console.log('Trying to load from:', url)
       const resp = await fetch(url)
+      console.log('Local JSON response status:', resp.status)
       const data = await resp.json()
       _currentMembersCache = Array.isArray(data) ? data : data.members || []
+      console.log('Loaded from local JSON:', _currentMembersCache.length)
       return _currentMembersCache
     } catch (e2) {
       console.error('Error loading fallback members data:', e2)
