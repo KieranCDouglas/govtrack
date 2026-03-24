@@ -19,6 +19,7 @@ export interface Member {
   isCurrent: boolean
   dim1?: number
   dim2?: number
+  govtrackId?: number
 }
 
 export interface VoteRecord {
@@ -114,15 +115,41 @@ export async function searchMembers(params: {
 }
 
 export async function getMemberVotes(bioguideId: string, govtrackId?: number): Promise<{ votes: VoteRecord[]; source: string }> {
-  // In static mode, return empty
-  if (IS_STATIC) {
-    return { votes: [], source: 'static' }
-  }
+  try {
+    // Try to call GovTrack API directly (works from browser - CORS enabled)
+    if (IS_STATIC && !govtrackId) {
+      // In static mode without govtrackId, try the server API as fallback
+      const resp = await apiRequest('GET', `/api/members/${bioguideId}/votes`)
+      const data = await resp.json()
+      return { votes: data.votes || [], source: 'api' }
+    }
 
-  // In server mode, call the API
-  const resp = await apiRequest('GET', `/api/members/${bioguideId}/votes`)
-  const data = await resp.json()
-  return { votes: data.votes || [], source: 'api' }
+    if (govtrackId) {
+      // Fetch recent votes for this member from GovTrack
+      const resp = await fetch(
+        `https://www.govtrack.us/api/v2/person/${govtrackId}/votes?limit=20&order_by=-created`,
+        { headers: { 'User-Agent': 'CongressWatch/1.0' } }
+      )
+      const data = await resp.json()
+      
+      const votes: VoteRecord[] = (data.objects || []).map((vote: any) => ({
+        voteDate: vote.vote?.created?.split('T')[0] || '',
+        question: vote.vote?.question || '',
+        result: vote.vote?.result || '',
+        option: vote.option || '',
+      }))
+      
+      return { votes, source: 'govtrack' }
+    }
+
+    // Fallback: server mode
+    const resp = await apiRequest('GET', `/api/members/${bioguideId}/votes`)
+    const data = await resp.json()
+    return { votes: data.votes || [], source: 'api' }
+  } catch (e) {
+    console.error('Error fetching member votes:', e)
+    return { votes: [], source: 'error' }
+  }
 }
 
 export async function getStats(): Promise<Stats> {
@@ -138,10 +165,31 @@ export async function getStats(): Promise<Stats> {
 }
 
 export async function getRecentVotes(limit: number) {
-  if (IS_STATIC) {
-    return { votes: [] }
-  } else {
-    const resp = await apiRequest('GET', `/api/votes/recent?limit=${limit}`)
-    return resp.json()
+  try {
+    // Fetch recent votes from GovTrack
+    const resp = await fetch(
+      `https://www.govtrack.us/api/v2/vote?congress=119&limit=${limit}&order_by=-created`,
+      { headers: { 'User-Agent': 'CongressWatch/1.0' } }
+    )
+    
+    const data = await resp.json()
+    
+    const votes = (data.objects || []).map((vote: any) => ({
+      voteDate: vote.created?.split('T')[0] || '',
+      question: vote.question || '',
+      result: vote.result || '',
+      option: '',
+    }))
+    
+    return { votes }
+  } catch (e) {
+    console.error('Error fetching recent votes:', e)
+    // Fallback to server API if CORS fails
+    try {
+      const resp = await apiRequest('GET', `/api/votes/recent?limit=${limit}`)
+      return resp.json()
+    } catch (e2) {
+      return { votes: [] }
+    }
   }
 }
