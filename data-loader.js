@@ -303,22 +303,24 @@
 
   /**
    * Compute stats from member data.
-   * Only count members marked as currently serving (isCurrent or has govtrackId).
+   * All members in members-current.json are currently serving.
    */
   function computeStats(members) {
     var house = 0, senate = 0, dems = 0, reps = 0, inds = 0;
     for (var i = 0; i < members.length; i++) {
       var m = members[i];
-      // Only count currently serving members
-      if (!m.isCurrent && !m.govtrackId) continue;
       if (m.chamber === "House") house++;
       else senate++;
       if (m.party === "Democrat") dems++;
       else if (m.party === "Republican") reps++;
       else inds++;
     }
+
+    // Get historical count from index if available
+    var historicalCount = _membersIndex ? _membersIndex.length : 12579;
+
     return {
-      total_historical: 12579,
+      total_historical: historicalCount,
       current_total: members.length,
       current_house: house,
       current_senate: senate,

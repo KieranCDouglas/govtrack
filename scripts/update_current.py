@@ -259,7 +259,7 @@ def update_members_current(congress, index):
     return members_out
 
 
-def update_stats(members_current):
+def update_stats(members_current, index):
     """Regenerate stats.json from current members."""
     print("=== Updating stats.json ===")
     house = senate = dems = reps = inds = 0
@@ -277,7 +277,7 @@ def update_stats(members_current):
             inds += 1
 
     stats = {
-        "total_historical": 12579,
+        "total_historical": len(index),
         "current_total": len(members_current),
         "current_house": house,
         "current_senate": senate,
@@ -371,7 +371,7 @@ def main():
 
     index = update_members_index(congress)
     current = update_members_current(congress, index)
-    update_stats(current)
+    update_stats(current, index)
     update_vote_data(congress)
 
     print("\nDone!")
