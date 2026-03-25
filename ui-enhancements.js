@@ -205,12 +205,12 @@
 
       box.innerHTML =
         '<div style="display:flex;align-items:center;gap:5px;">' +
-          '<span style="color:hsl(var(--primary));font-weight:600;">\u2190 \u2192</span>' +
-          '<span style="color:hsl(var(--muted-foreground));">Economic: Left (collectivist) \u2194 Right (free market)</span>' +
+          '<span style="color:hsl(var(--primary));font-weight:600;">\u25c2 \u25b8</span>' +
+          '<span style="color:hsl(var(--muted-foreground));">Economic: Left (collectivist) \u2013 Right (free market)</span>' +
         '</div>' +
         '<div style="display:flex;align-items:center;gap:5px;">' +
-          '<span style="color:hsl(var(--primary));font-weight:600;">\u2191 \u2193</span>' +
-          '<span style="color:hsl(var(--muted-foreground));">Social: Up (conservative) \u2194 Down (progressive)</span>' +
+          '<span style="color:hsl(var(--primary));font-weight:600;">\u25b4 \u25be</span>' +
+          '<span style="color:hsl(var(--muted-foreground));">Social: Up (conservative) \u2013 Down (progressive)</span>' +
         '</div>';
 
       // insert after the existing description <p>, or after canvas
