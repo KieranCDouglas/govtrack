@@ -223,7 +223,7 @@
     });
   }
 
-  /* ---- 2b  Expandable vote items ---- */
+  /* ---- 2b  Expandable vote items with party-line detection & filtering ---- */
 
   var billCache = {};
 
@@ -235,6 +235,12 @@
         if (!data) return null;
         var sponsorName = data.sponsor ? data.sponsor.name : "";
         var cosponsorsArr = data.cosponsors || [];
+        // Extract official title (describes what the bill does)
+        var officialTitle = "";
+        if (data.titles) {
+          var off = data.titles.find(function (t) { return t[0] === "official"; });
+          if (off) officialTitle = off[2] || "";
+        }
         // Build congress.gov URL from bill type
         var cgUrl = "";
         if (data.congress && data.bill_type_label && data.number) {
@@ -244,6 +250,7 @@
         }
         return {
           title: data.title_without_number || data.title || "",
+          officialTitle: officialTitle,
           number: data.display_number || "",
           status: data.current_status_description || "",
           statusDate: (data.current_status_date || "").substring(0, 10),
@@ -258,26 +265,190 @@
     return p;
   }
 
+  /* -- Detect the member's party from the page -- */
+  function detectMemberParty() {
+    var el = document.querySelector(".party-dem, .party-rep, .party-ind");
+    if (el) {
+      var t = el.textContent.trim();
+      if (t === "Democrat" || t === "Republican" || t === "Independent") return t;
+    }
+    return null;
+  }
+
+  /* -- Determine if a member's vote aligned with their party -- */
+  function getPartyAlignment(party, position, chamber, mjrPctPlusStr, pctPlusStr) {
+    if (!party || !position) return null;
+    var pos = position.toLowerCase();
+    if (pos === "not voting" || pos === "present") return null;
+    var mjr = parseFloat(mjrPctPlusStr);
+    var pct = parseFloat(pctPlusStr);
+    if (isNaN(mjr) || isNaN(pct)) return null;
+
+    var memberVotedYea = pos === "yes" || pos === "yea";
+    // 119th Congress: Republican majority in both chambers
+    var rFrac = chamber === "House" ? 0.506 : 0.53;
+
+    if (party === "Republican") {
+      var rPositionYea = mjr > 0.5;
+      return memberVotedYea === rPositionYea ? "with" : "against";
+    }
+    // Democrat / Independent — estimate minority-party position
+    var minPctPlus = (pct - mjr * rFrac) / (1 - rFrac);
+    var dPositionYea = minPctPlus > 0.5;
+    return memberVotedYea === dPositionYea ? "with" : "against";
+  }
+
+  /* -- Filter bar above vote list -- */
+  function addVoteFilters(container, voteSection, memberParty) {
+    if (container.querySelector(".cw-vote-filters")) return;
+
+    var bar = document.createElement("div");
+    bar.className = "cw-vote-filters";
+    bar.style.cssText =
+      "margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;";
+    bar.addEventListener("click", function (ev) { ev.stopPropagation(); });
+
+    var inputCss =
+      "padding:6px 10px;border-radius:6px;border:1px solid hsl(var(--border));" +
+      "background:hsl(var(--muted)/0.3);color:hsl(var(--foreground));font-size:12px;outline:none;";
+
+    bar.innerHTML =
+      '<input type="text" placeholder="Search votes\u2026" class="cw-vote-search" ' +
+        'style="flex:1;min-width:160px;' + inputCss + '" />' +
+      '<select class="cw-vote-pos-filter" style="' + inputCss + '">' +
+        '<option value="">All positions</option>' +
+        '<option value="yea">Yea</option>' +
+        '<option value="nay">Nay</option>' +
+        '<option value="nv">Not Voting</option>' +
+      '</select>' +
+      '<select class="cw-vote-party-filter" style="' + inputCss + '">' +
+        '<option value="">Party alignment</option>' +
+        '<option value="with">With party</option>' +
+        '<option value="against">Against party</option>' +
+      '</select>' +
+      '<span class="cw-vote-count" style="font-size:11px;color:hsl(var(--muted-foreground));white-space:nowrap;"></span>';
+
+    container.insertBefore(bar, voteSection);
+
+    var searchIn = bar.querySelector(".cw-vote-search");
+    var posSel  = bar.querySelector(".cw-vote-pos-filter");
+    var ptySel  = bar.querySelector(".cw-vote-party-filter");
+    var countEl = bar.querySelector(".cw-vote-count");
+
+    function applyFilters() {
+      var q = searchIn.value.toLowerCase().trim();
+      var pv = posSel.value;
+      var pa = ptySel.value;
+      var total = 0, shown = 0;
+
+      voteSection.querySelectorAll(":scope > div").forEach(function (item) {
+        if (!item.dataset.cwExp) return;           // skip non-vote divs
+        total++;
+        var show = true;
+
+        // text search
+        if (q && item.textContent.toLowerCase().indexOf(q) === -1) show = false;
+
+        // position filter
+        if (show && pv) {
+          var pos = (item.dataset.position || "").toLowerCase();
+          if (pv === "yea"  && pos !== "yes" && pos !== "yea") show = false;
+          if (pv === "nay"  && pos !== "no"  && pos !== "nay") show = false;
+          if (pv === "nv"   && pos !== "not voting")           show = false;
+        }
+
+        // party-alignment filter
+        if (show && pa && memberParty) {
+          var al = getPartyAlignment(
+            memberParty,
+            item.dataset.position,
+            item.dataset.chamber,
+            item.dataset.mjrPctPlus,
+            item.dataset.pctPlus
+          );
+          if (pa === "with"    && al !== "with")    show = false;
+          if (pa === "against" && al !== "against") show = false;
+        }
+
+        item.style.display = show ? "" : "none";
+        if (show) shown++;
+      });
+
+      countEl.textContent = shown < total
+        ? shown + " of " + total + " votes"
+        : total + " votes";
+    }
+
+    searchIn.addEventListener("input", applyFilters);
+    posSel.addEventListener("change", applyFilters);
+    ptySel.addEventListener("change", applyFilters);
+
+    // debounced re-count when new items appear
+    var recount;
+    new MutationObserver(function () {
+      clearTimeout(recount);
+      recount = setTimeout(applyFilters, 200);
+    }).observe(voteSection, { childList: true });
+
+    applyFilters();
+  }
+
+  /* -- Main vote enhancement entry point -- */
   function enhanceVotes() {
-    // vote items live inside .divide-y containers
-    document.querySelectorAll(".divide-y > div, .space-y-0 > div").forEach(function (item) {
+    var voteSection = document.querySelector(".divide-y.divide-border\\/40");
+    if (!voteSection) return;
+    var container = voteSection.parentElement;
+    if (!container) return;
+
+    var memberParty = detectMemberParty();
+    addVoteFilters(container, voteSection, memberParty);
+
+    // enhance individual vote items
+    voteSection.querySelectorAll(":scope > div").forEach(function (item) {
       if (item.dataset.cwExp) return;
       var badge = item.querySelector(".vote-yes,.vote-no,.vote-not-voting,.vote-present");
       if (!badge) return;
 
       item.dataset.cwExp = "1";
 
-      var gtId = item.dataset.billGtId || "";
-      var billDisplay = item.dataset.billDisplay || "";
-      var voteResult = item.dataset.voteResult || "";
+      var gtId           = item.dataset.billGtId || "";
+      var billDisplay    = item.dataset.billDisplay || "";
+      var voteResult     = item.dataset.voteResult || "";
+      var position       = item.dataset.position || "";
+      var chamber        = item.dataset.chamber || "";
+      var mjrPctPlus     = item.dataset.mjrPctPlus || "";
+      var pctPlus        = item.dataset.pctPlus || "";
+      var questionDetails = item.dataset.questionDetails || "";
 
-      // grab truncated text element references
+      var alignment = memberParty
+        ? getPartyAlignment(memberParty, position, chamber, mjrPctPlus, pctPlus)
+        : null;
+
+      // ---- Inline party-alignment badge (always visible) ----
+      if (alignment) {
+        var ab = document.createElement("div");
+        ab.style.cssText =
+          "font-size:9px;padding:1px 5px;border-radius:3px;margin-top:4px;" +
+          "text-align:center;font-weight:600;white-space:nowrap;";
+        if (alignment === "with") {
+          ab.textContent = "w/ party";
+          ab.style.background = "hsl(var(--primary)/0.15)";
+          ab.style.color = "hsl(var(--primary))";
+        } else {
+          ab.textContent = "vs party";
+          ab.style.background = "hsla(0,70%,50%,0.15)";
+          ab.style.color = "hsl(0,70%,55%)";
+        }
+        badge.parentElement.appendChild(ab);
+      }
+
+      // grab truncated text-element refs
       var questionEl = item.querySelector(".line-clamp-2") || item.querySelector(".text-sm.text-foreground");
       var allXs = item.querySelectorAll(".line-clamp-1");
       var billTitleEl = allXs[0] || null;
-      var descEl = allXs[1] || null;
+      var descEl      = allXs[1] || null;
 
-      // build expanded panel
+      // build expandable panel
       var panel = document.createElement("div");
       panel.className = "cw-vote-panel";
       panel.style.cssText =
@@ -287,7 +458,6 @@
 
       var loaded = false;
 
-      // cursor + hover
       item.style.cursor = "pointer";
       item.style.transition = "background .15s";
       item.addEventListener("mouseenter", function () {
@@ -301,14 +471,12 @@
       if (textBox) textBox.appendChild(panel);
       else item.appendChild(panel);
 
-      // click to toggle
       item.addEventListener("click", function (ev) {
-        if (ev.target.tagName === "A") return;
+        if (ev.target.tagName === "A" || ev.target.closest(".cw-vote-filters")) return;
         var open = panel.style.display !== "none";
         panel.style.display = open ? "none" : "block";
         item.style.backgroundColor = open ? "" : "hsl(var(--muted)/0.25)";
 
-        // toggle line-clamp
         [questionEl, billTitleEl, descEl].forEach(function (el) {
           if (!el) return;
           if (open) {
@@ -320,108 +488,113 @@
           }
         });
 
-        // load content on first expand
         if (!open && !loaded) {
           loaded = true;
-          renderPanel(panel, gtId, billDisplay, voteResult, questionEl, billTitleEl);
+          renderPanel(panel, gtId, billDisplay, voteResult, alignment, questionDetails, questionEl, billTitleEl);
         }
       });
     });
   }
 
-  function renderPanel(panel, gtId, billDisplay, voteResult, questionEl, billTitleEl) {
-    var qText = (questionEl && questionEl.textContent) || "";
-    var bTitle = (billTitleEl && billTitleEl.textContent) || "";
+  /* -- Render expanded panel content -- */
+  function renderPanel(panel, gtId, billDisplay, voteResult, alignment, questionDetails, questionEl, billTitleEl) {
+    var qText  = (questionEl  && questionEl.textContent)  || "";
+    var bTitle = (billTitleEl && billTitleEl.textContent)  || "";
 
-    // Show loading state
     panel.innerHTML =
       '<div style="display:flex;align-items:center;gap:6px;color:hsl(var(--muted-foreground));">' +
-        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+          'style="animation:spin 1s linear infinite;"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>' +
         'Loading bill details\u2026' +
       '</div>' +
       '<style>@keyframes spin{to{transform:rotate(360deg)}}</style>';
 
     if (gtId) {
       fetchBillSummary(gtId).then(function (bill) {
-        if (!bill) {
-          panel.innerHTML = buildFallbackHtml(qText, bTitle, billDisplay);
-          return;
-        }
-        panel.innerHTML = buildBillHtml(bill, voteResult);
+        panel.innerHTML = buildExpandedHtml(bill, voteResult, alignment, questionDetails, qText, bTitle, billDisplay);
       });
     } else {
-      panel.innerHTML = buildFallbackHtml(qText, bTitle, billDisplay);
+      panel.innerHTML = buildExpandedHtml(null, voteResult, alignment, questionDetails, qText, bTitle, billDisplay);
     }
   }
 
-  function buildBillHtml(bill, voteResult) {
+  /* -- Build the expansion-panel HTML -- */
+  function buildExpandedHtml(bill, voteResult, alignment, questionDetails, qText, bTitle, billDisplay) {
     var html = "";
 
-    // Bill number + status row
-    var statusColor = voteResult && (voteResult.toLowerCase().indexOf("passed") !== -1 || voteResult.toLowerCase().indexOf("agreed") !== -1)
-      ? "color:hsl(var(--primary));font-weight:600;"
-      : "color:hsl(var(--muted-foreground));font-weight:600;";
-    html += '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px;">';
-    if (bill.number) {
-      html += '<span style="font-weight:700;color:hsl(var(--foreground));font-size:13px;">' + esc(bill.number) + '</span>';
+    // 1. Party-alignment badge (prominent)
+    if (alignment) {
+      var aColor, aBg, aLabel;
+      if (alignment === "with") {
+        aColor = "hsl(var(--primary))";
+        aBg    = "hsl(var(--primary)/0.12)";
+        aLabel = "\u2713 Voted with party";
+      } else {
+        aColor = "hsl(0,70%,55%)";
+        aBg    = "hsla(0,70%,50%,0.12)";
+        aLabel = "\u2717 Voted against party";
+      }
+      html += '<div style="display:inline-block;font-size:11px;font-weight:600;' +
+        'padding:3px 10px;border-radius:5px;background:' + aBg + ';color:' + aColor + ';' +
+        'margin-bottom:10px;">' + aLabel + '</div>';
     }
-    if (voteResult) {
-      html += '<span style="font-size:11px;padding:1px 6px;border-radius:4px;background:hsl(var(--muted)/0.5);' + statusColor + '">' + esc(voteResult) + '</span>';
-    }
-    html += '</div>';
 
-    // Summary / Title
-    if (bill.title) {
-      html += '<div style="margin-bottom:10px;line-height:1.7;">' + esc(bill.title) + '</div>';
+    // 2. Vote procedure (e.g. "On Motion to Suspend the Rules and Pass")
+    if (questionDetails) {
+      html += '<div style="font-size:11px;color:hsl(var(--muted-foreground));margin-bottom:8px;font-style:italic;">' +
+        esc(questionDetails) + '</div>';
     }
 
-    // Metadata row
+    // 3. Official bill title / purpose (different from the displayed short title)
+    if (bill && bill.officialTitle && bill.officialTitle !== bill.title) {
+      html += '<div style="margin-bottom:10px;line-height:1.7;color:hsl(var(--foreground)/0.85);">' +
+        esc(bill.officialTitle) + '</div>';
+    }
+
+    // 4. Metadata row
     var meta = [];
-    if (bill.sponsor) meta.push('<span>Sponsor: <strong style="color:hsl(var(--foreground));">' + esc(bill.sponsor) + '</strong></span>');
-    if (bill.cosponsors > 0) meta.push('<span>' + bill.cosponsors + ' cosponsor' + (bill.cosponsors !== 1 ? 's' : '') + '</span>');
-    if (bill.status) meta.push('<span>' + esc(bill.status) + (bill.statusDate ? ' (' + bill.statusDate + ')' : '') + '</span>');
+    if (bill) {
+      if (bill.sponsor) meta.push('<span>Sponsor: <strong style="color:hsl(var(--foreground));">' + esc(bill.sponsor) + '</strong></span>');
+      if (bill.cosponsors > 0) meta.push('<span>' + bill.cosponsors + ' cosponsor' + (bill.cosponsors !== 1 ? 's' : '') + '</span>');
+      if (bill.status) meta.push('<span>' + esc(bill.status) + (bill.statusDate ? ' (' + bill.statusDate + ')' : '') + '</span>');
+    }
     if (meta.length) {
-      html += '<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:hsl(var(--muted-foreground));margin-bottom:8px;">' + meta.join("") + '</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:hsl(var(--muted-foreground));margin-bottom:8px;">' +
+        meta.join("") + '</div>';
     }
 
-    // Links
-    html += '<div style="display:flex;gap:10px;margin-top:6px;">';
-    if (bill.link) {
-      html += '<a href="' + bill.link + '" target="_blank" rel="noopener noreferrer" ' +
+    // 5. Links
+    var links = "";
+    if (bill && bill.link) {
+      links += '<a href="' + bill.link + '" target="_blank" rel="noopener noreferrer" ' +
         'style="color:hsl(var(--primary));font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:3px;" ' +
         'onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">' +
         'View on GovTrack \u2197</a>';
     }
-    if (bill.congressDotGov) {
-      html += '<a href="' + bill.congressDotGov + '" target="_blank" rel="noopener noreferrer" ' +
+    if (bill && bill.congressDotGov) {
+      links += '<a href="' + bill.congressDotGov + '" target="_blank" rel="noopener noreferrer" ' +
         'style="color:hsl(var(--primary));font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:3px;" ' +
         'onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">' +
         'Congress.gov \u2197</a>';
     }
-    html += '</div>';
-
-    return html;
-  }
-
-  function buildFallbackHtml(qText, bTitle, billDisplay) {
-    var html = "";
-    if (qText) html += '<div style="font-weight:500;color:hsl(var(--foreground));margin-bottom:4px;">' + esc(qText) + "</div>";
-    if (bTitle && bTitle !== qText) html += '<div style="margin-bottom:4px;">' + esc(bTitle) + "</div>";
-
-    var searchQ = encodeURIComponent(billDisplay || bTitle || qText);
-    html += '<div style="display:flex;gap:10px;margin-top:4px;">' +
-      '<a href="https://www.govtrack.us/congress/bills/#text=' + searchQ + '" ' +
+    if (!bill) {
+      var searchQ = encodeURIComponent(billDisplay || bTitle || qText);
+      links += '<a href="https://www.govtrack.us/congress/bills/#text=' + searchQ + '" ' +
         'target="_blank" rel="noopener noreferrer" ' +
         'style="color:hsl(var(--primary));font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:3px;" ' +
         'onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">' +
         'Search GovTrack \u2197</a>' +
-      '<a href="https://www.congress.gov/search?q=' + searchQ + '" ' +
+        '<a href="https://www.congress.gov/search?q=' + searchQ + '" ' +
         'target="_blank" rel="noopener noreferrer" ' +
         'style="color:hsl(var(--primary));font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:3px;" ' +
         'onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">' +
-        'Congress.gov \u2197</a>' +
-    "</div>";
-    return html;
+        'Congress.gov \u2197</a>';
+    }
+    if (links) {
+      html += '<div style="display:flex;gap:10px;margin-top:6px;">' + links + '</div>';
+    }
+
+    return html || '<div style="color:hsl(var(--muted-foreground));">No additional details available.</div>';
   }
 
   function esc(s) {
