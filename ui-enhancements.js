@@ -448,7 +448,10 @@
       recount = setTimeout(function () { applyFilters(false); }, 200);
     }).observe(voteSection, { childList: true });
 
-    applyFilters(false);
+    // Store applyFilters so enhanceVotes can call it after marking items
+    container._cwApplyFilters = applyFilters;
+
+    // Don't run initial applyFilters here — wait for enhanceVotes to mark items first
   }
 
   /* -- Main vote enhancement entry point -- */
@@ -500,11 +503,21 @@
         badge.parentElement.appendChild(ab);
       }
 
-      // grab truncated text-element refs
+      // Remove line-clamp truncation so full text is always visible
       var questionEl = item.querySelector(".line-clamp-2") || item.querySelector(".text-sm.text-foreground");
       var allXs = item.querySelectorAll(".line-clamp-1");
       var billTitleEl = allXs[0] || null;
       var descEl      = allXs[1] || null;
+
+      [questionEl, billTitleEl, descEl].forEach(function (el) {
+        if (!el) return;
+        el.style.webkitLineClamp = "unset";
+        el.style.overflow = "visible";
+        el.style.display = "block";
+        el.style.whiteSpace = "normal";
+        el.style.textOverflow = "unset";
+        el.classList.remove("line-clamp-1", "line-clamp-2", "truncate");
+      });
 
       // build expandable panel
       var panel = document.createElement("div");
@@ -535,23 +548,15 @@
         panel.style.display = open ? "none" : "block";
         item.style.backgroundColor = open ? "" : "hsl(var(--muted)/0.25)";
 
-        [questionEl, billTitleEl, descEl].forEach(function (el) {
-          if (!el) return;
-          if (open) {
-            el.style.webkitLineClamp = "";
-            el.style.display = "";
-          } else {
-            el.style.webkitLineClamp = "unset";
-            el.style.overflow = "visible";
-          }
-        });
-
         if (!open && !loaded) {
           loaded = true;
           renderPanel(panel, gtId, billDisplay, voteResult, alignment, questionDetails, questionEl, billTitleEl);
         }
       });
     });
+
+    // Now that all items are marked with cwExp, trigger pagination
+    if (container._cwApplyFilters) container._cwApplyFilters(false);
   }
 
   /* -- Render expanded panel content -- */
