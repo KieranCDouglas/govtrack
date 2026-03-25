@@ -275,16 +275,19 @@
       });
     }
 
-    // Intercept stats.json to recompute from live members if available
+    // Intercept stats.json — fetch live counts from GovTrack API
+    // (Voteview includes resigned/replaced members; GovTrack has only current)
     if (url.indexOf("stats.json") !== -1) {
-      var cachedMembers = getCachedMembers();
-      if (cachedMembers) {
-        var stats = computeStats(cachedMembers);
-        return Promise.resolve(new Response(JSON.stringify(stats), {
-          status: 200,
-          headers: { "Content-Type": "application/json" }
-        }));
-      }
+      return fetchGovTrackStats().then(function (stats) {
+        if (stats) {
+          return new Response(JSON.stringify(stats), {
+            status: 200,
+            headers: { "Content-Type": "application/json" }
+          });
+        }
+        // Fall back to static stats.json
+        return originalFetch.apply(window, [input, init]);
+      });
     }
 
     // Cache members-index.json when it's fetched by the bundle
@@ -302,32 +305,71 @@
   };
 
   /**
-   * Compute stats from member data.
-   * All members in members-current.json are currently serving.
+   * Fetch current member counts from GovTrack API.
+   * Uses role?current=true with limit=1 to get meta.total_count for each slice.
+   * Caches in sessionStorage for the browser session.
    */
-  function computeStats(members) {
-    var house = 0, senate = 0, dems = 0, reps = 0, inds = 0;
-    for (var i = 0; i < members.length; i++) {
-      var m = members[i];
-      if (m.chamber === "House") house++;
-      else senate++;
-      if (m.party === "Democrat") dems++;
-      else if (m.party === "Republican") reps++;
-      else inds++;
+  var _govtrackStatsCache = null;
+  function fetchGovTrackStats() {
+    if (_govtrackStatsCache) return Promise.resolve(_govtrackStatsCache);
+
+    // Check sessionStorage first
+    try {
+      var cached = sessionStorage.getItem("cw_govtrack_stats");
+      if (cached) {
+        _govtrackStatsCache = JSON.parse(cached);
+        return Promise.resolve(_govtrackStatsCache);
+      }
+    } catch (e) { /* ignore */ }
+
+    var API = "https://www.govtrack.us/api/v2/role?current=true&limit=1";
+    function getCount(extra) {
+      return originalFetch.call(window, API + (extra || ""))
+        .then(function (r) { return r.json(); })
+        .then(function (d) { return d.meta ? d.meta.total_count : 0; });
     }
 
-    // Get historical count from index if available
-    var historicalCount = _membersIndex ? _membersIndex.length : 12579;
+    return Promise.all([
+      getCount(""),
+      getCount("&role_type=representative"),
+      getCount("&role_type=senator"),
+      getCount("&party=Democrat"),
+      getCount("&party=Republican")
+    ]).then(function (counts) {
+      var historicalCount = _membersIndex ? _membersIndex.length : 12579;
 
-    return {
-      total_historical: historicalCount,
-      current_total: members.length,
-      current_house: house,
-      current_senate: senate,
-      current_dems: dems,
-      current_reps: reps,
-      current_ind: inds
-    };
+      // Compute full-congress totals from Voteview cached members
+      var cachedMembers = getCachedMembers();
+      var congressTotal = 0, congressHouse = 0, congressSenate = 0;
+      if (cachedMembers) {
+        congressTotal = cachedMembers.length;
+        for (var i = 0; i < cachedMembers.length; i++) {
+          if (cachedMembers[i].chamber === "House") congressHouse++;
+          else congressSenate++;
+        }
+      }
+
+      var stats = {
+        total_historical: historicalCount,
+        current_total: counts[0],
+        current_house: counts[1],
+        current_senate: counts[2],
+        current_dems: counts[3],
+        current_reps: counts[4],
+        current_ind: counts[0] - counts[3] - counts[4],
+        congress: CONGRESS,
+        congress_total: congressTotal || 547,
+        congress_house: congressHouse || 445,
+        congress_senate: congressSenate || 102
+      };
+      _govtrackStatsCache = stats;
+      try { sessionStorage.setItem("cw_govtrack_stats", JSON.stringify(stats)); } catch (e) { /* ignore */ }
+      console.log("[CongressWatch] Live stats from GovTrack:", stats);
+      return stats;
+    }).catch(function (err) {
+      console.warn("[CongressWatch] GovTrack stats fetch failed, using static:", err.message);
+      return null;
+    });
   }
 
   /* ================================================================

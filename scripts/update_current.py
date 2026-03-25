@@ -260,36 +260,72 @@ def update_members_current(congress, index):
 
 
 def update_stats(members_current, index):
-    """Regenerate stats.json from current members."""
+    """Regenerate stats.json using GovTrack API for current member counts.
+    
+    Voteview includes all members who served in a congress (including resigned/replaced),
+    while GovTrack tracks only currently serving members. We use GovTrack for accurate
+    current counts and the index for the historical total.
+    """
     print("=== Updating stats.json ===")
-    house = senate = dems = reps = inds = 0
-    for m in members_current:
-        if m["chamber"] == "House":
-            house += 1
-        else:
-            senate += 1
-        p = m["party"]
-        if p == "Democrat":
-            dems += 1
-        elif p == "Republican":
-            reps += 1
-        else:
-            inds += 1
+
+    # Try GovTrack API for accurate current counts
+    govtrack_api = "https://www.govtrack.us/api/v2/role?current=true&limit=1"
+
+    def get_count(extra=""):
+        url = govtrack_api + extra
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, context=ctx, timeout=30) as r:
+            data = json.loads(r.read())
+            return data.get("meta", {}).get("total_count", 0)
+
+    try:
+        total = get_count()
+        house = get_count("&role_type=representative")
+        senate = get_count("&role_type=senator")
+        dems = get_count("&party=Democrat")
+        reps = get_count("&party=Republican")
+        inds = total - dems - reps
+        print(f"  GovTrack API: Total={total} H={house} S={senate} D={dems} R={reps} I={inds}")
+    except Exception as e:
+        print(f"  GovTrack API failed ({e}), falling back to Voteview counts")
+        house = senate = dems = reps = inds = 0
+        for m in members_current:
+            if m["chamber"] == "House":
+                house += 1
+            else:
+                senate += 1
+            p = m["party"]
+            if p == "Democrat":
+                dems += 1
+            elif p == "Republican":
+                reps += 1
+            else:
+                inds += 1
+        total = len(members_current)
+
+    # Compute full-congress totals from Voteview (includes resigned/replaced members)
+    vv_house = sum(1 for m in members_current if m["chamber"] == "House")
+    vv_senate = sum(1 for m in members_current if m["chamber"] == "Senate")
+    vv_total = len(members_current)
 
     stats = {
         "total_historical": len(index),
-        "current_total": len(members_current),
+        "current_total": total,
         "current_house": house,
         "current_senate": senate,
         "current_dems": dems,
         "current_reps": reps,
         "current_ind": inds,
+        "congress": int(sys.argv[1]) if len(sys.argv) > 1 else 119,
+        "congress_total": vv_total,
+        "congress_house": vv_house,
+        "congress_senate": vv_senate,
     }
 
     with open(os.path.join(DATA_DIR, "stats.json"), "w") as f:
         json.dump(stats, f, separators=(",", ":"))
 
-    print(f"  Total: {len(members_current)} (H:{house} S:{senate} D:{dems} R:{reps} I:{inds})")
+    print(f"  Written: Total={total} (H:{house} S:{senate} D:{dems} R:{reps} I:{inds})")
 
 
 def update_vote_data(congress):
