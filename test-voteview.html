@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head><title>Test Voteview Loader</title></head>
+<body>
+<pre id="log"></pre>
+<script>
+function log(msg) {
+  document.getElementById('log').textContent += msg + '\n';
+}
+
+// Simulate the data-loader.js setup
+var originalFetch = window.fetch;
+
+function parseCSVRobust(text) {
+  var lines = text.split("\n");
+  if (lines.length < 2) return [];
+  function parseLine(line) {
+    var fields = [];
+    var field = "";
+    var inQ = false;
+    for (var i = 0; i < line.length; i++) {
+      var ch = line[i];
+      if (inQ) {
+        if (ch === '"') {
+          if (i + 1 < line.length && line[i + 1] === '"') { field += '"'; i++; }
+          else { inQ = false; }
+        } else { field += ch; }
+      } else {
+        if (ch === '"') { inQ = true; }
+        else if (ch === ",") { fields.push(field.trim()); field = ""; }
+        else if (ch !== "\r") { field += ch; }
+      }
+    }
+    fields.push(field.trim());
+    return fields;
+  }
+  var headers = parseLine(lines[0]);
+  var rows = [];
+  for (var i = 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    var values = parseLine(lines[i]);
+    var obj = {};
+    for (var j = 0; j < headers.length && j < values.length; j++) { obj[headers[j]] = values[j]; }
+    rows.push(obj);
+  }
+  return rows;
+}
+
+async function test() {
+  try {
+    // 1. Load members index
+    log("Loading members-index.json...");
+    var indexResp = await fetch('./data/members-index.json');
+    var index = await indexResp.json();
+    log("Loaded " + index.length + " members");
+
+    // 2. Find S000055
+    var member = index.find(function(m) { return m.b === "S000055"; });
+    log("Member: " + JSON.stringify(member));
+
+    if (!member) { log("FAIL: Member not found"); return; }
+
+    // 3. Load S102 votes  
+    var chamberCode = member.c;
+    var congress = member.l;
+    var key = chamberCode + congress;
+    log("Loading Voteview data for " + key + "...");
+
+    var votesUrl = "https://voteview.com/static/data/out/votes/" + key + "_votes.csv";
+    var rollcallsUrl = "https://voteview.com/static/data/out/rollcalls/" + key + "_rollcalls.csv";
+
+    var [votesResp, rollcallsResp] = await Promise.all([
+      fetch(votesUrl), fetch(rollcallsUrl)
+    ]);
+
+    log("Votes fetch status: " + votesResp.status);
+    log("Rollcalls fetch status: " + rollcallsResp.status);
+
+    var votesText = await votesResp.text();
+    var rollcallsText = await rollcallsResp.text();
+
+    log("Votes CSV size: " + votesText.length + " bytes");
+    log("Rollcalls CSV size: " + rollcallsText.length + " bytes");
+
+    // Parse votes
+    var voteLines = votesText.split("\n");
+    var icpsrVotes = {};
+    for (var i = 1; i < voteLines.length; i++) {
+      var line = voteLines[i];
+      if (!line || line.length < 5) continue;
+      var cols = line.split(",");
+      if (cols.length < 5) continue;
+      var ic = cols[3].trim();
+      if (!icpsrVotes[ic]) icpsrVotes[ic] = {};
+      icpsrVotes[ic][cols[2].trim()] = parseInt(cols[4], 10);
+    }
+    log("Unique ICPSRs in votes: " + Object.keys(icpsrVotes).length);
+
+    var icpsrStr = String(member.i);
+    var myVotes = icpsrVotes[icpsrStr] || {};
+    log("ICPSR " + icpsrStr + " votes: " + Object.keys(myVotes).length);
+
+    // Parse rollcalls
+    var rollcalls = parseCSVRobust(rollcallsText);
+    log("Rollcalls parsed: " + rollcalls.length);
+    if (rollcalls[0]) log("Rollcall keys: " + Object.keys(rollcalls[0]).join(", "));
+
+    // Join
+    var matched = 0;
+    for (var j = 0; j < rollcalls.length; j++) {
+      var rn = rollcalls[j].rollnumber;
+      if (myVotes[rn] !== undefined) matched++;
+    }
+    log("Matched votes after join: " + matched);
+
+  } catch (err) {
+    log("ERROR: " + err.message + "\n" + err.stack);
+  }
+}
+
+test();
+</script>
+</body>
+</html>

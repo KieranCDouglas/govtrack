@@ -287,6 +287,16 @@
       }
     }
 
+    // Cache members-index.json when it's fetched by the bundle
+    if (url.indexOf("members-index.json") !== -1) {
+      return originalFetch.apply(window, arguments).then(function (resp) {
+        resp.clone().json().then(function (data) {
+          _membersIndex = data;
+        });
+        return resp;
+      });
+    }
+
     // Pass through all other requests
     return originalFetch.apply(window, arguments);
   };
@@ -317,5 +327,148 @@
       current_ind: inds
     };
   }
+
+  /* ================================================================
+     VOTEVIEW  VOTE  DATA  LOADING
+     Uses pre-processed local JSON files (data/votes/{C}{congress}.json)
+     generated from Voteview CSV data by scripts/fetch_vote_data.py.
+
+     JSON format:
+       r: [[rollnum,date,bill,question,result,yea,nay,desc], ...]
+       v: { "icpsr": "16119..." }  (cast codes as single-digit string)
+     ================================================================ */
+
+  var _membersIndex = null;
+  var _congressVoteCache = {}; // "H119" -> parsed JSON data
+
+  function ensureMembersIndex() {
+    if (_membersIndex) return Promise.resolve(_membersIndex);
+    return originalFetch.call(window, "./data/members-index.json")
+      .then(function (r) { return r.json(); })
+      .then(function (data) { _membersIndex = data; return data; });
+  }
+
+  /**
+   * Load and cache pre-processed vote data for a chamber/congress pair.
+   */
+  function loadCongressVoteData(chamberCode, congress) {
+    var key = chamberCode + congress;
+    if (_congressVoteCache[key]) return Promise.resolve(_congressVoteCache[key]);
+
+    var url = "./data/votes/" + key + ".json";
+    return originalFetch.call(window, url).then(function (r) {
+      if (!r.ok) throw new Error(key + " " + r.status);
+      return r.json();
+    }).then(function (data) {
+      _congressVoteCache[key] = data;
+      return data;
+    });
+  }
+
+  function castCodeToPosition(cc) {
+    if (cc >= 1 && cc <= 3) return "Yes";
+    if (cc >= 4 && cc <= 6) return "No";
+    if (cc === 7) return "Present";
+    return "Not Voting";
+  }
+
+  /**
+   * Get a specific member's votes for one congress from pre-processed data.
+   * Rollcall format: [rollnum, date, bill, question, result, yea, nay, desc]
+   * Vote string: one digit per rollcall (0=missing, 1-3=Yea, 4-6=Nay, 7=Present, 8-9=NV)
+   */
+  function getMemberVotesForCongress(icpsr, chamberCode, congress) {
+    return loadCongressVoteData(chamberCode, congress).then(function (data) {
+      var voteStr = data.v[String(icpsr)] || "";
+      if (!voteStr) return [];
+
+      var out = [];
+      var chLabel = chamberCode === "H" ? "House" : "Senate";
+
+      for (var i = 0; i < data.r.length; i++) {
+        var cc = parseInt(voteStr.charAt(i), 10) || 0;
+        if (cc === 0) continue; // missing
+
+        var rc = data.r[i];
+        // rc: [rollnum, date, bill, question, result, yea, nay, desc]
+        out.push({
+          question: rc[3] || "Roll Call Vote #" + rc[0],
+          position: castCodeToPosition(cc),
+          voteDate: rc[1] || "",
+          result: rc[4] || undefined,
+          billId: rc[2] || undefined,
+          billTitle: rc[7] || undefined,
+          description: undefined,
+          category: undefined,
+          chamber: chLabel,
+          congress: congress,
+          voteId: rc[0] || 0,
+          totalPlus: rc[5] || 0,
+          totalMinus: rc[6] || 0,
+          totalOther: 0,
+          questionDetails: rc[7] || undefined
+        });
+      }
+      return out;
+    });
+  }
+
+  /**
+   * Global hook called by the bundle's ra() function.
+   * Loads voting records from pre-processed Voteview data files.
+   */
+  window.__cwLoadVotes = function (bioguideId, govtrackId) {
+    return ensureMembersIndex().then(function () {
+      var member = null;
+      for (var i = 0; i < _membersIndex.length; i++) {
+        var m = _membersIndex[i];
+        if (m.b === bioguideId || (govtrackId && m.g === govtrackId)) {
+          member = m;
+          break;
+        }
+      }
+
+      if (!member || !member.i) {
+        console.warn("[CongressWatch] No ICPSR for", bioguideId);
+        return { votes: [], source: "voteview", totalCount: 0 };
+      }
+
+      var icpsr = member.i;
+      var ch = member.c; // "H" or "S"
+      var last = member.l;
+      var first = member.fc || last;
+
+      // Load up to 5 most recent congresses
+      var congresses = [];
+      for (var c = last; c >= first && congresses.length < 5; c--) {
+        congresses.push(c);
+      }
+
+      console.log("[CongressWatch] Loading votes for ICPSR", icpsr,
+        ch === "H" ? "House" : "Senate", "congresses:", congresses.join(","));
+
+      return Promise.all(congresses.map(function (cong) {
+        return getMemberVotesForCongress(icpsr, ch, cong)
+          .catch(function (err) {
+            console.warn("[CongressWatch] No vote data for", ch + cong, err.message);
+            return [];
+          });
+      })).then(function (arrays) {
+        var all = [];
+        for (var j = 0; j < arrays.length; j++) {
+          all = all.concat(arrays[j]);
+        }
+        all.sort(function (a, b) {
+          return (b.voteDate || "").localeCompare(a.voteDate || "");
+        });
+
+        console.log("[CongressWatch] Loaded", all.length, "total votes");
+        return { votes: all, source: "voteview", totalCount: all.length };
+      });
+    }).catch(function (err) {
+      console.error("[CongressWatch] Vote loading failed:", err);
+      return { votes: [], source: "error", totalCount: 0 };
+    });
+  };
 
 })();
