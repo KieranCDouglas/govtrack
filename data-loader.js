@@ -175,6 +175,7 @@
         compassX: compass.compassX,
         compassY: compass.compassY,
         govtrackId: staticData ? staticData.govtrackId : null,
+        isCurrent: staticData ? (staticData.isCurrent !== false) : false,
         policyHeterodoxy: staticData ? staticData.policyHeterodoxy : {}
       });
     }
@@ -292,11 +293,14 @@
 
   /**
    * Compute stats from member data.
+   * Only count members marked as currently serving (isCurrent or has govtrackId).
    */
   function computeStats(members) {
     var house = 0, senate = 0, dems = 0, reps = 0, inds = 0;
     for (var i = 0; i < members.length; i++) {
       var m = members[i];
+      // Only count currently serving members
+      if (!m.isCurrent && !m.govtrackId) continue;
       if (m.chamber === "House") house++;
       else senate++;
       if (m.party === "Democrat") dems++;

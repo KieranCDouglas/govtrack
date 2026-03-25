@@ -137,8 +137,10 @@ def safe_int(val):
 
 
 def fetch_govtrack_ids(members):
-    """Fetch GovTrack person IDs for current members via role endpoint."""
+    """Fetch GovTrack person IDs for current members via role endpoint.
+    Returns the set of bioguide IDs that have a current role (truly serving now)."""
     print("  Fetching GovTrack person IDs...")
+    current_bioguides = set()
     offset = 0
     limit = 100
     while True:
@@ -166,11 +168,15 @@ def fetch_govtrack_ids(members):
                         pass
             if bio_id in members and gt_id:
                 members[bio_id]["govtrackId"] = gt_id
+            if bio_id:
+                current_bioguides.add(bio_id)
         offset += limit
         if offset >= data.get("meta", {}).get("total_count", 0):
             break
     found = sum(1 for m in members.values() if m["govtrackId"] is not None)
     print(f"  Matched {found}/{len(members)} GovTrack IDs")
+    print(f"  GovTrack reports {len(current_bioguides)} currently serving members")
+    return current_bioguides
 
 
 def compute_compass(members):
@@ -298,7 +304,11 @@ def main():
 
     # 2. Fetch GovTrack IDs
     print("\n[2/5] Fetching GovTrack person IDs...")
-    fetch_govtrack_ids(members)
+    current_bioguides = fetch_govtrack_ids(members)
+
+    # Mark isCurrent based on GovTrack's current role data
+    for bio_id, m in members.items():
+        m["isCurrent"] = bio_id in current_bioguides
 
     # 3. Compute compass coordinates
     print("\n[3/5] Computing compass coordinates...")
@@ -341,16 +351,19 @@ def main():
         json.dump(members_list, f, separators=(",", ":"))
     print(f"  Wrote {current_path} ({len(members_list)} members)")
 
-    # stats.json
-    dems = sum(1 for m in members_list if m["party"] == "Democrat")
-    reps = sum(1 for m in members_list if m["party"] == "Republican")
-    inds = sum(1 for m in members_list if m["party"] == "Independent")
-    house = sum(1 for m in members_list if m["chamber"] == "House")
-    senate = sum(1 for m in members_list if m["chamber"] == "Senate")
+    # stats.json — only count currently serving members (per GovTrack)
+    current_members = [m for m in members_list if m.get("isCurrent", False)]
+    dems = sum(1 for m in current_members if m["party"] == "Democrat")
+    reps = sum(1 for m in current_members if m["party"] == "Republican")
+    inds = sum(1 for m in current_members if m["party"] == "Independent")
+    house = sum(1 for m in current_members if m["chamber"] == "House")
+    senate = sum(1 for m in current_members if m["chamber"] == "Senate")
+
+    print(f"  Currently serving: {len(current_members)} (House: {house}, Senate: {senate})")
 
     stats = {
         "total_historical": 12579,  # Updated when index is rebuilt
-        "current_total": len(members_list),
+        "current_total": len(current_members),
         "current_house": house,
         "current_senate": senate,
         "current_dems": dems,
