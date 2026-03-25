@@ -328,6 +328,9 @@
         '<option value="with">With party</option>' +
         '<option value="against">Against party</option>' +
       '</select>' +
+      '<select class="cw-vote-congress-filter" style="' + inputCss + '">' +
+        '<option value="">All congresses</option>' +
+      '</select>' +
       '<span class="cw-vote-count" style="font-size:11px;color:hsl(var(--muted-foreground));white-space:nowrap;"></span>';
 
     container.insertBefore(bar, voteSection);
@@ -363,6 +366,7 @@
     var searchIn = bar.querySelector(".cw-vote-search");
     var posSel  = bar.querySelector(".cw-vote-pos-filter");
     var ptySel  = bar.querySelector(".cw-vote-party-filter");
+    var congSel = bar.querySelector(".cw-vote-congress-filter");
     var countEl = bar.querySelector(".cw-vote-count");
 
     var currentPage = 0;
@@ -373,6 +377,7 @@
       var q = searchIn.value.toLowerCase().trim();
       var pv = posSel.value;
       var pa = ptySel.value;
+      var cv = congSel.value;
       var matching = [];
 
       voteSection.querySelectorAll(":scope > div").forEach(function (item) {
@@ -386,6 +391,10 @@
           if (pv === "yea"  && pos !== "yes" && pos !== "yea") show = false;
           if (pv === "nay"  && pos !== "no"  && pos !== "nay") show = false;
           if (pv === "nv"   && pos !== "not voting")           show = false;
+        }
+
+        if (show && cv) {
+          if ((item.dataset.congress || "") !== cv) show = false;
         }
 
         if (show && pa && memberParty) {
@@ -440,12 +449,39 @@
     searchIn.addEventListener("input", function () { applyFilters(true); });
     posSel.addEventListener("change", function () { applyFilters(true); });
     ptySel.addEventListener("change", function () { applyFilters(true); });
+    congSel.addEventListener("change", function () { applyFilters(true); });
 
     // debounced re-count when new items appear
     var recount;
+    function populateCongressFilter() {
+      var congresses = new Set();
+      voteSection.querySelectorAll(":scope > div[data-congress]").forEach(function (item) {
+        var c = item.dataset.congress;
+        if (c) congresses.add(c);
+      });
+      var sorted = Array.from(congresses).sort(function (a, b) { return Number(b) - Number(a); });
+      if (sorted.length <= 1) {
+        congSel.style.display = "none";
+      } else {
+        // Preserve current selection
+        var cur = congSel.value;
+        congSel.innerHTML = '<option value="">All congresses</option>';
+        sorted.forEach(function (c) {
+          var opt = document.createElement("option");
+          opt.value = c;
+          opt.textContent = "Congress " + c;
+          congSel.appendChild(opt);
+        });
+        congSel.value = cur;
+        congSel.style.display = "";
+      }
+    }
     new MutationObserver(function () {
       clearTimeout(recount);
-      recount = setTimeout(function () { applyFilters(false); }, 200);
+      recount = setTimeout(function () {
+        populateCongressFilter();
+        applyFilters(false);
+      }, 200);
     }).observe(voteSection, { childList: true });
 
     // Store applyFilters so enhanceVotes can call it after marking items
