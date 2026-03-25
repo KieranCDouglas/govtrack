@@ -176,8 +176,114 @@
     function run() {
       addCompassLegends();
       enhanceVotes();
+      injectMemberSummary();
     }
   });
+
+  /* ---- 2a-pre  Member policy summary injection ---- */
+
+  var _summariesData = null;
+  var _summariesLoading = false;
+  var _summariesCallbacks = [];
+
+  function loadSummaries(cb) {
+    if (_summariesData) { cb(_summariesData); return; }
+    _summariesCallbacks.push(cb);
+    if (_summariesLoading) return;
+    _summariesLoading = true;
+
+    var base = window.location.pathname.split("/").filter(Boolean).slice(0, -1).join("/");
+    var prefix = base ? "/" + base : ".";
+    fetch(prefix + "/data/member-summaries.json")
+      .then(function (r) { return r.ok ? r.json() : {}; })
+      .then(function (data) {
+        _summariesData = data;
+        _summariesCallbacks.forEach(function (fn) { fn(data); });
+        _summariesCallbacks = [];
+      })
+      .catch(function () {
+        _summariesData = {};
+        _summariesCallbacks.forEach(function (fn) { fn({}); });
+        _summariesCallbacks = [];
+      });
+  }
+
+  function injectMemberSummary() {
+    // Only on member detail pages: /#/members/{bioguideId}
+    var hash = window.location.hash || "";
+    var match = hash.match(/^#\/members\/([A-Z]\d{5,6})$/);
+    if (!match) return;
+    var bioguideId = match[1];
+
+    // Find the "Issue Positions" card
+    var headings = document.querySelectorAll("h2");
+    var positionsCard = null;
+    headings.forEach(function (h) {
+      if (h.textContent.trim() === "Issue Positions") {
+        positionsCard = h.closest(".bg-card");
+      }
+    });
+    if (!positionsCard) return;
+
+    // Don't inject twice
+    if (positionsCard.querySelector("[data-cw-summary]")) return;
+
+    loadSummaries(function (summaries) {
+      var summary = summaries[bioguideId];
+      if (!summary) return;
+
+      // Find the Issue Positions heading
+      var h2 = null;
+      positionsCard.querySelectorAll("h2").forEach(function (h) {
+        if (h.textContent.trim() === "Issue Positions") h2 = h;
+      });
+      if (!h2) return;
+
+      // Create summary block and insert after the heading
+      var block = document.createElement("div");
+      block.setAttribute("data-cw-summary", "true");
+      block.style.cssText = "margin-bottom:16px;padding:12px 14px;border-radius:8px;"
+        + "background:hsl(var(--muted)/0.3);border:1px solid hsl(var(--border)/0.5);";
+
+      // Parse summary: split into prose paragraph and bullet points
+      var parts = summary.split("\n");
+      var proseLines = [];
+      var bulletLines = [];
+      parts.forEach(function (line) {
+        var trimmed = line.trim();
+        if (trimmed.match(/^[-•]\s/)) {
+          bulletLines.push(trimmed.replace(/^[-•]\s*/, ""));
+        } else if (trimmed.length > 0) {
+          proseLines.push(trimmed);
+        }
+      });
+
+      var text = document.createElement("p");
+      text.style.cssText = "font-size:13px;line-height:1.65;color:hsl(var(--foreground));margin:0;";
+      text.textContent = proseLines.join(" ");
+      block.appendChild(text);
+
+      if (bulletLines.length > 0) {
+        var ul = document.createElement("ul");
+        ul.style.cssText = "margin:10px 0 0 0;padding-left:18px;list-style:disc;";
+        bulletLines.forEach(function (b) {
+          var li = document.createElement("li");
+          li.style.cssText = "font-size:12.5px;line-height:1.55;color:hsl(var(--foreground));margin-bottom:4px;";
+          li.textContent = b;
+          ul.appendChild(li);
+        });
+        block.appendChild(ul);
+      }
+
+      var label = document.createElement("div");
+      label.style.cssText = "font-size:10px;color:hsl(var(--muted-foreground));margin-top:6px;font-style:italic;";
+      label.textContent = "AI-generated summary based on voting record and ideology scores.";
+      block.appendChild(label);
+
+      // Insert after the h2
+      h2.insertAdjacentElement("afterend", block);
+    });
+  }
 
   /* ---- 2a  Compass axis-explanation boxes ---- */
 
