@@ -298,6 +298,8 @@
     return memberVotedYea === dPositionYea ? "with" : "against";
   }
 
+  var VOTES_PER_PAGE = 15;
+
   /* -- Filter bar above vote list -- */
   function addVoteFilters(container, voteSection, memberParty) {
     if (container.querySelector(".cw-vote-filters")) return;
@@ -330,26 +332,55 @@
 
     container.insertBefore(bar, voteSection);
 
+    /* ---- Pagination controls (inserted after vote list) ---- */
+    var pagBar = document.createElement("div");
+    pagBar.className = "cw-vote-pagination";
+    pagBar.style.cssText =
+      "display:flex;justify-content:center;align-items:center;gap:10px;" +
+      "margin-top:14px;padding:8px 0;";
+
+    var btnCss =
+      "padding:6px 14px;border-radius:6px;border:1px solid hsl(var(--border));" +
+      "background:hsl(var(--muted)/0.3);color:hsl(var(--foreground));" +
+      "font-size:12px;cursor:pointer;transition:background .15s;";
+
+    pagBar.innerHTML =
+      '<button class="cw-page-prev" style="' + btnCss + '">Previous</button>' +
+      '<span class="cw-page-info" style="font-size:12px;color:hsl(var(--muted-foreground));"></span>' +
+      '<button class="cw-page-next" style="' + btnCss + '">Next</button>';
+
+    // Insert after voteSection
+    if (voteSection.nextSibling) {
+      container.insertBefore(pagBar, voteSection.nextSibling);
+    } else {
+      container.appendChild(pagBar);
+    }
+
+    var prevBtn  = pagBar.querySelector(".cw-page-prev");
+    var nextBtn  = pagBar.querySelector(".cw-page-next");
+    var pageInfo = pagBar.querySelector(".cw-page-info");
+
     var searchIn = bar.querySelector(".cw-vote-search");
     var posSel  = bar.querySelector(".cw-vote-pos-filter");
     var ptySel  = bar.querySelector(".cw-vote-party-filter");
     var countEl = bar.querySelector(".cw-vote-count");
 
-    function applyFilters() {
+    var currentPage = 0;
+
+    function applyFilters(resetPage) {
+      if (resetPage) currentPage = 0;
+
       var q = searchIn.value.toLowerCase().trim();
       var pv = posSel.value;
       var pa = ptySel.value;
-      var total = 0, shown = 0;
+      var matching = [];
 
       voteSection.querySelectorAll(":scope > div").forEach(function (item) {
-        if (!item.dataset.cwExp) return;           // skip non-vote divs
-        total++;
+        if (!item.dataset.cwExp) return;
         var show = true;
 
-        // text search
         if (q && item.textContent.toLowerCase().indexOf(q) === -1) show = false;
 
-        // position filter
         if (show && pv) {
           var pos = (item.dataset.position || "").toLowerCase();
           if (pv === "yea"  && pos !== "yes" && pos !== "yea") show = false;
@@ -357,7 +388,6 @@
           if (pv === "nv"   && pos !== "not voting")           show = false;
         }
 
-        // party-alignment filter
         if (show && pa && memberParty) {
           var al = getPartyAlignment(
             memberParty,
@@ -370,27 +400,55 @@
           if (pa === "against" && al !== "against") show = false;
         }
 
-        item.style.display = show ? "" : "none";
-        if (show) shown++;
+        if (show) matching.push(item);
+        else item.style.display = "none";
       });
 
-      countEl.textContent = shown < total
-        ? shown + " of " + total + " votes"
-        : total + " votes";
+      var totalMatching = matching.length;
+      var totalPages = Math.max(1, Math.ceil(totalMatching / VOTES_PER_PAGE));
+      if (currentPage >= totalPages) currentPage = totalPages - 1;
+      var start = currentPage * VOTES_PER_PAGE;
+      var end = start + VOTES_PER_PAGE;
+
+      matching.forEach(function (item, idx) {
+        item.style.display = (idx >= start && idx < end) ? "" : "none";
+      });
+
+      var showingEnd = Math.min(end, totalMatching);
+      countEl.textContent = totalMatching + " votes";
+
+      // Update pagination bar
+      pageInfo.textContent = "Page " + (currentPage + 1) + " of " + totalPages;
+      prevBtn.disabled = currentPage <= 0;
+      nextBtn.disabled = currentPage >= totalPages - 1;
+      prevBtn.style.opacity = prevBtn.disabled ? "0.4" : "1";
+      nextBtn.style.opacity = nextBtn.disabled ? "0.4" : "1";
+      prevBtn.style.cursor = prevBtn.disabled ? "default" : "pointer";
+      nextBtn.style.cursor = nextBtn.disabled ? "default" : "pointer";
+
+      // Hide pagination if only 1 page
+      pagBar.style.display = totalPages <= 1 ? "none" : "flex";
     }
 
-    searchIn.addEventListener("input", applyFilters);
-    posSel.addEventListener("change", applyFilters);
-    ptySel.addEventListener("change", applyFilters);
+    prevBtn.addEventListener("click", function () {
+      if (currentPage > 0) { currentPage--; applyFilters(false); }
+    });
+    nextBtn.addEventListener("click", function () {
+      currentPage++; applyFilters(false);
+    });
+
+    searchIn.addEventListener("input", function () { applyFilters(true); });
+    posSel.addEventListener("change", function () { applyFilters(true); });
+    ptySel.addEventListener("change", function () { applyFilters(true); });
 
     // debounced re-count when new items appear
     var recount;
     new MutationObserver(function () {
       clearTimeout(recount);
-      recount = setTimeout(applyFilters, 200);
+      recount = setTimeout(function () { applyFilters(false); }, 200);
     }).observe(voteSection, { childList: true });
 
-    applyFilters();
+    applyFilters(false);
   }
 
   /* -- Main vote enhancement entry point -- */
