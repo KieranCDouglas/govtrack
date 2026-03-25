@@ -201,7 +201,7 @@
       box.style.cssText =
         "display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;font-size:11px;" +
         "margin-top:10px;padding:10px 14px;border-radius:8px;" +
-        "background:hsl(var(--muted)/0.45);border:1px solid hsl(var(--border));";
+        "background:hsl(var(--card));border:1px solid hsl(var(--border));";
 
       box.innerHTML =
         '<div style="display:flex;align-items:center;gap:5px;">' +
