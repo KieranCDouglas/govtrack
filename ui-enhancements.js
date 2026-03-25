@@ -225,6 +225,39 @@
 
   /* ---- 2b  Expandable vote items ---- */
 
+  var billCache = {};
+
+  function fetchBillSummary(gtId) {
+    if (billCache[gtId]) return billCache[gtId];
+    var p = fetch("https://www.govtrack.us/api/v2/bill/" + gtId)
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data) return null;
+        var sponsorName = data.sponsor ? data.sponsor.name : "";
+        var cosponsorsArr = data.cosponsors || [];
+        // Build congress.gov URL from bill type
+        var cgUrl = "";
+        if (data.congress && data.bill_type_label && data.number) {
+          var typeMap = {"S.":"senate-bill","H.R.":"house-bill","H.Res.":"house-resolution","S.Res.":"senate-resolution","H.J.Res.":"house-joint-resolution","S.J.Res.":"senate-joint-resolution","H.Con.Res.":"house-concurrent-resolution","S.Con.Res.":"senate-concurrent-resolution"};
+          var t = typeMap[data.bill_type_label] || "";
+          if (t) cgUrl = "https://www.congress.gov/bill/" + data.congress + (data.congress === 1 ? "st" : data.congress === 2 ? "nd" : data.congress === 3 ? "rd" : "th") + "-congress/" + t + "/" + data.number;
+        }
+        return {
+          title: data.title_without_number || data.title || "",
+          number: data.display_number || "",
+          status: data.current_status_description || "",
+          statusDate: (data.current_status_date || "").substring(0, 10),
+          sponsor: sponsorName,
+          cosponsors: cosponsorsArr.length,
+          link: data.link || ("https://www.govtrack.us" + (data.get_absolute_url || "")),
+          congressDotGov: cgUrl
+        };
+      })
+      .catch(function () { return null; });
+    billCache[gtId] = p;
+    return p;
+  }
+
   function enhanceVotes() {
     // vote items live inside .divide-y containers
     document.querySelectorAll(".divide-y > div, .space-y-0 > div").forEach(function (item) {
@@ -233,6 +266,10 @@
       if (!badge) return;
 
       item.dataset.cwExp = "1";
+
+      var gtId = item.dataset.billGtId || "";
+      var billDisplay = item.dataset.billDisplay || "";
+      var voteResult = item.dataset.voteResult || "";
 
       // grab truncated text element references
       var questionEl = item.querySelector(".line-clamp-2") || item.querySelector(".text-sm.text-foreground");
@@ -244,39 +281,11 @@
       var panel = document.createElement("div");
       panel.className = "cw-vote-panel";
       panel.style.cssText =
-        "display:none;margin-top:8px;padding:10px 12px;border-radius:8px;" +
+        "display:none;margin-top:8px;padding:12px 14px;border-radius:8px;" +
         "background:hsl(var(--muted)/0.35);font-size:12px;line-height:1.6;" +
         "color:hsl(var(--muted-foreground));";
 
-      var qText = (questionEl && questionEl.textContent) || "";
-      var bTitle = (billTitleEl && billTitleEl.textContent) || "";
-      var dText = (descEl && descEl.textContent) || "";
-
-      var html = "";
-      if (qText) html += '<div style="font-weight:500;color:hsl(var(--foreground));margin-bottom:4px;">' + esc(qText) + "</div>";
-      if (bTitle && bTitle !== qText) html += '<div style="margin-bottom:4px;">' + esc(bTitle) + "</div>";
-      if (dText && dText !== bTitle) html += '<div style="margin-bottom:6px;">' + esc(dText) + "</div>";
-
-      // source link
-      var searchQ = encodeURIComponent(bTitle || qText);
-      html +=
-        '<div style="display:flex;gap:10px;margin-top:4px;">' +
-          '<a href="https://www.govtrack.us/congress/bills/#text=' + searchQ + '" ' +
-            'target="_blank" rel="noopener noreferrer" ' +
-            'style="color:hsl(var(--primary));font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:3px;"' +
-            ' onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">' +
-            'View on GovTrack \u2197</a>' +
-          '<a href="https://www.congress.gov/search?q=' + searchQ + '" ' +
-            'target="_blank" rel="noopener noreferrer" ' +
-            'style="color:hsl(var(--primary));font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:3px;"' +
-            ' onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">' +
-            'Congress.gov \u2197</a>' +
-        "</div>";
-      panel.innerHTML = html;
-
-      var textBox = item.querySelector(".flex-1");
-      if (textBox) textBox.appendChild(panel);
-      else item.appendChild(panel);
+      var loaded = false;
 
       // cursor + hover
       item.style.cursor = "pointer";
@@ -287,6 +296,10 @@
       item.addEventListener("mouseleave", function () {
         if (panel.style.display === "none") item.style.backgroundColor = "";
       });
+
+      var textBox = item.querySelector(".flex-1");
+      if (textBox) textBox.appendChild(panel);
+      else item.appendChild(panel);
 
       // click to toggle
       item.addEventListener("click", function (ev) {
@@ -306,8 +319,109 @@
             el.style.overflow = "visible";
           }
         });
+
+        // load content on first expand
+        if (!open && !loaded) {
+          loaded = true;
+          renderPanel(panel, gtId, billDisplay, voteResult, questionEl, billTitleEl);
+        }
       });
     });
+  }
+
+  function renderPanel(panel, gtId, billDisplay, voteResult, questionEl, billTitleEl) {
+    var qText = (questionEl && questionEl.textContent) || "";
+    var bTitle = (billTitleEl && billTitleEl.textContent) || "";
+
+    // Show loading state
+    panel.innerHTML =
+      '<div style="display:flex;align-items:center;gap:6px;color:hsl(var(--muted-foreground));">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>' +
+        'Loading bill details\u2026' +
+      '</div>' +
+      '<style>@keyframes spin{to{transform:rotate(360deg)}}</style>';
+
+    if (gtId) {
+      fetchBillSummary(gtId).then(function (bill) {
+        if (!bill) {
+          panel.innerHTML = buildFallbackHtml(qText, bTitle, billDisplay);
+          return;
+        }
+        panel.innerHTML = buildBillHtml(bill, voteResult);
+      });
+    } else {
+      panel.innerHTML = buildFallbackHtml(qText, bTitle, billDisplay);
+    }
+  }
+
+  function buildBillHtml(bill, voteResult) {
+    var html = "";
+
+    // Bill number + status row
+    var statusColor = voteResult && (voteResult.toLowerCase().indexOf("passed") !== -1 || voteResult.toLowerCase().indexOf("agreed") !== -1)
+      ? "color:hsl(var(--primary));font-weight:600;"
+      : "color:hsl(var(--muted-foreground));font-weight:600;";
+    html += '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px;">';
+    if (bill.number) {
+      html += '<span style="font-weight:700;color:hsl(var(--foreground));font-size:13px;">' + esc(bill.number) + '</span>';
+    }
+    if (voteResult) {
+      html += '<span style="font-size:11px;padding:1px 6px;border-radius:4px;background:hsl(var(--muted)/0.5);' + statusColor + '">' + esc(voteResult) + '</span>';
+    }
+    html += '</div>';
+
+    // Summary / Title
+    if (bill.title) {
+      html += '<div style="margin-bottom:10px;line-height:1.7;">' + esc(bill.title) + '</div>';
+    }
+
+    // Metadata row
+    var meta = [];
+    if (bill.sponsor) meta.push('<span>Sponsor: <strong style="color:hsl(var(--foreground));">' + esc(bill.sponsor) + '</strong></span>');
+    if (bill.cosponsors > 0) meta.push('<span>' + bill.cosponsors + ' cosponsor' + (bill.cosponsors !== 1 ? 's' : '') + '</span>');
+    if (bill.status) meta.push('<span>' + esc(bill.status) + (bill.statusDate ? ' (' + bill.statusDate + ')' : '') + '</span>');
+    if (meta.length) {
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:hsl(var(--muted-foreground));margin-bottom:8px;">' + meta.join("") + '</div>';
+    }
+
+    // Links
+    html += '<div style="display:flex;gap:10px;margin-top:6px;">';
+    if (bill.link) {
+      html += '<a href="' + bill.link + '" target="_blank" rel="noopener noreferrer" ' +
+        'style="color:hsl(var(--primary));font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:3px;" ' +
+        'onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">' +
+        'View on GovTrack \u2197</a>';
+    }
+    if (bill.congressDotGov) {
+      html += '<a href="' + bill.congressDotGov + '" target="_blank" rel="noopener noreferrer" ' +
+        'style="color:hsl(var(--primary));font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:3px;" ' +
+        'onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">' +
+        'Congress.gov \u2197</a>';
+    }
+    html += '</div>';
+
+    return html;
+  }
+
+  function buildFallbackHtml(qText, bTitle, billDisplay) {
+    var html = "";
+    if (qText) html += '<div style="font-weight:500;color:hsl(var(--foreground));margin-bottom:4px;">' + esc(qText) + "</div>";
+    if (bTitle && bTitle !== qText) html += '<div style="margin-bottom:4px;">' + esc(bTitle) + "</div>";
+
+    var searchQ = encodeURIComponent(billDisplay || bTitle || qText);
+    html += '<div style="display:flex;gap:10px;margin-top:4px;">' +
+      '<a href="https://www.govtrack.us/congress/bills/#text=' + searchQ + '" ' +
+        'target="_blank" rel="noopener noreferrer" ' +
+        'style="color:hsl(var(--primary));font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:3px;" ' +
+        'onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">' +
+        'Search GovTrack \u2197</a>' +
+      '<a href="https://www.congress.gov/search?q=' + searchQ + '" ' +
+        'target="_blank" rel="noopener noreferrer" ' +
+        'style="color:hsl(var(--primary));font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:3px;" ' +
+        'onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">' +
+        'Congress.gov \u2197</a>' +
+    "</div>";
+    return html;
   }
 
   function esc(s) {
