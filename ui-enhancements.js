@@ -282,6 +282,16 @@
 
       // Insert after the h2
       h2.insertAdjacentElement("afterend", block);
+
+      // Hide the old generic position items (the space-y-3 div and italic disclaimer)
+      var oldPositions = positionsCard.querySelector(".space-y-3");
+      if (oldPositions) oldPositions.style.display = "none";
+      positionsCard.querySelectorAll("p").forEach(function (p) {
+        if (p.style.fontStyle === "italic" || (p.className && p.className.indexOf("italic") !== -1) ||
+            (p.textContent && p.textContent.indexOf("Positions are estimated") !== -1)) {
+          p.style.display = "none";
+        }
+      });
     });
   }
 
