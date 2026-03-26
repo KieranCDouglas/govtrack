@@ -12,9 +12,9 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment: github-pages
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
     
     steps:
       - uses: actions/checkout@v4
@@ -28,4 +28,5 @@ jobs:
           path: .
       
       - name: Deploy to GitHub Pages
+        id: deploy
         uses: actions/deploy-pages@v4
