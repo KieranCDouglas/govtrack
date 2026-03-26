@@ -327,7 +327,7 @@
       box.innerHTML =
         '<div style="display:flex;align-items:center;gap:5px;">' +
           '<span style="color:hsl(var(--primary));font-weight:600;">\u25c2 \u25b8</span>' +
-          '<span style="color:hsl(var(--muted-foreground));">Economic: Liberal (\u22121) \u2013 Conservative (+1)</span>' +
+          '<span style="color:hsl(var(--muted-foreground));">Economic: Progressive (\u22121) \u2013 Conservative (+1)</span>' +
         '</div>' +
         '<div style="display:flex;align-items:center;gap:5px;">' +
           '<span style="color:hsl(var(--primary));font-weight:600;">\u25b4 \u25be</span>' +

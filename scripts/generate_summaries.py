@@ -242,7 +242,7 @@ def build_user_prompt(member, vote_stats, party_ctx, heterodoxy=None):
     ]
 
     if dim1 is not None:
-        direction = "right/conservative" if dim1 > 0 else "left/liberal"
+        direction = "right/conservative" if dim1 > 0 else "left/progressive"
         lines.append(f"Economic ideology score: {dim1:.3f} ({direction}, scale -1 to +1)")
     if dim2 is not None:
         direction2 = "positive (conservative/traditional)" if dim2 > 0 else "negative (progressive/libertarian)"

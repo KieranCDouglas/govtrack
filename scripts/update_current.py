@@ -152,6 +152,9 @@ def update_members_index(congress):
             m["chamber"] = chamber
         if cong >= m["last_congress"]:
             m["icpsr"] = icpsr
+            # Update party to most recent congress
+            party_code = int(row.get("party_code", 0) or 0)
+            m["party"] = party_map.get(party_code, "O")
 
         # Prefer Nokken-Poole (congress-specific) over DW-NOMINATE (career-wide)
         nk1 = safe_float(row.get("nokken_poole_dim1", ""))
@@ -196,11 +199,20 @@ def update_members_index(congress):
     return output
 
 
+# Members to exclude from current congress (e.g. VP, resigned before being sworn in)
+EXCLUDE_CURRENT = {
+    "V000137",  # JD Vance — elected VP, never served in 119th Congress
+}
+
+
 def update_members_current(congress, index):
     """Generate members-current.json for app's compass/detail pages."""
     print("=== Updating members-current.json ===")
 
-    current = [m for m in index if m["l"] == congress]
+    current = [m for m in index if m["l"] == congress and m["b"] not in EXCLUDE_CURRENT]
+    excluded = [m for m in index if m["l"] == congress and m["b"] in EXCLUDE_CURRENT]
+    if excluded:
+        print(f"  Excluded from current: {[m['n'] for m in excluded]}")
 
     # Load existing members-current.json for policyHeterodoxy preservation
     current_path = os.path.join(DATA_DIR, "members-current.json")
