@@ -327,11 +327,11 @@
       box.innerHTML =
         '<div style="display:flex;align-items:center;gap:5px;">' +
           '<span style="color:hsl(var(--primary));font-weight:600;">\u25c2 \u25b8</span>' +
-          '<span style="color:hsl(var(--muted-foreground));">Dimension 1: Liberal (\u22121) \u2013 Conservative (+1)</span>' +
+          '<span style="color:hsl(var(--muted-foreground));">Economic: Liberal (\u22121) \u2013 Conservative (+1)</span>' +
         '</div>' +
         '<div style="display:flex;align-items:center;gap:5px;">' +
           '<span style="color:hsl(var(--primary));font-weight:600;">\u25b4 \u25be</span>' +
-          '<span style="color:hsl(var(--muted-foreground));">Dimension 2: Secondary ideological axis</span>' +
+          '<span style="color:hsl(var(--muted-foreground));">Social: Progressive (\u22121) \u2013 Conservative (+1)</span>' +
         '</div>';
 
       // insert after the existing description <p>, or after canvas

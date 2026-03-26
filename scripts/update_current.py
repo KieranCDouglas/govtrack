@@ -212,20 +212,49 @@ def update_members_current(congress, index):
     except (FileNotFoundError, json.JSONDecodeError):
         pass
 
+    # Load social scores
+    social_path = os.path.join(DATA_DIR, "social-scores.json")
+    social_lookup = {}
+    try:
+        with open(social_path, "r") as f:
+            social_lookup = json.load(f).get("scores", {})
+        print(f"  Loaded {len(social_lookup)} social scores")
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("  WARNING: social-scores.json not found, using dim2 fallback for all")
+
     party_names = {"D": "Democrat", "R": "Republican", "O": "Independent"}
 
     members_out = []
+    social_used = 0
+    social_fallback = 0
     for m in current:
         bio = m["b"]
         old = old_lookup.get(bio, {})
         dim1 = m.get("x")
         dim2 = m.get("y")
 
-        # Compute compass coordinates (raw NOMINATE/Nokken-Poole, no party adjustment)
+        # Look up social score by ICPSR
+        icpsr_str = str(m.get("i", ""))
+        ss = social_lookup.get(icpsr_str)
+        social_score = None
+        social_votes = 0
+        is_fallback = True
+        if ss and not ss.get("fallback", True):
+            social_score = ss["score"]
+            social_votes = ss["socialVotes"]
+            is_fallback = False
+            social_used += 1
+        else:
+            social_fallback += 1
+
+        # Compute compass coordinates
         compass_x = None
         compass_y = None
-        if dim1 is not None and dim2 is not None:
+        if dim1 is not None:
             compass_x = round(max(-1, min(1, dim1)), 4)
+        if social_score is not None:
+            compass_y = round(max(-1, min(1, social_score)), 4)
+        elif dim2 is not None:
             compass_y = round(max(-1, min(1, dim2)), 4)
 
         members_out.append({
@@ -243,6 +272,9 @@ def update_members_current(congress, index):
             "numVotes": old.get("numVotes", 0),
             "compassX": compass_x,
             "compassY": compass_y,
+            "socialScore": social_score,
+            "socialVotes": social_votes,
+            "socialFallback": is_fallback,
             "govtrackId": old.get("govtrackId") or m.get("g"),
             "isCurrent": True,
             "policyHeterodoxy": old.get("policyHeterodoxy", {}),
@@ -254,6 +286,7 @@ def update_members_current(congress, index):
         json.dump(members_out, f, separators=(",", ":"))
 
     print(f"  {len(members_out)} current members written")
+    print(f"  Social scores: {social_used} used, {social_fallback} fallback to dim2")
     return members_out
 
 

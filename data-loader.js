@@ -87,13 +87,17 @@
     var dim2 = member.dim2;
     var nk1 = member.nk_dim1;
     var nk2 = member.nk_dim2;
+    var socialScore = member.socialScore;
 
     if (dim1 === null || dim2 === null) {
       return { compassX: null, compassY: null };
     }
 
     var compassX = nk1 !== null ? nk1 : dim1;
-    var compassY = nk2 !== null ? nk2 : dim2;
+    // Prefer social score for Y axis; fall back to NOMINATE dim2
+    var compassY = socialScore !== null && socialScore !== undefined
+      ? socialScore
+      : (nk2 !== null ? nk2 : dim2);
 
     return {
       compassX: Math.round(Math.max(-1, Math.min(1, compassX)) * 10000) / 10000,
@@ -136,7 +140,7 @@
       var nk2 = safeFloat(row.nokken_poole_dim2);
 
       var compass = computeCompass(
-        { dim1: dim1, dim2: dim2, nk_dim1: nk1, nk_dim2: nk2 },
+        { dim1: dim1, dim2: dim2, nk_dim1: nk1, nk_dim2: nk2, socialScore: staticData ? (staticData.socialScore != null ? staticData.socialScore : null) : null },
         party
       );
 
@@ -164,6 +168,9 @@
         numVotes: safeInt(row.nominate_number_of_votes),
         compassX: compass.compassX,
         compassY: compass.compassY,
+        socialScore: staticData ? (staticData.socialScore != null ? staticData.socialScore : null) : null,
+        socialVotes: staticData ? (staticData.socialVotes || 0) : 0,
+        socialFallback: staticData ? (staticData.socialFallback !== false) : true,
         govtrackId: staticData ? staticData.govtrackId : null,
         isCurrent: staticData ? (staticData.isCurrent !== false) : false,
         policyHeterodoxy: staticData ? staticData.policyHeterodoxy : {}
