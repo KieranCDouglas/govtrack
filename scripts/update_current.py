@@ -153,11 +153,16 @@ def update_members_index(congress):
         if cong >= m["last_congress"]:
             m["icpsr"] = icpsr
 
+        # Prefer Nokken-Poole (congress-specific) over DW-NOMINATE (career-wide)
+        nk1 = safe_float(row.get("nokken_poole_dim1", ""))
+        nk2 = safe_float(row.get("nokken_poole_dim2", ""))
         dim1 = safe_float(row.get("nominate_dim1", ""))
         dim2 = safe_float(row.get("nominate_dim2", ""))
-        if dim1 is not None and dim2 is not None and cong > m["best_congress"]:
-            m["dim1"] = dim1
-            m["dim2"] = dim2
+        best1 = nk1 if nk1 is not None else dim1
+        best2 = nk2 if nk2 is not None else dim2
+        if best1 is not None and best2 is not None and cong > m["best_congress"]:
+            m["dim1"] = best1
+            m["dim2"] = best2
             m["best_congress"] = cong
 
     output = []
@@ -216,19 +221,12 @@ def update_members_current(congress, index):
         dim1 = m.get("x")
         dim2 = m.get("y")
 
-        # Compute compass coordinates
+        # Compute compass coordinates (raw NOMINATE/Nokken-Poole, no party adjustment)
         compass_x = None
         compass_y = None
         if dim1 is not None and dim2 is not None:
-            nk1 = dim1  # Use NOMINATE dim1 as approximation
-            compass_x = round(max(-1, min(1, nk1 * 0.55)), 4)
-            party = m["p"]
-            if party == "R":
-                compass_y = round(max(-1, min(1, dim2 * 0.8 + 0.3)), 4)
-            elif party == "D":
-                compass_y = round(max(-1, min(1, dim2 * 0.7 - 0.3)), 4)
-            else:
-                compass_y = round(max(-1, min(1, dim2 * 0.75)), 4)
+            compass_x = round(max(-1, min(1, dim1)), 4)
+            compass_y = round(max(-1, min(1, dim2)), 4)
 
         members_out.append({
             "bioguideId": bio,

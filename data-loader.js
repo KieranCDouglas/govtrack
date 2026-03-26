@@ -79,8 +79,8 @@
 
   /**
    * Compute compass coordinates from NOMINATE scores.
-   * X = economic axis (from Nokken-Poole dim1)
-   * Y = social axis (from dim2, party-adjusted)
+   * X = Dimension 1 (primary left-right ideology, Nokken-Poole preferred)
+   * Y = Dimension 2 (secondary dimension, no party adjustment)
    */
   function computeCompass(member, party) {
     var dim1 = member.dim1;
@@ -92,18 +92,8 @@
       return { compassX: null, compassY: null };
     }
 
-    var baseX = nk1 !== null ? nk1 : dim1;
-    var compassX = baseX * 0.55;
-
-    var baseY = nk2 !== null ? nk2 : dim2;
-    var compassY;
-    if (party === "Republican") {
-      compassY = baseY * 0.8 + 0.3;
-    } else if (party === "Democrat") {
-      compassY = baseY * 0.7 - 0.3;
-    } else {
-      compassY = baseY * 0.75;
-    }
+    var compassX = nk1 !== null ? nk1 : dim1;
+    var compassY = nk2 !== null ? nk2 : dim2;
 
     return {
       compassX: Math.round(Math.max(-1, Math.min(1, compassX)) * 10000) / 10000,

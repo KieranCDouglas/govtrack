@@ -117,13 +117,18 @@ def main():
         if congress >= m["last_congress"]:
             m["icpsr"] = icpsr
         
-        # Keep the best (most recent) NOMINATE scores
+        # Keep the best (most recent) scores — prefer Nokken-Poole over DW-NOMINATE
+        nk1_raw = row.get("nokken_poole_dim1", "").strip()
+        nk2_raw = row.get("nokken_poole_dim2", "").strip()
         dim1 = row.get("nominate_dim1", "").strip()
         dim2 = row.get("nominate_dim2", "").strip()
-        if dim1 and dim2 and dim1 != "NA" and dim2 != "NA":
+        # Prefer Nokken-Poole (congress-specific) when available
+        best1_s = nk1_raw if (nk1_raw and nk1_raw != "NA") else dim1
+        best2_s = nk2_raw if (nk2_raw and nk2_raw != "NA") else dim2
+        if best1_s and best2_s and best1_s != "NA" and best2_s != "NA":
             try:
-                d1 = float(dim1)
-                d2 = float(dim2)
+                d1 = float(best1_s)
+                d2 = float(best2_s)
                 if congress > m["best_congress"]:
                     m["dim1_best"] = d1
                     m["dim2_best"] = d2
