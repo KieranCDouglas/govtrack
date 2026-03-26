@@ -711,7 +711,7 @@
 
         if (!open && !loaded) {
           loaded = true;
-          renderPanel(panel, gtId, billDisplay, voteResult, alignment, questionDetails, questionEl, billTitleEl, congress, chamber, totalPlus, totalMinus, voteIdNum);
+          renderPanel(panel, gtId, billDisplay, voteResult, alignment, questionDetails, questionEl, billTitleEl, congress, chamber, totalPlus, totalMinus, voteIdNum, position);
         }
       });
     });
@@ -721,7 +721,7 @@
   }
 
   /* -- Render expanded panel content -- */
-  function renderPanel(panel, gtId, billDisplay, voteResult, alignment, questionDetails, questionEl, billTitleEl, congress, chamber, totalPlus, totalMinus, voteIdNum) {
+  function renderPanel(panel, gtId, billDisplay, voteResult, alignment, questionDetails, questionEl, billTitleEl, congress, chamber, totalPlus, totalMinus, voteIdNum, position) {
     var qText  = (questionEl  && questionEl.textContent)  || "";
     var bTitle = (billTitleEl && billTitleEl.textContent)  || "";
 
@@ -735,10 +735,10 @@
 
     if (gtId) {
       fetchBillSummary(gtId).then(function (bill) {
-        panel.innerHTML = buildExpandedHtml(bill, voteResult, alignment, questionDetails, qText, bTitle, billDisplay, congress, chamber, totalPlus, totalMinus, voteIdNum);
+        panel.innerHTML = buildExpandedHtml(bill, voteResult, alignment, questionDetails, qText, bTitle, billDisplay, congress, chamber, totalPlus, totalMinus, voteIdNum, position);
       });
     } else {
-      panel.innerHTML = buildExpandedHtml(null, voteResult, alignment, questionDetails, qText, bTitle, billDisplay, congress, chamber, totalPlus, totalMinus, voteIdNum);
+      panel.innerHTML = buildExpandedHtml(null, voteResult, alignment, questionDetails, qText, bTitle, billDisplay, congress, chamber, totalPlus, totalMinus, voteIdNum, position);
     }
   }
 
@@ -773,10 +773,77 @@
   }
 
   /* -- Build the expansion-panel HTML -- */
-  function buildExpandedHtml(bill, voteResult, alignment, questionDetails, qText, bTitle, billDisplay, congress, chamber, totalPlus, totalMinus, voteIdNum) {
+  function buildExpandedHtml(bill, voteResult, alignment, questionDetails, qText, bTitle, billDisplay, congress, chamber, totalPlus, totalMinus, voteIdNum, position) {
     var html = "";
+    var tp = parseInt(totalPlus, 10);
+    var tm = parseInt(totalMinus, 10);
+    var hasTally = !isNaN(tp) && !isNaN(tm) && (tp + tm) > 0;
 
-    // 1. Party-alignment badge (prominent)
+    // 1. Vote tally graphic with member's position highlighted
+    if (hasTally) {
+      var total = tp + tm;
+      var yeaPct = Math.round(100 * tp / total);
+      var nayPct = 100 - yeaPct;
+      var passed = /pass|agree|confirm|approved/i.test(voteResult || "");
+      var failed = /fail|reject|not agreed|defeated/i.test(voteResult || "");
+      var resultLabel = voteResult ? esc(voteResult) : "";
+      var resultColor = passed ? "hsl(142,60%,40%)" : failed ? "hsl(0,70%,55%)" : "hsl(var(--muted-foreground))";
+
+      // Determine if member sided with majority
+      var posLower = (position || "").toLowerCase();
+      var memberVotedYea = posLower === "yes" || posLower === "yea";
+      var memberVotedNay = posLower === "no" || posLower === "nay";
+      var majorityIsYea = tp >= tm;
+      var withMajority = (memberVotedYea && majorityIsYea) || (memberVotedNay && !majorityIsYea);
+      var memberDidVote = memberVotedYea || memberVotedNay;
+
+      html += '<div style="margin-bottom:12px;">';
+
+      // Result + majority indicator
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">';
+      if (resultLabel) {
+        html += '<span style="font-size:12px;font-weight:700;color:' + resultColor + ';">' + resultLabel + '</span>';
+      }
+      if (memberDidVote) {
+        var majBg = withMajority ? "hsl(var(--primary)/0.12)" : "hsla(0,70%,50%,0.12)";
+        var majColor = withMajority ? "hsl(var(--primary))" : "hsl(0,70%,55%)";
+        var majLabel = withMajority ? "\u2713 Voted with majority" : "\u2717 Voted against majority";
+        html += '<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:' + majBg + ';color:' + majColor + ';">' + majLabel + '</span>';
+      }
+      html += '</div>';
+
+      // Stacked bar chart with member's side highlighted
+      var yeaBorder = memberVotedYea ? "box-shadow:inset 0 0 0 2px rgba(255,255,255,0.6);" : "";
+      var nayBorder = memberVotedNay ? "box-shadow:inset 0 0 0 2px rgba(255,255,255,0.6);" : "";
+      var yeaOpacity = memberVotedNay ? "opacity:0.5;" : "";
+      var nayOpacity = memberVotedYea ? "opacity:0.5;" : "";
+
+      html += '<div style="display:flex;border-radius:5px;overflow:hidden;height:24px;font-size:11px;font-weight:600;line-height:24px;margin-bottom:6px;">';
+      if (yeaPct > 0) {
+        html += '<div style="width:' + yeaPct + '%;background:hsl(142,60%,42%);color:#fff;text-align:center;' +
+          'min-width:' + (yeaPct > 8 ? '0' : '32px') + ';' + yeaBorder + yeaOpacity + '">' +
+          (yeaPct >= 12 ? 'Yea ' + tp : tp) + '</div>';
+      }
+      if (nayPct > 0) {
+        html += '<div style="width:' + nayPct + '%;background:hsl(0,65%,50%);color:#fff;text-align:center;' +
+          'min-width:' + (nayPct > 8 ? '0' : '32px') + ';' + nayBorder + nayOpacity + '">' +
+          (nayPct >= 12 ? 'Nay ' + tm : tm) + '</div>';
+      }
+      html += '</div>';
+
+      // Legend with member's position indicated
+      html += '<div style="display:flex;justify-content:space-between;font-size:10px;color:hsl(var(--muted-foreground));">';
+      html += '<span>' + (memberVotedYea ? '\u25b6 ' : '') + 'Yea: ' + tp + ' (' + yeaPct + '%)</span>';
+      html += '<span>' + (memberVotedNay ? '\u25b6 ' : '') + 'Nay: ' + tm + ' (' + nayPct + '%)</span>';
+      html += '</div>';
+
+      html += '</div>';
+    } else if (voteResult) {
+      html += '<div style="font-size:12px;font-weight:600;color:hsl(var(--muted-foreground));margin-bottom:10px;">' +
+        'Result: ' + esc(voteResult) + '</div>';
+    }
+
+    // 2. Party-alignment badge
     if (alignment) {
       var aColor, aBg, aLabel;
       if (alignment === "with") {
@@ -791,29 +858,6 @@
       html += '<div style="display:inline-block;font-size:11px;font-weight:600;' +
         'padding:3px 10px;border-radius:5px;background:' + aBg + ';color:' + aColor + ';' +
         'margin-bottom:10px;">' + aLabel + '</div>';
-    }
-
-    // 2. Vote result + tally
-    var tp = parseInt(totalPlus, 10);
-    var tm = parseInt(totalMinus, 10);
-    if (!isNaN(tp) && !isNaN(tm) && (tp + tm) > 0) {
-      var resultText = voteResult ? esc(voteResult) : "";
-      var tallyText = tp + " \u2013 " + tm;
-      var yeaPct = Math.round(100 * tp / (tp + tm));
-      html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">';
-      if (resultText) {
-        var rColor = /pass|agree|confirm/i.test(resultText) ? "hsl(142,60%,40%)" : "hsl(0,70%,55%)";
-        html += '<span style="font-size:11px;font-weight:600;color:' + rColor + ';">' + resultText + '</span>';
-      }
-      html += '<span style="font-size:12px;font-weight:700;color:hsl(var(--foreground));">' + tallyText + '</span>';
-      // Mini bar
-      html += '<div style="flex:1;max-width:120px;height:6px;border-radius:3px;background:hsl(0,70%,55%,0.3);overflow:hidden;">' +
-        '<div style="width:' + yeaPct + '%;height:100%;border-radius:3px;background:hsl(142,60%,45%);"></div></div>';
-      html += '<span style="font-size:10px;color:hsl(var(--muted-foreground));">' + yeaPct + '% Yea</span>';
-      html += '</div>';
-    } else if (voteResult) {
-      html += '<div style="font-size:11px;font-weight:600;color:hsl(var(--muted-foreground));margin-bottom:8px;">' +
-        'Result: ' + esc(voteResult) + '</div>';
     }
 
     // 3. Vote procedure (e.g. "On Motion to Suspend the Rules and Pass")
@@ -840,39 +884,33 @@
         meta.join("") + '</div>';
     }
 
-    // 6. Links
-    var linkStyle = 'style="color:hsl(var(--primary));font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:3px;" ' +
-      'onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'"';
-    var links = "";
+    // 6. Single bill link — prefer congress.gov, fall back to GovTrack
+    var linkStyle = 'style="color:hsl(var(--primary));font-size:11px;font-weight:600;text-decoration:none;' +
+      'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:5px;' +
+      'background:hsl(var(--primary)/0.08);transition:background .15s;" ' +
+      'onmouseover="this.style.background=\'hsl(var(--primary)/0.15)\'" ' +
+      'onmouseout="this.style.background=\'hsl(var(--primary)/0.08)\'"';
 
-    if (bill && bill.link) {
-      links += '<a href="' + bill.link + '" target="_blank" rel="noopener noreferrer" ' + linkStyle + '>' +
-        'GovTrack \u2197</a>';
-    }
+    var billUrl = "";
+    var billLinkLabel = "";
 
-    // Congress.gov bill link — from API or constructed from bill ID
+    // Try congress.gov first (from API or constructed from bill ID)
     var cgUrl = (bill && bill.congressDotGov) || "";
     if (!cgUrl && billDisplay) {
       cgUrl = billIdToCongressGovUrl(billDisplay, congress);
     }
     if (cgUrl) {
-      links += '<a href="' + cgUrl + '" target="_blank" rel="noopener noreferrer" ' + linkStyle + '>' +
-        'Congress.gov \u2197</a>';
+      billUrl = cgUrl;
+      billLinkLabel = "View bill on Congress.gov \u2197";
+    } else if (bill && bill.link) {
+      billUrl = bill.link;
+      billLinkLabel = "View bill on GovTrack \u2197";
     }
 
-    // Fallback search links when no bill at all
-    if (!bill && !cgUrl && (billDisplay || bTitle || qText)) {
-      var searchQ = encodeURIComponent(billDisplay || bTitle || qText);
-      links += '<a href="https://www.govtrack.us/congress/bills/#text=' + searchQ + '" ' +
-        'target="_blank" rel="noopener noreferrer" ' + linkStyle + '>' +
-        'Search GovTrack \u2197</a>' +
-        '<a href="https://www.congress.gov/search?q=' + searchQ + '" ' +
-        'target="_blank" rel="noopener noreferrer" ' + linkStyle + '>' +
-        'Search Congress.gov \u2197</a>';
-    }
-
-    if (links) {
-      html += '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">' + links + '</div>';
+    if (billUrl) {
+      html += '<div style="margin-top:8px;">' +
+        '<a href="' + billUrl + '" target="_blank" rel="noopener noreferrer" ' + linkStyle + '>' +
+        billLinkLabel + '</a></div>';
     }
 
     return html || '<div style="color:hsl(var(--muted-foreground));">No additional details available.</div>';
