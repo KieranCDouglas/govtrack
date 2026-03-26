@@ -176,6 +176,7 @@
     function run() {
       addCompassLegends();
       enhanceVotes();
+      enhanceRecentVotes();
       injectMemberSummary();
     }
   });
@@ -944,6 +945,236 @@
     }
 
     return html || '<div style="color:hsl(var(--muted-foreground));">No additional details available.</div>';
+  }
+
+  /* ================================================================
+     3.  RECENT  VOTES  EXPANSION  (home page)
+     ================================================================ */
+
+  var _recentVotesData = null;
+  var _recentVotesFetching = false;
+
+  function fetchRecentVotesData() {
+    if (_recentVotesData) return Promise.resolve(_recentVotesData);
+    if (_recentVotesFetching) return _recentVotesFetching;
+    _recentVotesFetching = fetch("https://www.govtrack.us/api/v2/vote?congress=119&limit=15&order_by=-created")
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        _recentVotesData = (d && d.objects) || [];
+        return _recentVotesData;
+      })
+      .catch(function () { _recentVotesData = []; return []; });
+    return _recentVotesFetching;
+  }
+
+  function enhanceRecentVotes() {
+    // Find the "Recent Congressional Votes" section on the home page
+    var headings = document.querySelectorAll("h2");
+    var recentHeading = null;
+    for (var i = 0; i < headings.length; i++) {
+      if (/recent congressional votes/i.test(headings[i].textContent)) {
+        recentHeading = headings[i];
+        break;
+      }
+    }
+    if (!recentHeading) return;
+
+    var section = recentHeading.closest(".mb-8");
+    if (!section) return;
+
+    var voteList = section.querySelector(".space-y-2");
+    if (!voteList) return;
+
+    var items = voteList.querySelectorAll(":scope > a");
+    if (!items.length) return;
+
+    // Check if already enhanced
+    if (voteList.dataset.cwRecent) return;
+    voteList.dataset.cwRecent = "1";
+
+    // Fetch vote data and enhance each item
+    fetchRecentVotesData().then(function (votes) {
+      items.forEach(function (link, idx) {
+        var voteData = votes[idx] || null;
+
+        // Replace <a> with a <div> so clicking doesn't navigate
+        var wrapper = document.createElement("div");
+        wrapper.className = link.className;
+        wrapper.innerHTML = link.innerHTML;
+        wrapper.style.cursor = "pointer";
+        link.parentNode.replaceChild(wrapper, link);
+
+        // Build expansion panel
+        var panel = document.createElement("div");
+        panel.className = "cw-recent-panel";
+        panel.style.cssText =
+          "display:none;margin-top:10px;padding:14px 16px;border-radius:8px;" +
+          "background:hsl(var(--muted)/0.35);font-size:12px;line-height:1.6;" +
+          "color:hsl(var(--muted-foreground));border-top:1px solid hsl(var(--border)/0.3);";
+        wrapper.appendChild(panel);
+
+        var loaded = false;
+
+        wrapper.addEventListener("mouseenter", function () {
+          if (panel.style.display === "none")
+            wrapper.style.backgroundColor = "hsl(var(--muted)/0.15)";
+        });
+        wrapper.addEventListener("mouseleave", function () {
+          if (panel.style.display === "none")
+            wrapper.style.backgroundColor = "";
+        });
+
+        wrapper.addEventListener("click", function (ev) {
+          // Allow clicks on links inside the panel
+          if (ev.target.tagName === "A" || ev.target.closest("a")) return;
+          var open = panel.style.display !== "none";
+          panel.style.display = open ? "none" : "block";
+          wrapper.style.backgroundColor = open ? "" : "hsl(var(--muted)/0.25)";
+
+          if (!open && !loaded) {
+            loaded = true;
+            renderRecentPanel(panel, voteData);
+          }
+        });
+      });
+    });
+  }
+
+  function renderRecentPanel(panel, vote) {
+    if (!vote) {
+      panel.innerHTML = '<div style="color:hsl(var(--muted-foreground));">No additional details available.</div>';
+      return;
+    }
+
+    // Show loading spinner
+    panel.innerHTML =
+      '<div style="display:flex;align-items:center;gap:6px;color:hsl(var(--muted-foreground));">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+          'style="animation:spin 1s linear infinite;"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>' +
+        'Loading details\u2026' +
+      '</div>';
+
+    var billGtId = (vote.related_bill && vote.related_bill.id) || null;
+    var billDisplayNum = (vote.related_bill && vote.related_bill.display_number) || "";
+    var billTitle = (vote.related_bill && vote.related_bill.title) || "";
+    var congress = vote.congress || 119;
+
+    var billPromise = billGtId ? fetchBillSummary(billGtId) : Promise.resolve(null);
+
+    billPromise.then(function (bill) {
+      var html = "";
+
+      // 1. Vote tally graphic
+      var tp = vote.total_plus || 0;
+      var tm = vote.total_minus || 0;
+      var hasTally = (tp + tm) > 0;
+
+      if (hasTally) {
+        var total = tp + tm;
+        var yeaPct = Math.round(100 * tp / total);
+        var nayPct = 100 - yeaPct;
+        var result = vote.result || "";
+        var passed = /pass|agree|confirm|approved/i.test(result);
+        var failed = /fail|reject|not agreed|defeated/i.test(result);
+        var resultColor = passed ? "hsl(142,60%,40%)" : failed ? "hsl(0,70%,55%)" : "hsl(var(--muted-foreground))";
+
+        html += '<div style="margin-bottom:12px;">';
+        if (result) {
+          html += '<div style="font-size:12px;font-weight:700;color:' + resultColor + ';margin-bottom:8px;">' + esc(result) + '</div>';
+        }
+
+        // Stacked bar
+        html += '<div style="display:flex;border-radius:5px;overflow:hidden;height:24px;font-size:11px;font-weight:600;line-height:24px;margin-bottom:6px;">';
+        if (yeaPct > 0) {
+          html += '<div style="width:' + yeaPct + '%;background:hsl(142,60%,42%);color:#fff;text-align:center;' +
+            'min-width:' + (yeaPct > 8 ? '0' : '32px') + ';">' +
+            (yeaPct >= 12 ? 'Yea ' + tp : tp) + '</div>';
+        }
+        if (nayPct > 0) {
+          html += '<div style="width:' + nayPct + '%;background:hsl(0,65%,50%);color:#fff;text-align:center;' +
+            'min-width:' + (nayPct > 8 ? '0' : '32px') + ';">' +
+            (nayPct >= 12 ? 'Nay ' + tm : tm) + '</div>';
+        }
+        html += '</div>';
+
+        // Legend
+        html += '<div style="display:flex;justify-content:space-between;font-size:10px;color:hsl(var(--muted-foreground));">';
+        html += '<span>Yea: ' + tp + ' (' + yeaPct + '%)</span>';
+        html += '<span>Nay: ' + tm + ' (' + nayPct + '%)</span>';
+        if (vote.total_other > 0) html += '<span>Other: ' + vote.total_other + '</span>';
+        html += '</div>';
+        html += '</div>';
+      }
+
+      // 2. Question details
+      if (vote.question_details) {
+        html += '<div style="font-size:11px;color:hsl(var(--muted-foreground));margin-bottom:8px;font-style:italic;">' +
+          esc(vote.question_details) + '</div>';
+      }
+
+      // 3. Bill title (from the vote data or from bill summary)
+      var displayTitle = (bill && bill.title) || billTitle || "";
+      if (displayTitle) {
+        html += '<div style="margin-bottom:8px;font-size:12px;line-height:1.7;color:hsl(var(--foreground)/0.9);">' +
+          (billDisplayNum ? '<strong>' + esc(billDisplayNum) + ':</strong> ' : '') +
+          esc(displayTitle) + '</div>';
+      }
+
+      // 4. Official title (if different)
+      if (bill && bill.officialTitle && bill.officialTitle !== bill.title) {
+        html += '<div style="margin-bottom:8px;font-size:11px;line-height:1.7;color:hsl(var(--foreground)/0.75);">' +
+          esc(bill.officialTitle) + '</div>';
+      }
+
+      // 5. Metadata
+      var meta = [];
+      if (bill) {
+        if (bill.sponsor) meta.push('<span>Sponsor: <strong style="color:hsl(var(--foreground));">' + esc(bill.sponsor) + '</strong></span>');
+        if (bill.cosponsors > 0) meta.push('<span>' + bill.cosponsors + ' cosponsor' + (bill.cosponsors !== 1 ? 's' : '') + '</span>');
+        if (bill.status) meta.push('<span>' + esc(bill.status) + (bill.statusDate ? ' (' + bill.statusDate + ')' : '') + '</span>');
+      }
+      if (vote.category_label) meta.push('<span>' + esc(vote.category_label) + '</span>');
+      if (meta.length) {
+        html += '<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:hsl(var(--muted-foreground));margin-bottom:8px;">' +
+          meta.join("") + '</div>';
+      }
+
+      // 6. Links: congress.gov bill link + GovTrack vote link
+      var linkStyle = 'style="color:hsl(var(--primary));font-size:11px;font-weight:600;text-decoration:none;' +
+        'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:5px;' +
+        'background:hsl(var(--primary)/0.08);transition:background .15s;" ' +
+        'onmouseover="this.style.background=\'hsl(var(--primary)/0.15)\'" ' +
+        'onmouseout="this.style.background=\'hsl(var(--primary)/0.08)\'"';
+
+      var links = "";
+
+      // Bill link (congress.gov preferred)
+      var cgUrl = (bill && bill.congressDotGov) || "";
+      if (!cgUrl && billDisplayNum) {
+        cgUrl = billIdToCongressGovUrl(billDisplayNum, congress);
+      }
+      if (cgUrl) {
+        var isNom = billDisplayNum && billDisplayNum.replace(/[.\s]/g, "").toUpperCase().indexOf("PN") === 0;
+        links += '<a href="' + cgUrl + '" target="_blank" rel="noopener noreferrer" ' + linkStyle + '>' +
+          (isNom ? 'View nomination \u2197' : 'View bill \u2197') + '</a> ';
+      } else if (bill && bill.link) {
+        links += '<a href="' + bill.link + '" target="_blank" rel="noopener noreferrer" ' + linkStyle + '>' +
+          'View bill \u2197</a> ';
+      }
+
+      // Vote page link
+      var voteLink = vote.link || "";
+      if (voteLink) {
+        links += '<a href="' + voteLink + '" target="_blank" rel="noopener noreferrer" ' + linkStyle + '>' +
+          'Full vote details \u2197</a>';
+      }
+
+      if (links) {
+        html += '<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;">' + links + '</div>';
+      }
+
+      panel.innerHTML = html || '<div style="color:hsl(var(--muted-foreground));">No additional details available.</div>';
+    });
   }
 
   function esc(s) {
