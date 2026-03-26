@@ -742,29 +742,58 @@
     }
   }
 
-  /* -- Helper: parse a bill identifier like "HR29", "S100", "HRES5" into a congress.gov URL -- */
+  /* -- Helper: parse a bill/nomination identifier into a congress.gov URL -- */
   function billIdToCongressGovUrl(rawId, congress) {
     if (!rawId || !congress) return "";
-    var id = rawId.replace(/\./g, "").toUpperCase().trim();
+    var id = rawId.replace(/[.\s]/g, "").toUpperCase().trim();
+    var c = parseInt(congress, 10);
+    if (!c || c < 1) return "";
+    var suffix = c === 1 ? "st" : c === 2 ? "nd" : c === 3 ? "rd" : "th";
+    var base = "https://www.congress.gov/";
+
+    // Presidential Nominations (PN123 → congress.gov/nomination/119th-congress/123)
+    if (id.indexOf("PN") === 0) {
+      var pnNum = id.substring(2);
+      if (pnNum && /^\d+$/.test(pnNum)) {
+        return base + "nomination/" + c + suffix + "-congress/" + pnNum;
+      }
+      return "";
+    }
+
+    // Bill type mapping — canonical and abbreviated forms
     var typeMap = {
-      "HR": "house-bill",
-      "S": "senate-bill",
-      "HRES": "house-resolution",
-      "SRES": "senate-resolution",
-      "HJRES": "house-joint-resolution",
-      "SJRES": "senate-joint-resolution",
       "HCONRES": "house-concurrent-resolution",
-      "SCONRES": "senate-concurrent-resolution"
+      "SCONRES": "senate-concurrent-resolution",
+      "HCONR":   "house-concurrent-resolution",
+      "SCONR":   "senate-concurrent-resolution",
+      "HCRES":   "house-concurrent-resolution",
+      "SCRES":   "senate-concurrent-resolution",
+      "HCR":     "house-concurrent-resolution",
+      "SCR":     "senate-concurrent-resolution",
+      "HJRES":   "house-joint-resolution",
+      "SJRES":   "senate-joint-resolution",
+      "HJRE":    "house-joint-resolution",
+      "SJRE":    "senate-joint-resolution",
+      "HJR":     "house-joint-resolution",
+      "SJR":     "senate-joint-resolution",
+      "HRES":    "house-resolution",
+      "SRES":    "senate-resolution",
+      "HRE":     "house-resolution",
+      "SRE":     "senate-resolution",
+      "HR":      "house-bill",
+      "S":       "senate-bill"
     };
-    // Try longest prefixes first
-    var prefixes = ["HCONRES","SCONRES","HJRES","SJRES","HRES","SRES","HR","S"];
+    // Try longest prefixes first to avoid partial matches
+    var prefixes = [
+      "HCONRES","SCONRES","HCONR","SCONR","HCRES","SCRES","HCR","SCR",
+      "HJRES","SJRES","HJRE","SJRE","HJR","SJR",
+      "HRES","SRES","HRE","SRE","HR","S"
+    ];
     for (var i = 0; i < prefixes.length; i++) {
       if (id.indexOf(prefixes[i]) === 0) {
         var num = id.substring(prefixes[i].length);
         if (num && /^\d+$/.test(num)) {
-          var c = parseInt(congress, 10);
-          var suffix = c === 1 ? "st" : c === 2 ? "nd" : c === 3 ? "rd" : "th";
-          return "https://www.congress.gov/bill/" + c + suffix + "-congress/" +
+          return base + "bill/" + c + suffix + "-congress/" +
             typeMap[prefixes[i]] + "/" + num;
         }
       }
@@ -901,7 +930,8 @@
     }
     if (cgUrl) {
       billUrl = cgUrl;
-      billLinkLabel = "View bill on Congress.gov \u2197";
+      var isNom = billDisplay && billDisplay.replace(/[.\s]/g, "").toUpperCase().indexOf("PN") === 0;
+      billLinkLabel = isNom ? "View nomination on Congress.gov \u2197" : "View bill on Congress.gov \u2197";
     } else if (bill && bill.link) {
       billUrl = bill.link;
       billLinkLabel = "View bill on GovTrack \u2197";
