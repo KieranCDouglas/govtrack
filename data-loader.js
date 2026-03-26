@@ -483,6 +483,7 @@
         billId: (vote.related_bill && vote.related_bill.display_number) || undefined,
         billTitle: (vote.related_bill && vote.related_bill.title) ?
           vote.related_bill.title.substring(0, 200) : undefined,
+        billGovtrackId: (vote.related_bill && vote.related_bill.id) || undefined,
         description: vote.category_label || undefined,
         category: vote.category || undefined,
         chamber: vote.chamber_label || undefined,
