@@ -225,19 +225,24 @@
     });
     if (!positionsCard) return;
 
-    // Don't inject twice
-    if (positionsCard.querySelector("[data-cw-summary]")) return;
+    // Don't inject twice — set marker synchronously to prevent race from
+    // multiple MutationObserver callbacks queuing async loadSummaries calls
+    if (positionsCard.querySelector("[data-cw-summary]") || positionsCard.hasAttribute("data-cw-summary-pending")) return;
+    positionsCard.setAttribute("data-cw-summary-pending", "true");
 
     loadSummaries(function (summaries) {
+      // Double-check inside callback in case of edge-case race
+      if (positionsCard.querySelector("[data-cw-summary]")) return;
+
       var summary = summaries[bioguideId];
-      if (!summary) return;
+      if (!summary) { positionsCard.removeAttribute("data-cw-summary-pending"); return; }
 
       // Find the Issue Positions heading
       var h2 = null;
       positionsCard.querySelectorAll("h2").forEach(function (h) {
         if (h.textContent.trim() === "Issue Positions") h2 = h;
       });
-      if (!h2) return;
+      if (!h2) { positionsCard.removeAttribute("data-cw-summary-pending"); return; }
 
       // Create summary block and insert after the heading
       var block = document.createElement("div");
