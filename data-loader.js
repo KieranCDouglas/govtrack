@@ -259,7 +259,7 @@
         return staticResponse.clone().json().then(function (staticMembers) {
           // Try live Voteview data, merge with static for missing fields
           return fetchLiveMembers(staticMembers).then(function (liveMembers) {
-            console.log("[CongressWatch] Loaded " + liveMembers.length + " members from live Voteview data");
+            console.log("[Civicism] Loaded " + liveMembers.length + " members from live Voteview data");
             setCachedMembers(liveMembers);
             return new Response(JSON.stringify(liveMembers), {
               status: 200,
@@ -268,7 +268,7 @@
           });
         });
       }).catch(function (err) {
-        console.warn("[CongressWatch] Live data fetch failed, using static fallback:", err.message);
+        console.warn("[Civicism] Live data fetch failed, using static fallback:", err.message);
         return originalFetch.apply(window, [input, init]);
       });
     }
