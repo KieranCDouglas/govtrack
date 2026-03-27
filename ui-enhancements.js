@@ -161,6 +161,16 @@
     var root = document.getElementById("root");
     if (!root) return;
 
+    // Inject CSS to hide React's children inside replaced vote text containers.
+    // This survives React re-renders because it targets by class, not individual elements.
+    if (!document.getElementById("cw-vote-styles")) {
+      var style = document.createElement("style");
+      style.id = "cw-vote-styles";
+      style.textContent =
+        ".cw-replaced > :not(.cw-bill-line):not(.cw-proc-line):not(.cw-vote-panel) { display: none !important; }";
+      document.head.appendChild(style);
+    }
+
     var debounce;
     var ob = new MutationObserver(function () {
       clearTimeout(debounce);
@@ -384,6 +394,66 @@
       })
       .catch(function () { return null; });
     billCache[gtId] = p;
+    return p;
+  }
+
+  /* -- Fetch bill info by display ID (e.g. "HR29") from GovTrack search API -- */
+  var billSearchCache = {};
+
+  function fetchBillByDisplayId(displayId, congress) {
+    var key = displayId + "_" + congress;
+    if (billSearchCache[key]) return billSearchCache[key];
+
+    // Parse bill type and number from display ID
+    var id = displayId.replace(/[.\s]/g, "").toUpperCase().trim();
+    var gtTypeMap = {
+      "HCONRES": "house_concurrent_resolution", "SCONRES": "senate_concurrent_resolution",
+      "HCONR": "house_concurrent_resolution", "SCONR": "senate_concurrent_resolution",
+      "HCRES": "house_concurrent_resolution", "SCRES": "senate_concurrent_resolution",
+      "HCR": "house_concurrent_resolution", "SCR": "senate_concurrent_resolution",
+      "HJRES": "house_joint_resolution", "SJRES": "senate_joint_resolution",
+      "HJRE": "house_joint_resolution", "SJRE": "senate_joint_resolution",
+      "HJR": "house_joint_resolution", "SJR": "senate_joint_resolution",
+      "HRES": "house_resolution", "SRES": "senate_resolution",
+      "HRE": "house_resolution", "SRE": "senate_resolution",
+      "HR": "house_bill", "S": "senate_bill"
+    };
+    var prefixes = [
+      "HCONRES","SCONRES","HCONR","SCONR","HCRES","SCRES","HCR","SCR",
+      "HJRES","SJRES","HJRE","SJRE","HJR","SJR",
+      "HRES","SRES","HRE","SRE","HR","S"
+    ];
+    var billType = "", billNum = "";
+    for (var i = 0; i < prefixes.length; i++) {
+      if (id.indexOf(prefixes[i]) === 0) {
+        var num = id.substring(prefixes[i].length);
+        if (num && /^\d+$/.test(num)) {
+          billType = gtTypeMap[prefixes[i]];
+          billNum = num;
+          break;
+        }
+      }
+    }
+
+    if (!billType || !billNum) {
+      billSearchCache[key] = Promise.resolve(null);
+      return billSearchCache[key];
+    }
+
+    var url = "https://www.govtrack.us/api/v2/bill?bill_type=" + billType +
+      "&number=" + billNum + "&congress=" + congress + "&limit=1";
+
+    var p = fetch(url)
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data || !data.objects || !data.objects.length) return null;
+        var b = data.objects[0];
+        // Fetch full details using the bill ID
+        return fetchBillSummary(b.id);
+      })
+      .catch(function () { return null; });
+
+    billSearchCache[key] = p;
     return p;
   }
 
@@ -665,21 +735,90 @@
         badge.parentElement.appendChild(ab);
       }
 
-      // Remove line-clamp truncation so full text is always visible
-      var questionEl = item.querySelector(".line-clamp-2") || item.querySelector(".text-sm.text-foreground");
-      var allXs = item.querySelectorAll(".line-clamp-1");
-      var billTitleEl = allXs[0] || null;
-      var descEl      = allXs[1] || null;
+      // Restructure collapsed view: bill name prominent, question secondary
+      // Instead of modifying React's text nodes (which React reconciliation can overwrite),
+      // we hide the originals and create new elements.
+      var textParent = item.querySelector(".flex-1");
+      if (textParent) {
+        var questionEl = textParent.querySelector(".line-clamp-2") || textParent.querySelector(".text-sm.text-foreground");
+        var allXs = textParent.querySelectorAll(".line-clamp-1");
+        var billTitleEl = allXs[0] || null;
+        var descEl      = allXs[1] || null;
 
-      [questionEl, billTitleEl, descEl].forEach(function (el) {
-        if (!el) return;
-        el.style.webkitLineClamp = "unset";
-        el.style.overflow = "visible";
-        el.style.display = "block";
-        el.style.whiteSpace = "normal";
-        el.style.textOverflow = "unset";
-        el.classList.remove("line-clamp-1", "line-clamp-2", "truncate");
-      });
+        var origQuestion = (questionEl && questionEl.textContent) || "";
+        var origBillTitle = (billTitleEl && billTitleEl.textContent) || "";
+
+        // Save originals as data attrs so renderPanel can read them later
+        item.dataset.cwOrigQuestion = origQuestion;
+        item.dataset.cwOrigBillTitle = origBillTitle;
+
+        // Format bill display number nicely: "HR29" → "H.R. 29"
+        var prettyBillId = formatBillId(billDisplay);
+
+        // If no bill ID from data, try to extract one from the title or question text
+        // Search anywhere in the text for patterns like "H.Res. 1131", "H.R. 8029", "S. 1234"
+        var _billIdRe = /(H\.?\s*(?:Con\.?\s*)?(?:J\.?\s*)?(?:Res\.?\s*)?\s*\d+|S\.?\s*(?:Con\.?\s*)?(?:J\.?\s*)?(?:Res\.?\s*)?\s*\d+)/i;
+        if (!prettyBillId) {
+          var _extractSrc = origBillTitle || origQuestion || "";
+          var _billIdMatch = _extractSrc.match(_billIdRe);
+          if (_billIdMatch) {
+            prettyBillId = _billIdMatch[1].replace(/\s+/g, " ").trim();
+          }
+        }
+
+        // Strip redundant bill number prefix from title
+        var cleanTitle = origBillTitle || "";
+        if (prettyBillId && cleanTitle) {
+          var colonIdx = cleanTitle.indexOf(":");
+          if (colonIdx > 0 && colonIdx < 20) {
+            var beforeColon = cleanTitle.substring(0, colonIdx).replace(/[.\s]/g, "").toUpperCase();
+            var billIdNorm = prettyBillId.replace(/[.\s]/g, "").toUpperCase();
+            if (beforeColon === billIdNorm) {
+              cleanTitle = cleanTitle.substring(colonIdx + 1).trim();
+            }
+          }
+        }
+
+        // Determine what to show on collapsed tab:
+        // - Short titles (<= 80 chars): "H.R. 29 — Short Title Here"
+        // - Long titles or no title: just "H.R. 29"
+        var COLLAPSE_TITLE_LIMIT = 80;
+        var showTitleInline = prettyBillId && cleanTitle && cleanTitle.length <= COLLAPSE_TITLE_LIMIT;
+
+        // Always replace React's text if we have a bill ID
+        if (prettyBillId) {
+          // Mark parent so CSS hides ALL React children (survives React re-renders)
+          textParent.classList.add("cw-replaced");
+
+          // Create new primary line (bill ID always bold)
+          var cwLine1 = document.createElement("div");
+          cwLine1.className = "cw-bill-line";
+          cwLine1.style.cssText = "font-size:14px;color:hsl(var(--foreground));line-height:1.4;";
+          var idSpan = document.createElement("span");
+          idSpan.style.fontWeight = "700";
+          idSpan.textContent = prettyBillId;
+          cwLine1.appendChild(idSpan);
+          if (showTitleInline) {
+            cwLine1.appendChild(document.createTextNode(" \u2014 " + cleanTitle));
+          }
+
+          // Create new secondary line (vote procedure)
+          var cwLine2 = document.createElement("div");
+          cwLine2.className = "cw-proc-line";
+          cwLine2.textContent = origQuestion;
+          cwLine2.style.cssText = "font-size:12px;font-weight:400;color:hsl(var(--muted-foreground));margin-top:2px;" +
+            "white-space:nowrap;overflow:hidden;text-overflow:ellipsis;";
+
+          var firstChild = textParent.firstChild;
+          textParent.insertBefore(cwLine2, firstChild);
+          textParent.insertBefore(cwLine1, firstChild);
+        } else {
+          // No bill reference found — keep React's text, just tighten clamps
+          if (questionEl) questionEl.style.webkitLineClamp = "2";
+          if (billTitleEl) billTitleEl.style.webkitLineClamp = "1";
+          if (descEl) descEl.style.display = "none";
+        }
+      }
 
       // build expandable panel
       var panel = document.createElement("div");
@@ -700,6 +839,7 @@
         if (panel.style.display === "none") item.style.backgroundColor = "";
       });
 
+      // Append panel inside .flex-1 text area
       var textBox = item.querySelector(".flex-1");
       if (textBox) textBox.appendChild(panel);
       else item.appendChild(panel);
@@ -712,7 +852,7 @@
 
         if (!open && !loaded) {
           loaded = true;
-          renderPanel(panel, gtId, billDisplay, voteResult, alignment, questionDetails, questionEl, billTitleEl, congress, chamber, totalPlus, totalMinus, voteIdNum, position);
+          renderPanel(panel, gtId, billDisplay, voteResult, alignment, questionDetails, item, congress, chamber, totalPlus, totalMinus, voteIdNum, position);
         }
       });
     });
@@ -722,9 +862,10 @@
   }
 
   /* -- Render expanded panel content -- */
-  function renderPanel(panel, gtId, billDisplay, voteResult, alignment, questionDetails, questionEl, billTitleEl, congress, chamber, totalPlus, totalMinus, voteIdNum, position) {
-    var qText  = (questionEl  && questionEl.textContent)  || "";
-    var bTitle = (billTitleEl && billTitleEl.textContent)  || "";
+  function renderPanel(panel, gtId, billDisplay, voteResult, alignment, questionDetails, item, congress, chamber, totalPlus, totalMinus, voteIdNum, position) {
+    // Read original (pre-swap) values saved in data attributes
+    var qText  = item.dataset.cwOrigQuestion || "";
+    var bTitle = item.dataset.cwOrigBillTitle || "";
 
     panel.innerHTML =
       '<div style="display:flex;align-items:center;gap:6px;color:hsl(var(--muted-foreground));">' +
@@ -734,12 +875,16 @@
       '</div>' +
       '<style>@keyframes spin{to{transform:rotate(360deg)}}</style>';
 
+    function renderContent(bill) {
+      panel.innerHTML = buildExpandedHtml(bill, voteResult, alignment, questionDetails, qText, bTitle, billDisplay, congress, chamber, totalPlus, totalMinus, voteIdNum, position);
+    }
+
     if (gtId) {
-      fetchBillSummary(gtId).then(function (bill) {
-        panel.innerHTML = buildExpandedHtml(bill, voteResult, alignment, questionDetails, qText, bTitle, billDisplay, congress, chamber, totalPlus, totalMinus, voteIdNum, position);
-      });
+      fetchBillSummary(gtId).then(renderContent).catch(function () { renderContent(null); });
+    } else if (billDisplay && congress) {
+      fetchBillByDisplayId(billDisplay, congress).then(renderContent).catch(function () { renderContent(null); });
     } else {
-      panel.innerHTML = buildExpandedHtml(null, voteResult, alignment, questionDetails, qText, bTitle, billDisplay, congress, chamber, totalPlus, totalMinus, voteIdNum, position);
+      renderContent(null);
     }
   }
 
@@ -802,8 +947,42 @@
     return "";
   }
 
+  /* -- Format a bill ID like "HR29" into "H.R. 29" for display -- */
+  function formatBillId(raw) {
+    if (!raw) return "";
+    var id = raw.replace(/[.\s]/g, "").toUpperCase().trim();
+    var displayMap = {
+      "HCONRES": "H.Con.Res.", "SCONRES": "S.Con.Res.",
+      "HCONR": "H.Con.Res.", "SCONR": "S.Con.Res.",
+      "HCRES": "H.Con.Res.", "SCRES": "S.Con.Res.",
+      "HCR": "H.Con.Res.", "SCR": "S.Con.Res.",
+      "HJRES": "H.J.Res.", "SJRES": "S.J.Res.",
+      "HJRE": "H.J.Res.", "SJRE": "S.J.Res.",
+      "HJR": "H.J.Res.", "SJR": "S.J.Res.",
+      "HRES": "H.Res.", "SRES": "S.Res.",
+      "HRE": "H.Res.", "SRE": "S.Res.",
+      "HR": "H.R.", "S": "S.",
+      "PN": "PN"
+    };
+    var prefixes = [
+      "HCONRES","SCONRES","HCONR","SCONR","HCRES","SCRES","HCR","SCR",
+      "HJRES","SJRES","HJRE","SJRE","HJR","SJR",
+      "HRES","SRES","HRE","SRE","HR","PN","S"
+    ];
+    for (var i = 0; i < prefixes.length; i++) {
+      if (id.indexOf(prefixes[i]) === 0) {
+        var num = id.substring(prefixes[i].length);
+        if (num && /^\d+$/.test(num)) {
+          return displayMap[prefixes[i]] + " " + num;
+        }
+      }
+    }
+    return raw;
+  }
+
   /* -- Build the expansion-panel HTML -- */
   function buildExpandedHtml(bill, voteResult, alignment, questionDetails, qText, bTitle, billDisplay, congress, chamber, totalPlus, totalMinus, voteIdNum, position) {
+    try {
     var html = "";
     var tp = parseInt(totalPlus, 10);
     var tm = parseInt(totalMinus, 10);
@@ -811,9 +990,16 @@
 
     // 1. Vote tally graphic with member's position highlighted
     if (hasTally) {
-      var total = tp + tm;
-      var yeaPct = Math.round(100 * tp / total);
-      var nayPct = 100 - yeaPct;
+      // Compute "not voting" from expected chamber size
+      var chamberLower = (chamber || "").toLowerCase();
+      var expectedTotal = /senate/i.test(chamberLower) ? 100 : 435;
+      var notVoting = Math.max(0, expectedTotal - tp - tm);
+
+      var grandTotal = tp + tm + notVoting;
+      var yeaPct = Math.round(100 * tp / grandTotal);
+      var nayPct = Math.round(100 * tm / grandTotal);
+      var nvPct = 100 - yeaPct - nayPct;
+
       var passed = /pass|agree|confirm|approved/i.test(voteResult || "");
       var failed = /fail|reject|not agreed|defeated/i.test(voteResult || "");
       var resultLabel = voteResult ? esc(voteResult) : "";
@@ -859,12 +1045,20 @@
           'min-width:' + (nayPct > 8 ? '0' : '32px') + ';' + nayBorder + nayOpacity + '">' +
           (nayPct >= 12 ? 'Nay ' + tm : tm) + '</div>';
       }
+      if (nvPct > 0 && notVoting > 0) {
+        html += '<div style="width:' + nvPct + '%;background:hsl(var(--muted-foreground)/0.25);color:hsl(var(--muted-foreground));text-align:center;' +
+          'min-width:' + (nvPct > 5 ? '0' : '28px') + ';font-weight:500;font-size:10px;">' +
+          (nvPct >= 10 ? notVoting + ' NV' : notVoting) + '</div>';
+      }
       html += '</div>';
 
       // Legend with member's position indicated
-      html += '<div style="display:flex;justify-content:space-between;font-size:10px;color:hsl(var(--muted-foreground));">';
-      html += '<span>' + (memberVotedYea ? '\u25b6 ' : '') + 'Yea: ' + tp + ' (' + yeaPct + '%)</span>';
-      html += '<span>' + (memberVotedNay ? '\u25b6 ' : '') + 'Nay: ' + tm + ' (' + nayPct + '%)</span>';
+      html += '<div style="display:flex;gap:12px;font-size:10px;color:hsl(var(--muted-foreground));">';
+      html += '<span>' + (memberVotedYea ? '\u25b6 ' : '') + 'Yea: ' + tp + ' (' + Math.round(100 * tp / (tp + tm)) + '%)</span>';
+      html += '<span>' + (memberVotedNay ? '\u25b6 ' : '') + 'Nay: ' + tm + ' (' + Math.round(100 * tm / (tp + tm)) + '%)</span>';
+      if (notVoting > 0) {
+        html += '<span style="margin-left:auto;">Not Voting: ' + notVoting + '</span>';
+      }
       html += '</div>';
 
       html += '</div>';
@@ -890,19 +1084,75 @@
         'margin-bottom:10px;">' + aLabel + '</div>';
     }
 
-    // 3. Vote procedure (e.g. "On Motion to Suspend the Rules and Pass")
-    if (questionDetails) {
+    // 3. Full bill name + number
+    var prettyId = formatBillId(billDisplay);
+    var rawTitle = (bill && bill.title) || bTitle || "";
+
+    // Strip redundant bill number prefix from title (e.g. "H.R. 8029: Pay Our..." → "Pay Our...")
+    var fullTitle = rawTitle;
+    if (prettyId && fullTitle) {
+      var _colonIdx = fullTitle.indexOf(":");
+      if (_colonIdx > 0 && _colonIdx < 20) {
+        var _before = fullTitle.substring(0, _colonIdx).replace(/[.\s]/g, "").toUpperCase();
+        var _idNorm = prettyId.replace(/[.\s]/g, "").toUpperCase();
+        if (_before === _idNorm) {
+          fullTitle = fullTitle.substring(_colonIdx + 1).trim();
+        }
+      }
+    }
+
+    // Determine if section 4 has genuinely new information
+    var sec4Text = "";
+    if (bill && bill.officialTitle) {
+      var _oNorm = bill.officialTitle.toLowerCase().trim();
+      var _fNorm = fullTitle.toLowerCase().trim();
+      // Show section 4 only if officialTitle adds new info (not contained in fullTitle)
+      if (_oNorm !== _fNorm && !_fNorm.includes(_oNorm) && !_oNorm.includes(_fNorm)) {
+        sec4Text = bill.officialTitle;
+      }
+    } else if (bTitle && bTitle !== rawTitle && bTitle !== fullTitle) {
+      var _bNorm = bTitle.toLowerCase().trim();
+      var _fNorm2 = fullTitle.toLowerCase().trim();
+      if (_bNorm !== _fNorm2 && !_fNorm2.includes(_bNorm) && !_bNorm.includes(_fNorm2)) {
+        sec4Text = bTitle;
+      }
+    }
+
+    // Smart truncation: shorten section 3 title when it's very long AND section 4 will show full text
+    var TRUNC_LIMIT = 120;
+    var displayTitle = fullTitle;
+    if (fullTitle.length > TRUNC_LIMIT && sec4Text) {
+      displayTitle = fullTitle.substring(0, TRUNC_LIMIT).replace(/[\s,;:\-]+$/, '') + '\u2026';
+    }
+
+    if (prettyId || displayTitle) {
+      html += '<div style="margin-bottom:8px;">';
+      if (prettyId && displayTitle) {
+        html += '<div style="font-size:13px;font-weight:600;color:hsl(var(--foreground));line-height:1.5;">' +
+          esc(prettyId) + ' \u2014 ' + esc(displayTitle) + '</div>';
+      } else if (displayTitle) {
+        html += '<div style="font-size:13px;font-weight:600;color:hsl(var(--foreground));line-height:1.5;">' +
+          esc(displayTitle) + '</div>';
+      } else {
+        html += '<div style="font-size:13px;font-weight:600;color:hsl(var(--foreground));line-height:1.5;">' +
+          esc(prettyId) + '</div>';
+      }
+      html += '</div>';
+    }
+
+    // 4. Official bill title / purpose (only when it adds new information)
+    if (sec4Text) {
+      html += '<div style="margin-bottom:10px;font-size:12px;line-height:1.7;color:hsl(var(--foreground)/0.8);">' +
+        esc(sec4Text) + '</div>';
+    }
+
+    // 5. Vote procedure (e.g. "On Motion to Suspend the Rules and Pass")
+    if (qText) {
       html += '<div style="font-size:11px;color:hsl(var(--muted-foreground));margin-bottom:8px;font-style:italic;">' +
-        esc(questionDetails) + '</div>';
+        'Procedure: ' + esc(qText) + '</div>';
     }
 
-    // 4. Official bill title / purpose (different from the displayed short title)
-    if (bill && bill.officialTitle && bill.officialTitle !== bill.title) {
-      html += '<div style="margin-bottom:10px;line-height:1.7;color:hsl(var(--foreground)/0.85);">' +
-        esc(bill.officialTitle) + '</div>';
-    }
-
-    // 5. Metadata row
+    // 6. Metadata row
     var meta = [];
     if (bill) {
       if (bill.sponsor) meta.push('<span>Sponsor: <strong style="color:hsl(var(--foreground));">' + esc(bill.sponsor) + '</strong></span>');
@@ -914,37 +1164,101 @@
         meta.join("") + '</div>';
     }
 
-    // 6. Single bill link — prefer congress.gov, fall back to GovTrack
+    // 7. Bill links — primary bill + any referenced bills from procedural text
     var linkStyle = 'style="color:hsl(var(--primary));font-size:11px;font-weight:600;text-decoration:none;' +
       'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:5px;' +
       'background:hsl(var(--primary)/0.08);transition:background .15s;" ' +
       'onmouseover="this.style.background=\'hsl(var(--primary)/0.15)\'" ' +
       'onmouseout="this.style.background=\'hsl(var(--primary)/0.08)\'"';
+    var refLinkStyle = 'style="color:hsl(var(--primary));font-size:11px;text-decoration:none;' +
+      'display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;' +
+      'background:hsl(var(--primary)/0.05);transition:background .15s;" ' +
+      'onmouseover="this.style.background=\'hsl(var(--primary)/0.12)\'" ' +
+      'onmouseout="this.style.background=\'hsl(var(--primary)/0.05)\'"';
 
     var billUrl = "";
     var billLinkLabel = "";
+    var isNom = billDisplay && billDisplay.replace(/[.\s]/g, "").toUpperCase().indexOf("PN") === 0;
 
-    // Try congress.gov first (from API or constructed from bill ID)
-    var cgUrl = (bill && bill.congressDotGov) || "";
-    if (!cgUrl && billDisplay) {
-      cgUrl = billIdToCongressGovUrl(billDisplay, congress);
+    // Priority 1: construct congress.gov URL directly from bill ID + congress
+    if (billDisplay && congress) {
+      var directUrl = billIdToCongressGovUrl(billDisplay, congress);
+      if (directUrl) {
+        billUrl = directUrl;
+        billLinkLabel = isNom ? "View nomination on Congress.gov \u2197" : "View bill on Congress.gov \u2197";
+      }
     }
-    if (cgUrl) {
-      billUrl = cgUrl;
-      var isNom = billDisplay && billDisplay.replace(/[.\s]/g, "").toUpperCase().indexOf("PN") === 0;
+    // Priority 2: congress.gov URL from API data
+    if (!billUrl && bill && bill.congressDotGov) {
+      billUrl = bill.congressDotGov;
       billLinkLabel = isNom ? "View nomination on Congress.gov \u2197" : "View bill on Congress.gov \u2197";
-    } else if (bill && bill.link) {
+    }
+    // Priority 3: GovTrack link from API data
+    if (!billUrl && bill && bill.link) {
       billUrl = bill.link;
       billLinkLabel = "View bill on GovTrack \u2197";
     }
 
-    if (billUrl) {
-      html += '<div style="margin-top:8px;">' +
-        '<a href="' + billUrl + '" target="_blank" rel="noopener noreferrer" ' + linkStyle + '>' +
-        billLinkLabel + '</a></div>';
+    // Extract referenced bill IDs from procedural text (e.g. "H.R. 8029", "S. 1234", "H.J.Res. 45")
+    var refBills = [];
+    var refSources = [qText, rawTitle].join(" ");
+    if (congress && refSources) {
+      var billRefRe = /\b(H\.?\s*(?:Con\.?\s*)?(?:J\.?\s*)?(?:Res\.?\s*)?|S\.?\s*(?:Con\.?\s*)?(?:J\.?\s*)?(?:Res\.?\s*)?)\s*(\d+)\b/gi;
+      var refMatch;
+      var seenRef = {};
+      // Normalize the main billDisplay so we can skip it
+      var mainNorm = billDisplay ? billDisplay.replace(/[.\s]/g, "").toUpperCase() : "";
+      while ((refMatch = billRefRe.exec(refSources)) !== null) {
+        var refPrefix = refMatch[1].replace(/[\s.]/g, "").toUpperCase();
+        var refNum = refMatch[2];
+        var refRaw = refPrefix + refNum;
+        // Skip the main bill and duplicates
+        if (refRaw === mainNorm || seenRef[refRaw]) continue;
+        seenRef[refRaw] = true;
+        var refUrl = billIdToCongressGovUrl(refRaw, congress);
+        if (refUrl && refUrl !== billUrl) {
+          // Reconstruct a pretty label from the match text
+          var refLabel = refMatch[0].replace(/\s+/g, " ").trim();
+          refBills.push({ label: refLabel, url: refUrl });
+        }
+      }
+    }
+
+    if (billUrl || refBills.length) {
+      html += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid hsl(var(--border)/0.3);display:flex;flex-wrap:wrap;gap:6px;align-items:center;">';
+      if (billUrl) {
+        html += '<a href="' + billUrl + '" target="_blank" rel="noopener noreferrer" ' + linkStyle + '>' +
+          billLinkLabel + '</a>';
+      }
+      for (var ri = 0; ri < refBills.length; ri++) {
+        html += '<a href="' + refBills[ri].url + '" target="_blank" rel="noopener noreferrer" ' + refLinkStyle + '>' +
+          esc(refBills[ri].label) + ' \u2197</a>';
+      }
+      html += '</div>';
+    } else if (billDisplay) {
+      // Fallback: link to congress.gov search
+      var searchUrl = 'https://www.congress.gov/search?q=' + encodeURIComponent(billDisplay);
+      html += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid hsl(var(--border)/0.3);">' +
+        '<a href="' + searchUrl + '" target="_blank" rel="noopener noreferrer" ' + linkStyle + '>' +
+        'Search for ' + esc(billDisplay) + ' on Congress.gov \u2197</a></div>';
     }
 
     return html || '<div style="color:hsl(var(--muted-foreground));">No additional details available.</div>';
+    } catch (err) {
+      console.error('[CW] buildExpandedHtml error:', err);
+      // Emergency fallback: at minimum show the bill link
+      var fallback = '<div style="color:hsl(var(--muted-foreground));">Error loading details.</div>';
+      if (billDisplay && congress) {
+        try {
+          var fbUrl = billIdToCongressGovUrl(billDisplay, congress);
+          if (fbUrl) {
+            fallback += '<div style="margin-top:8px;"><a href="' + fbUrl +
+              '" target="_blank" rel="noopener noreferrer" style="color:hsl(var(--primary));font-size:12px;">View bill on Congress.gov \u2197</a></div>';
+          }
+        } catch (e2) {}
+      }
+      return fallback;
+    }
   }
 
   /* ================================================================
@@ -1070,9 +1384,15 @@
       var hasTally = (tp + tm) > 0;
 
       if (hasTally) {
-        var total = tp + tm;
-        var yeaPct = Math.round(100 * tp / total);
-        var nayPct = 100 - yeaPct;
+        var chamberLabel = (vote.chamber_label || vote.chamber || "").toLowerCase();
+        var expectedTotal = /senate/i.test(chamberLabel) ? 100 : 435;
+        var notVoting = Math.max(0, expectedTotal - tp - tm);
+
+        var grandTotal = tp + tm + notVoting;
+        var yeaPct = Math.round(100 * tp / grandTotal);
+        var nayPct = Math.round(100 * tm / grandTotal);
+        var nvPct = 100 - yeaPct - nayPct;
+
         var result = vote.result || "";
         var passed = /pass|agree|confirm|approved/i.test(result);
         var failed = /fail|reject|not agreed|defeated/i.test(result);
@@ -1095,13 +1415,18 @@
             'min-width:' + (nayPct > 8 ? '0' : '32px') + ';">' +
             (nayPct >= 12 ? 'Nay ' + tm : tm) + '</div>';
         }
+        if (nvPct > 0 && notVoting > 0) {
+          html += '<div style="width:' + nvPct + '%;background:hsl(var(--muted-foreground)/0.25);color:hsl(var(--muted-foreground));text-align:center;' +
+            'min-width:' + (nvPct > 5 ? '0' : '28px') + ';font-weight:500;font-size:10px;">' +
+            (nvPct >= 10 ? notVoting + ' NV' : notVoting) + '</div>';
+        }
         html += '</div>';
 
         // Legend
-        html += '<div style="display:flex;justify-content:space-between;font-size:10px;color:hsl(var(--muted-foreground));">';
-        html += '<span>Yea: ' + tp + ' (' + yeaPct + '%)</span>';
-        html += '<span>Nay: ' + tm + ' (' + nayPct + '%)</span>';
-        if (vote.total_other > 0) html += '<span>Other: ' + vote.total_other + '</span>';
+        html += '<div style="display:flex;gap:12px;font-size:10px;color:hsl(var(--muted-foreground));">';
+        html += '<span>Yea: ' + tp + ' (' + Math.round(100 * tp / (tp + tm)) + '%)</span>';
+        html += '<span>Nay: ' + tm + ' (' + Math.round(100 * tm / (tp + tm)) + '%)</span>';
+        if (notVoting > 0) html += '<span style="margin-left:auto;">Not Voting: ' + notVoting + '</span>';
         html += '</div>';
         html += '</div>';
       }

@@ -475,15 +475,21 @@
       else if (optKey === "0") position = "Present";
       else position = "Not Voting";
 
+      // related_bill can be an integer ID or an expanded object
+      var rb = vote.related_bill;
+      var rbIsObj = rb && typeof rb === "object";
+      var rbId = rbIsObj ? rb.id : (typeof rb === "number" ? rb : undefined);
+      var rbDisplay = rbIsObj ? rb.display_number : undefined;
+      var rbTitle = rbIsObj ? rb.title : undefined;
+
       return {
         question: vote.question || "Roll Call Vote",
         position: position,
         voteDate: (vote.created || "").substring(0, 10),
         result: vote.result || undefined,
-        billId: (vote.related_bill && vote.related_bill.display_number) || undefined,
-        billTitle: (vote.related_bill && vote.related_bill.title) ?
-          vote.related_bill.title.substring(0, 200) : undefined,
-        billGovtrackId: (vote.related_bill && vote.related_bill.id) || undefined,
+        billId: rbDisplay || undefined,
+        billTitle: rbTitle ? rbTitle.substring(0, 200) : undefined,
+        billGovtrackId: rbId || undefined,
         description: vote.category_label || undefined,
         category: vote.category || undefined,
         chamber: vote.chamber_label || undefined,
