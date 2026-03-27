@@ -1,5 +1,5 @@
 /**
- * CongressWatch Dynamic Data Loader
+ * Civicism Dynamic Data Loader
  * 
  * Intercepts fetch requests to data/members-current.json and data/stats.json,
  * fetching live NOMINATE scores from Voteview on each page load.
@@ -9,7 +9,7 @@
  */
 (function () {
   "use strict";
-  console.log("[CongressWatch] data-loader.js v20260327c loaded");
+  console.log("[Civicism] data-loader.js v20260327c loaded");
 
   var CONGRESS = 119;
   var VOTEVIEW_HOUSE = "https://voteview.com/static/data/out/members/H" + CONGRESS + "_members.csv";
@@ -362,10 +362,10 @@
       };
       _govtrackStatsCache = stats;
       try { sessionStorage.setItem("cw_govtrack_stats", JSON.stringify(stats)); } catch (e) { /* ignore */ }
-      console.log("[CongressWatch] Live stats from GovTrack:", stats);
+      console.log("[Civicism] Live stats from GovTrack:", stats);
       return stats;
     }).catch(function (err) {
-      console.warn("[CongressWatch] GovTrack stats fetch failed, using static:", err.message);
+      console.warn("[Civicism] GovTrack stats fetch failed, using static:", err.message);
       return null;
     });
   }
@@ -393,7 +393,7 @@
       if (objects.length > 0 && objects[0].id) {
         var id = objects[0].id;
         _govtrackIdCache[bioguideId] = id;
-        console.log("[CongressWatch] Resolved", bioguideId, "-> GovTrack person", id);
+        console.log("[Civicism] Resolved", bioguideId, "-> GovTrack person", id);
         return id;
       }
       throw new Error("No GovTrack person found for " + bioguideId);
@@ -512,7 +512,7 @@
         return fetchPage();
       }).catch(function (pageErr) {
         // On page-level error (CORS / rate-limit), return what we have so far
-        console.warn("[CongressWatch] Page fetch failed at offset " + offset + ", returning " + allVotes.length + " votes collected so far:", pageErr.message);
+        console.warn("[Civicism] Page fetch failed at offset " + offset + ", returning " + allVotes.length + " votes collected so far:", pageErr.message);
         return allVotes;
       });
     }
@@ -526,20 +526,20 @@
    * If govtrackId is missing, resolves it via person lookup first.
    */
   window.__cwLoadVotes = function (bioguideId, govtrackId) {
-    console.log("[CongressWatch] __cwLoadVotes called:", bioguideId, "govtrackId:", govtrackId);
+    console.log("[Civicism] __cwLoadVotes called:", bioguideId, "govtrackId:", govtrackId);
     // Resolve govtrackId if not provided
     var idPromise = govtrackId
       ? Promise.resolve(govtrackId)
       : lookupGovTrackId(bioguideId);
 
     return idPromise.then(function (resolvedId) {
-      console.log("[CongressWatch] Fetching votes from GovTrack API for person", resolvedId);
+      console.log("[Civicism] Fetching votes from GovTrack API for person", resolvedId);
       return fetchGovTrackVotes(resolvedId, null).then(function (gtVotes) {
-        console.log("[CongressWatch] Loaded", gtVotes.length, "votes from GovTrack API");
+        console.log("[Civicism] Loaded", gtVotes.length, "votes from GovTrack API");
         return { votes: gtVotes, source: "govtrack.us", totalCount: gtVotes.length };
       });
     }).catch(function (err) {
-      console.error("[CongressWatch] Vote loading failed:", err.message, err.stack || err);
+      console.error("[Civicism] Vote loading failed:", err.message, err.stack || err);
       return { votes: [], source: "error", totalCount: 0 };
     });
   };

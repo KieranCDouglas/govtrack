@@ -725,7 +725,10 @@
     // Store applyFilters so enhanceVotes can call it after marking items
     container._cwApplyFilters = applyFilters;
 
-    // Don't run initial applyFilters here — wait for enhanceVotes to mark items first
+    // Run initial applyFilters to ensure filter selection immediately updates the vote list
+    setTimeout(function () {
+      applyFilters(true);
+    }, 0);
   }
 
   /* -- Main vote enhancement entry point -- */
@@ -1422,16 +1425,7 @@
     var recentSection = document.createElement("div");
     recentSection.className = "cw-recent-section";
 
-    // Search bar (shared across both columns)
-    var searchBar = document.createElement("div");
-    searchBar.style.cssText = "margin-bottom:12px;display:flex;gap:8px;align-items:center;";
-    searchBar.addEventListener("click", function (ev) { ev.stopPropagation(); });
-    var inputCss = "padding:6px 10px;border-radius:6px;border:1px solid hsl(var(--border));" +
-      "background:hsl(var(--muted)/0.3);color:hsl(var(--foreground));font-size:12px;outline:none;";
-    searchBar.innerHTML =
-      '<input type="text" placeholder="Search votes\u2026" class="cw-recent-search" ' +
-        'style="flex:1;min-width:160px;' + inputCss + '" />';
-    recentSection.appendChild(searchBar);
+    // Remove search bar from Recent Congressional Votes section
 
     // Two-column grid for House and Senate
     var votesGrid = document.createElement("div");
@@ -1481,32 +1475,14 @@
 
     // State tracking for pagination
     var state = {
-      house: { page: 0, total: 0, search: "" },
-      senate: { page: 0, total: 0, search: "" }
+      house: { page: 0, total: 0 },
+      senate: { page: 0, total: 0 }
     };
 
     var houseListEl = houseCol.querySelector(".cw-house-list");
     var senateListEl = senateCol.querySelector(".cw-senate-list");
     var housePagEl = houseCol.querySelector(".cw-house-pag");
     var senatePagEl = senateCol.querySelector(".cw-senate-pag");
-    var searchInput = searchBar.querySelector(".cw-recent-search");
-
-    // Debounced search
-    var searchTimeout;
-    searchInput.addEventListener("input", function () {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(function () {
-        var q = searchInput.value.trim().toLowerCase();
-        state.house.search = q;
-        state.senate.search = q;
-        state.house.page = 0;
-        state.senate.page = 0;
-        // Clear cache so filtered results get fresh data
-        _recentVoteCache = {};
-        loadColumn("house");
-        loadColumn("senate");
-      }, 300);
-    });
 
     function loadColumn(chamber) {
       var listEl = chamber === "house" ? houseListEl : senateListEl;
@@ -1521,21 +1497,12 @@
         s.total = data.total;
         var votes = data.votes;
 
-        // Client-side search filter
-        if (s.search) {
-          votes = votes.filter(function (v) {
-            var text = ((v.question || "") + " " + (v.related_bill ? v.related_bill.title || "" : "") +
-              " " + (v.related_bill ? v.related_bill.display_number || "" : "") +
-              " " + (v.result || "") + " " + (v.category_label || "")).toLowerCase();
-            return text.indexOf(s.search) >= 0;
-          });
-        }
+
 
         listEl.innerHTML = "";
 
         if (!votes.length) {
-          listEl.innerHTML = '<div style="text-align:center;padding:20px;color:hsl(var(--muted-foreground));font-size:12px;">' +
-            (s.search ? 'No votes matching "' + esc(s.search) + '"' : 'No votes found') + '</div>';
+          listEl.innerHTML = '<div style="text-align:center;padding:20px;color:hsl(var(--muted-foreground));font-size:12px;">No votes found</div>';
         } else {
           votes.forEach(function (vote) {
             listEl.appendChild(buildRecentVoteCard(vote));
