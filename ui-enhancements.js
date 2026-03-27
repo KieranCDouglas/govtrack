@@ -8,145 +8,10 @@
   "use strict";
 
   /* ================================================================
-     1.  INDIVIDUALIZED  MEMBER  POSITIONS
+     1.  INDIVIDUALIZED  MEMBER  POSITIONS  (disabled — replaced by LLM summaries)
      ================================================================ */
 
-  var POLICY = {
-    healthcare: {
-      title: "Healthcare",
-      econ: true,
-      left: "Supports expanding access to affordable healthcare, including a public option and Medicaid expansion.",
-      right: "Supports market-based healthcare reform and opposes government-run healthcare programs.",
-      hLeft: "While generally favoring public healthcare, shows more openness to market-based solutions than most in their party.",
-      hRight: "Though aligned with market-based principles, shows some support for expanded healthcare access."
-    },
-    environment_energy: {
-      title: "Climate & Energy",
-      econ: true,
-      left: "Advocates for aggressive climate legislation, clean-energy investment, and environmental protections.",
-      right: "Prioritizes energy independence through domestic production and is skeptical of heavy climate regulation.",
-      hLeft: "Supports climate action but takes a more pragmatic stance on energy policy than typical party members.",
-      hRight: "While skeptical of regulation, shows more willingness to consider clean-energy initiatives than most in their party."
-    },
-    immigration: {
-      title: "Immigration",
-      econ: false,
-      left: "Favors pathways to citizenship for undocumented immigrants and expanded protections for DACA recipients.",
-      right: "Supports stricter border enforcement, reduced illegal immigration, and merit-based legal immigration.",
-      hLeft: "While supportive of immigration reform, takes a more moderate stance on enforcement than typical party members.",
-      hRight: "Holds firm views on border security but shows some flexibility on specific reform measures."
-    },
-    fiscal_tax: {
-      title: "Fiscal & Tax Policy",
-      econ: true,
-      left: "Supports progressive taxation, social-safety-net expansions, and government investment in public services.",
-      right: "Backs tax cuts, deregulation, and fiscal conservatism to promote private-sector growth.",
-      hLeft: "While favoring progressive fiscal policy, shows more concern for deficit reduction than many in their party.",
-      hRight: "Generally supports lower taxes but occasionally breaks with party on specific spending measures."
-    },
-    guns: {
-      title: "Gun Policy",
-      econ: false,
-      left: "Backs universal background checks, assault-weapons restrictions, and red-flag laws.",
-      right: "Strong defender of Second Amendment rights, opposing most new gun restrictions.",
-      hLeft: "Supports gun-safety measures but takes a more moderate position on certain firearm regulations.",
-      hRight: "Generally defends gun rights but shows some willingness to consider targeted safety measures."
-    },
-    social_rights: {
-      title: "Social & Civil Rights",
-      econ: false,
-      left: "Champions LGBTQ+ rights, reproductive rights, and civil-liberties protections.",
-      right: "Emphasizes traditional values, religious liberty, and a cautious approach to social-policy changes.",
-      hLeft: "Supports civil rights broadly but takes more nuanced positions on certain social issues.",
-      hRight: "Holds traditional social views overall but diverges from party on some civil-rights positions."
-    },
-    trade: {
-      title: "Trade & Tariffs",
-      econ: true,
-      left: "Favors trade policies that protect workers and the environment, with skepticism toward unrestricted free trade.",
-      right: "Generally supports free trade and market-oriented trade agreements.",
-      hLeft: "More open to free-trade agreements than typical party members.",
-      hRight: "More supportive of protectionist trade measures than the party mainstream."
-    },
-    military_defense: {
-      title: "Military & Defense",
-      econ: false,
-      left: "Advocates for diplomatic solutions, reduced military spending, and restraint in foreign intervention.",
-      right: "Supports strong national defense, robust military funding, and American global leadership.",
-      hLeft: "While favoring diplomacy, shows more support for defense spending than many in their party.",
-      hRight: "Supports strong defense but shows more restraint on military intervention than typical party members."
-    },
-    foreign_policy: {
-      title: "Foreign Policy",
-      econ: false,
-      left: "Emphasizes multilateral diplomacy, international cooperation, and a human-rights-centered foreign policy.",
-      right: "Favors strong alliances, peace through strength, and an America-first approach to world affairs.",
-      hLeft: "Supports international engagement but takes more hawkish positions on certain foreign-policy issues.",
-      hRight: "While aligned with a strong-defense posture, diverges on specific alliance or intervention questions."
-    },
-    criminal_justice: {
-      title: "Criminal Justice",
-      econ: false,
-      left: "Supports criminal-justice reform, sentencing reduction, and addressing systemic inequities in policing.",
-      right: "Emphasizes law and order, police funding, and tougher sentencing for violent offenders.",
-      hLeft: "Supports reform but takes a more balanced position on policing and public safety.",
-      hRight: "While supporting law enforcement, shows openness to targeted criminal-justice reforms."
-    },
-    elections_democracy: {
-      title: "Elections & Democracy",
-      econ: false,
-      left: "Champions voting access, campaign-finance reform, and protections against voter suppression.",
-      right: "Emphasizes election integrity, voter-ID requirements, and fraud prevention.",
-      hLeft: "Supports expanded voting access but takes more nuanced positions on specific election reforms.",
-      hRight: "Supports election-integrity measures but diverges from party on some voting-access questions."
-    }
-  };
-
-  var HETERO_THRESHOLD = 0.15;
-
-  window.__getPositions = function (member, party, St) {
-    var ph = member.policyHeterodoxy;
-    if (!ph) return St[party] || St.Independent;
-    if (typeof ph === "string") {
-      try { ph = JSON.parse(ph); } catch (_) { return St[party] || St.Independent; }
-    }
-
-    var cx = member.compassX ?? 0;
-    var cy = member.compassY ?? 0;
-
-    // For near-zero scores, fall back to party default direction
-    var NEUTRAL = 0.08;
-    var isRightEcon = Math.abs(cx) < NEUTRAL
-      ? party === "Republican"
-      : cx > 0;
-    var isConservative = Math.abs(cy) < NEUTRAL
-      ? party === "Republican"
-      : cy > 0;
-
-    var keys = Object.keys(POLICY);
-    var scored = keys.map(function (k) {
-      var v = ph[k];
-      var has = v !== null && v !== undefined;
-      var het = has && v > HETERO_THRESHOLD;
-      return { key: k, s: (has ? 1 : 0) + (het ? 2 : 0), v: v, has: has, het: het };
-    });
-    scored.sort(function (a, b) { return b.s - a.s || (b.has ? 1 : 0) - (a.has ? 1 : 0); });
-
-    var out = scored.slice(0, 6).map(function (item) {
-      var d = POLICY[item.key];
-      if (!d) return null;
-      var useRight = d.econ ? isRightEcon : isConservative;
-      var desc;
-      if (item.het) {
-        desc = party === "Democrat" ? d.hLeft : party === "Republican" ? d.hRight : (useRight ? d.right : d.left);
-      } else {
-        desc = useRight ? d.right : d.left;
-      }
-      return { title: d.title, description: desc, dimHint: useRight ? "+" : "-" };
-    }).filter(Boolean);
-
-    return out.length ? out : St[party] || St.Independent;
-  };
+  window.__getPositions = function () { return []; };
 
   /* ================================================================
      2.  DOM  ENHANCEMENTS  (after app renders)
@@ -193,6 +58,171 @@
       injectMemberSummary();
     }
   });
+
+  /* ================================================================
+     1b.  MEMBER  LIST  FILTER  PERSISTENCE
+     ================================================================ */
+
+  var FILTER_KEY = "cw-member-filters";
+  var _filterSaveTimer = null;
+
+  function _getReactFiber(dom) {
+    var key = Object.keys(dom).find(function (k) {
+      return k.startsWith("__reactFiber$");
+    });
+    return key ? dom[key] : null;
+  }
+
+  /** Walk up the fiber tree from a Radix Select trigger to find the
+   *  Select.Root fiber whose props include { value, onValueChange }. */
+  function _findSelectFiber(testId) {
+    var trigger = document.querySelector('[data-testid="' + testId + '"]');
+    if (!trigger) return null;
+    var fiber = _getReactFiber(trigger);
+    var f = fiber;
+    while (f) {
+      var props = f.memoizedProps || f.pendingProps;
+      if (
+        props &&
+        typeof props.onValueChange === "function" &&
+        "value" in props
+      ) {
+        return props;
+      }
+      f = f.return;
+    }
+    return null;
+  }
+
+  function _readSelect(testId) {
+    var p = _findSelectFiber(testId);
+    return p ? p.value : null;
+  }
+
+  function _writeSelect(testId, value) {
+    var p = _findSelectFiber(testId);
+    if (p && p.value !== value) {
+      p.onValueChange(value);
+      return true;
+    }
+    return false;
+  }
+
+  function _isOnMembersList() {
+    var h = window.location.hash || "";
+    return h === "#/members" || h === "#/members/";
+  }
+
+  function _saveFilters() {
+    if (!_isOnMembersList()) return;
+
+    var input = document.querySelector(
+      '[data-testid="input-member-search"]'
+    );
+    if (!input) return; // UI not rendered yet
+
+    var filters = {
+      search: input.value || "",
+      chamber: _readSelect("select-chamber") || "all",
+      party: _readSelect("select-party") || "all",
+      state: _readSelect("select-state") || "all",
+      current: _readSelect("select-current") || "current",
+    };
+
+    var isDefault =
+      !filters.search &&
+      filters.chamber === "all" &&
+      filters.party === "all" &&
+      filters.state === "all" &&
+      filters.current === "current";
+
+    if (isDefault) {
+      sessionStorage.removeItem(FILTER_KEY);
+    } else {
+      sessionStorage.setItem(FILTER_KEY, JSON.stringify(filters));
+    }
+  }
+
+  function _restoreFilters() {
+    var raw = sessionStorage.getItem(FILTER_KEY);
+    if (!raw) return;
+
+    var filters;
+    try {
+      filters = JSON.parse(raw);
+    } catch (e) {
+      return;
+    }
+
+    // Restore search input via native setter so React picks it up
+    if (filters.search) {
+      var input = document.querySelector(
+        '[data-testid="input-member-search"]'
+      );
+      if (input) {
+        var nativeSetter = Object.getOwnPropertyDescriptor(
+          HTMLInputElement.prototype,
+          "value"
+        ).set;
+        nativeSetter.call(input, filters.search);
+        var tracker = input._valueTracker;
+        if (tracker) tracker.setValue("");
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    }
+
+    // Restore selects through React fiber
+    if (filters.chamber && filters.chamber !== "all")
+      _writeSelect("select-chamber", filters.chamber);
+    if (filters.party && filters.party !== "all")
+      _writeSelect("select-party", filters.party);
+    if (filters.state && filters.state !== "all")
+      _writeSelect("select-state", filters.state);
+    if (filters.current && filters.current !== "current")
+      _writeSelect("select-current", filters.current);
+  }
+
+  function _startFilterTracking() {
+    _stopFilterTracking();
+    _filterSaveTimer = setInterval(_saveFilters, 400);
+  }
+
+  function _stopFilterTracking() {
+    if (_filterSaveTimer) {
+      clearInterval(_filterSaveTimer);
+      _filterSaveTimer = null;
+    }
+  }
+
+  /** When entering the members list, wait for React to render then
+   *  restore saved filters and begin continuous saving. */
+  function _handleMembersNav() {
+    if (!_isOnMembersList()) {
+      _stopFilterTracking();
+      return;
+    }
+    // Wait for React to mount the filter controls
+    var attempts = 0;
+    var waitId = setInterval(function () {
+      attempts++;
+      var input = document.querySelector(
+        '[data-testid="input-member-search"]'
+      );
+      if (input || attempts > 20) {
+        clearInterval(waitId);
+        if (input) {
+          _restoreFilters();
+          _startFilterTracking();
+        }
+      }
+    }, 100);
+  }
+
+  window.addEventListener("hashchange", _handleMembersNav);
+  // Handle initial page load on #/members
+  if (_isOnMembersList()) {
+    setTimeout(_handleMembersNav, 600);
+  }
 
   /* ---- 2a-pre  Member policy summary injection ---- */
 
@@ -244,12 +274,26 @@
     if (positionsCard.querySelector("[data-cw-summary]") || positionsCard.hasAttribute("data-cw-summary-pending")) return;
     positionsCard.setAttribute("data-cw-summary-pending", "true");
 
+    // Immediately hide the generic positions content to prevent flash
+    var _oldPos = positionsCard.querySelector(".space-y-3");
+    if (_oldPos) _oldPos.style.display = "none";
+    positionsCard.querySelectorAll("p").forEach(function (p) {
+      if (p.style.fontStyle === "italic" || (p.className && p.className.indexOf("italic") !== -1) ||
+          (p.textContent && p.textContent.indexOf("Positions are estimated") !== -1)) {
+        p.style.display = "none";
+      }
+    });
+
     loadSummaries(function (summaries) {
       // Double-check inside callback in case of edge-case race
       if (positionsCard.querySelector("[data-cw-summary]")) return;
 
       var summary = summaries[bioguideId];
-      if (!summary) { positionsCard.removeAttribute("data-cw-summary-pending"); return; }
+      if (!summary) {
+        // No LLM summary — hide the entire Issue Positions card
+        positionsCard.style.display = "none";
+        return;
+      }
 
       // Find the Issue Positions heading
       var h2 = null;
@@ -301,16 +345,6 @@
 
       // Insert after the h2
       h2.insertAdjacentElement("afterend", block);
-
-      // Hide the old generic position items (the space-y-3 div and italic disclaimer)
-      var oldPositions = positionsCard.querySelector(".space-y-3");
-      if (oldPositions) oldPositions.style.display = "none";
-      positionsCard.querySelectorAll("p").forEach(function (p) {
-        if (p.style.fontStyle === "italic" || (p.className && p.className.indexOf("italic") !== -1) ||
-            (p.textContent && p.textContent.indexOf("Positions are estimated") !== -1)) {
-          p.style.display = "none";
-        }
-      });
     });
   }
 
@@ -378,7 +412,7 @@
         }
         // Build congress.gov URL from bill type
         var cgUrl = "";
-        if (data.congress && data.bill_type_label && data.number) {
+        if (data.congress && data.congress >= 93 && data.bill_type_label && data.number) {
           var typeMap = {"S.":"senate-bill","H.R.":"house-bill","H.Res.":"house-resolution","S.Res.":"senate-resolution","H.J.Res.":"house-joint-resolution","S.J.Res.":"senate-joint-resolution","H.Con.Res.":"house-concurrent-resolution","S.Con.Res.":"senate-concurrent-resolution"};
           var t = typeMap[data.bill_type_label] || "";
           if (t) cgUrl = "https://www.congress.gov/bill/" + data.congress + (data.congress === 1 ? "st" : data.congress === 2 ? "nd" : data.congress === 3 ? "rd" : "th") + "-congress/" + t + "/" + data.number;
@@ -545,9 +579,6 @@
         '<option value="with">With party</option>' +
         '<option value="against">Against party</option>' +
       '</select>' +
-      '<select class="cw-vote-congress-filter" style="' + inputCss + '">' +
-        '<option value="">All congresses</option>' +
-      '</select>' +
       '<span class="cw-vote-count" style="font-size:11px;color:hsl(var(--muted-foreground));white-space:nowrap;"></span>';
 
     container.insertBefore(bar, voteSection);
@@ -583,10 +614,14 @@
     var searchIn = bar.querySelector(".cw-vote-search");
     var posSel  = bar.querySelector(".cw-vote-pos-filter");
     var ptySel  = bar.querySelector(".cw-vote-party-filter");
-    var congSel = bar.querySelector(".cw-vote-congress-filter");
     var countEl = bar.querySelector(".cw-vote-count");
 
     var currentPage = 0;
+
+    // Collect all vote items once for full-dataset search
+    var allVoteItems = Array.from(voteSection.querySelectorAll(":scope > div")).filter(function (item) {
+      return item.dataset.cwExp;
+    });
 
     function applyFilters(resetPage) {
       if (resetPage) currentPage = 0;
@@ -594,24 +629,35 @@
       var q = searchIn.value.toLowerCase().trim();
       var pv = posSel.value;
       var pa = ptySel.value;
-      var cv = congSel.value;
       var matching = [];
 
-      voteSection.querySelectorAll(":scope > div").forEach(function (item) {
-        if (!item.dataset.cwExp) return;
+      // Search all votes, not just visible ones
+      allVoteItems.forEach(function (item) {
         var show = true;
 
-        if (q && item.textContent.toLowerCase().indexOf(q) === -1) show = false;
+        // Keyword-sensitive: match bill number/title as well as text
+        if (q) {
+          var text = item.textContent.toLowerCase();
+          var billNum = (item._cwPrettyBillId || "").toLowerCase();
+          var billTitle = (item._cwOrigBillTitle || "").toLowerCase();
+          var billLine = "";
+          var billLineEl = item.querySelector('.cw-bill-line span');
+          if (billLineEl) billLine = billLineEl.textContent.toLowerCase();
+          if (
+            text.indexOf(q) === -1 &&
+            billNum.indexOf(q) === -1 &&
+            billTitle.indexOf(q) === -1 &&
+            billLine.indexOf(q) === -1
+          ) {
+            show = false;
+          }
+        }
 
         if (show && pv) {
           var pos = (item.dataset.position || "").toLowerCase();
           if (pv === "yea"  && pos !== "yes" && pos !== "yea") show = false;
           if (pv === "nay"  && pos !== "no"  && pos !== "nay") show = false;
           if (pv === "nv"   && pos !== "not voting")           show = false;
-        }
-
-        if (show && cv) {
-          if ((item.dataset.congress || "") !== cv) show = false;
         }
 
         if (show && pa && memberParty) {
@@ -666,37 +712,12 @@
     searchIn.addEventListener("input", function () { applyFilters(true); });
     posSel.addEventListener("change", function () { applyFilters(true); });
     ptySel.addEventListener("change", function () { applyFilters(true); });
-    congSel.addEventListener("change", function () { applyFilters(true); });
 
     // debounced re-count when new items appear
     var recount;
-    function populateCongressFilter() {
-      var congresses = new Set();
-      voteSection.querySelectorAll(":scope > div[data-congress]").forEach(function (item) {
-        var c = item.dataset.congress;
-        if (c) congresses.add(c);
-      });
-      var sorted = Array.from(congresses).sort(function (a, b) { return Number(b) - Number(a); });
-      if (sorted.length <= 1) {
-        congSel.style.display = "none";
-      } else {
-        // Preserve current selection
-        var cur = congSel.value;
-        congSel.innerHTML = '<option value="">All congresses</option>';
-        sorted.forEach(function (c) {
-          var opt = document.createElement("option");
-          opt.value = c;
-          opt.textContent = "Congress " + c;
-          congSel.appendChild(opt);
-        });
-        congSel.value = cur;
-        congSel.style.display = "";
-      }
-    }
     new MutationObserver(function () {
       clearTimeout(recount);
       recount = setTimeout(function () {
-        populateCongressFilter();
         applyFilters(false);
       }, 200);
     }).observe(voteSection, { childList: true });
@@ -742,28 +763,11 @@
         ? getPartyAlignment(memberParty, position, chamber, mjrPctPlus, pctPlus)
         : null;
 
-      // ---- Inline party-alignment badge (always visible) ----
-      if (alignment) {
-        var ab = document.createElement("div");
-        ab.style.cssText =
-          "font-size:9px;padding:1px 5px;border-radius:3px;margin-top:4px;" +
-          "text-align:center;font-weight:600;white-space:nowrap;";
-        if (alignment === "with") {
-          ab.textContent = "w/ party";
-          ab.style.background = "hsl(var(--primary)/0.15)";
-          ab.style.color = "hsl(var(--primary))";
-        } else {
-          ab.textContent = "vs party";
-          ab.style.background = "hsla(0,70%,50%,0.15)";
-          ab.style.color = "hsl(0,70%,55%)";
-        }
-        badge.parentElement.appendChild(ab);
-      }
-
       // Restructure collapsed view: bill name prominent, question secondary
       // Instead of modifying React's text nodes (which React reconciliation can overwrite),
       // we hide the originals and create new elements.
       var textParent = item.querySelector(".flex-1");
+
       if (textParent) {
         var questionEl = textParent.querySelector(".line-clamp-2") || textParent.querySelector(".text-sm.text-foreground");
         var allXs = textParent.querySelectorAll(".line-clamp-1");
@@ -782,7 +786,7 @@
 
         // If no bill ID from data, try to extract one from the title or question text
         // Search anywhere in the text for patterns like "H.Res. 1131", "H.R. 8029", "S. 1234"
-        var _billIdRe = /(H\.?\s*(?:Con\.?\s*)?(?:J\.?\s*)?(?:Res\.?\s*)?\s*\d+|S\.?\s*(?:Con\.?\s*)?(?:J\.?\s*)?(?:Res\.?\s*)?\s*\d+)/i;
+        var _billIdRe = /(H\.?\s*R\.?\s*\d+|H\.?\s*(?:Con\.?\s*)?(?:J\.?\s*)?Res\.?\s*\d+|S\.?\s*(?:Con\.?\s*)?(?:J\.?\s*)?(?:Res\.?\s*)?\s*\d+)/i;
         if (!prettyBillId) {
           var _extractSrc = origBillTitle || origQuestion || "";
           var _billIdMatch = _extractSrc.match(_billIdRe);
@@ -804,37 +808,83 @@
           }
         }
 
-        // Determine what to show on collapsed tab:
-        // - Short titles (<= 80 chars): "H.R. 29 — Short Title Here"
-        // - Long titles or no title: just "H.R. 29"
-        // Always replace React's text if we have a bill ID
-        if (prettyBillId) {
+        if (prettyBillId || origQuestion || origBillTitle) {
           // Mark parent so CSS hides ALL React children (survives React re-renders)
           textParent.classList.add("cw-replaced");
 
-          // Create new primary line (bill ID only — full title shown on expand)
+          // Build primary title: "H.R. 7084 — Title" or just question text for procedural votes
+          var primaryTitle = "";
+          if (prettyBillId && cleanTitle) {
+            primaryTitle = prettyBillId + " \u2014 " + cleanTitle;
+          } else if (prettyBillId) {
+            primaryTitle = prettyBillId + (origBillTitle ? " \u2014 " + origBillTitle : "");
+          } else {
+            primaryTitle = origBillTitle || origQuestion || "Roll Call Vote";
+          }
+
+          // Create new primary line with title + badge
           var cwLine1 = document.createElement("div");
           cwLine1.className = "cw-bill-line";
-          cwLine1.style.cssText = "font-size:14px;color:hsl(var(--foreground));line-height:1.4;";
-          var idSpan = document.createElement("span");
-          idSpan.style.fontWeight = "700";
-          idSpan.textContent = prettyBillId;
-          cwLine1.appendChild(idSpan);
+          cwLine1.style.cssText = "display:flex;align-items:center;gap:8px;font-size:14px;color:hsl(var(--foreground));line-height:1.4;";
 
-          // Create new secondary line (vote procedure)
+          var titleSpan = document.createElement("span");
+          titleSpan.style.cssText = "font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1;";
+          titleSpan.textContent = primaryTitle;
+          cwLine1.appendChild(titleSpan);
+
+          // Result badge (Passed/Failed) — right-aligned
+          var passed = /pass|agree|confirm|approved/i.test(voteResult);
+          var failed = /fail|reject|not agreed|defeated/i.test(voteResult);
+          if (voteResult) {
+            var resultBadge = document.createElement("span");
+            resultBadge.style.cssText = "font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;";
+            if (passed) {
+              resultBadge.textContent = "Passed";
+              resultBadge.style.background = "hsl(142,60%,42%,0.15)";
+              resultBadge.style.color = "hsl(142,60%,35%)";
+            } else if (failed) {
+              resultBadge.textContent = "Failed";
+              resultBadge.style.background = "hsl(0,65%,50%,0.15)";
+              resultBadge.style.color = "hsl(0,65%,45%)";
+            } else {
+              resultBadge.textContent = voteResult;
+              resultBadge.style.background = "hsl(var(--muted)/0.3)";
+              resultBadge.style.color = "hsl(var(--muted-foreground))";
+            }
+            cwLine1.appendChild(resultBadge);
+          }
+
+          // Create secondary line: "247-164 · 2026-03-27 · Passage · On Passage..."
           var cwLine2 = document.createElement("div");
           cwLine2.className = "cw-proc-line";
-          cwLine2.textContent = origQuestion;
           cwLine2.style.cssText = "font-size:12px;font-weight:400;color:hsl(var(--muted-foreground));margin-top:2px;" +
             "white-space:nowrap;overflow:hidden;text-overflow:ellipsis;";
+
+          var secondaryParts = [];
+          // Vote tally
+          var _tp = parseInt(totalPlus, 10);
+          var _tm = parseInt(totalMinus, 10);
+          if (!isNaN(_tp) && !isNaN(_tm) && (_tp + _tm) > 0) {
+            secondaryParts.push(_tp + "-" + _tm);
+          }
+          // Vote date from global map
+          var _voteKey = "";
+          if (congress && chamber && voteIdNum) {
+            _voteKey = String(congress) + (chamber || "").charAt(0).toLowerCase() + String(voteIdNum);
+          }
+          var _voteDate = (window.__cwVoteDates && _voteKey && window.__cwVoteDates[_voteKey]) || "";
+          if (_voteDate) secondaryParts.push(_voteDate);
+          // Description / category
+          var origDesc = (descEl && descEl.textContent) || "";
+          if (origDesc) secondaryParts.push(origDesc);
+
+          cwLine2.textContent = secondaryParts.join(" \u00b7 ");
 
           var firstChild = textParent.firstChild;
           textParent.insertBefore(cwLine2, firstChild);
           textParent.insertBefore(cwLine1, firstChild);
         } else {
-          // No bill reference found — keep React's text, just tighten clamps
-          if (questionEl) questionEl.style.webkitLineClamp = "2";
-          if (billTitleEl) billTitleEl.style.webkitLineClamp = "1";
+          // Truly empty vote — hide extras
           if (descEl) descEl.style.display = "none";
         }
       }
@@ -887,6 +937,58 @@
           renderPanel(panel, gtId, billDisplay, voteResult, alignment, questionDetails, item, congress, chamber, totalPlus, totalMinus, voteIdNum, position);
         }
       });
+
+      // Eagerly fetch full bill title so it displays immediately (not on click)
+      if (gtId && item._cwLine1) {
+        (function (cardItem, cardGtId, cardBillDisplay) {
+          var fetcher = fetchBillSummary(cardGtId);
+          fetcher.then(function (bill) {
+            if (!bill) return;
+            var rawTitle = bill.title || bill.officialTitle || '';
+            var prettyId = cardItem._cwPrettyBillId || formatBillId(cardBillDisplay);
+            var clean = rawTitle;
+            if (prettyId && clean) {
+              var ci = clean.indexOf(':');
+              if (ci > 0 && ci < 20) {
+                var bf = clean.substring(0, ci).replace(/[.\s]/g, '').toUpperCase();
+                var idn = prettyId.replace(/[.\s]/g, '').toUpperCase();
+                if (bf === idn) clean = clean.substring(ci + 1).trim();
+              }
+            }
+            var newTitle;
+            if (prettyId && clean) newTitle = prettyId + ' \u2014 ' + clean;
+            else if (prettyId) newTitle = prettyId + (rawTitle ? ' \u2014 ' + rawTitle : '');
+            else if (clean) newTitle = clean;
+            else return;
+            var span = cardItem._cwLine1.querySelector('span');
+            if (span) span.textContent = newTitle;
+          }).catch(function () { /* title stays as-is */ });
+        })(item, gtId, billDisplay);
+      } else if (!gtId && billDisplay && congress && item._cwLine1) {
+        (function (cardItem, cardBillDisplay, cardCongress) {
+          fetchBillByDisplayId(cardBillDisplay, cardCongress).then(function (bill) {
+            if (!bill) return;
+            var rawTitle = bill.title || bill.officialTitle || '';
+            var prettyId = cardItem._cwPrettyBillId || formatBillId(cardBillDisplay);
+            var clean = rawTitle;
+            if (prettyId && clean) {
+              var ci = clean.indexOf(':');
+              if (ci > 0 && ci < 20) {
+                var bf = clean.substring(0, ci).replace(/[.\s]/g, '').toUpperCase();
+                var idn = prettyId.replace(/[.\s]/g, '').toUpperCase();
+                if (bf === idn) clean = clean.substring(ci + 1).trim();
+              }
+            }
+            var newTitle;
+            if (prettyId && clean) newTitle = prettyId + ' \u2014 ' + clean;
+            else if (prettyId) newTitle = prettyId + (rawTitle ? ' \u2014 ' + rawTitle : '');
+            else if (clean) newTitle = clean;
+            else return;
+            var span = cardItem._cwLine1.querySelector('span');
+            if (span) span.textContent = newTitle;
+          }).catch(function () { /* title stays as-is */ });
+        })(item, billDisplay, congress);
+      }
     });
 
     // Now that all items are marked with cwExp, trigger pagination
@@ -910,41 +1012,63 @@
     function renderContent(bill) {
       panel.innerHTML = buildExpandedHtml(bill, voteResult, alignment, questionDetails, qText, bTitle, billDisplay, congress, chamber, totalPlus, totalMinus, voteIdNum, position);
 
-      // Update the header title with the full (non-truncated) title from the API
-      // Use title_with_number so the display matches the collapsed format (includes bill ID prefix)
-      var fullTitle = (bill && (bill.titleWithNumber || bill.title || bill.officialTitle)) || bTitle || '';
+      // Resolve full title from API for the header
+      var rawTitle = (bill && (bill.title || bill.officialTitle)) || bTitle || '';
       var prettyId = item._cwPrettyBillId || formatBillId(billDisplay);
 
-      if (fullTitle && item._cwLine1) {
-        // cw-replaced path: show full title text (already includes bill ID prefix)
+      // Strip redundant bill number prefix from title
+      var cleanFullTitle = rawTitle;
+      if (prettyId && cleanFullTitle) {
+        var _ci = cleanFullTitle.indexOf(':');
+        if (_ci > 0 && _ci < 20) {
+          var _bf = cleanFullTitle.substring(0, _ci).replace(/[.\s]/g, '').toUpperCase();
+          var _in = prettyId.replace(/[.\s]/g, '').toUpperCase();
+          if (_bf === _in) cleanFullTitle = cleanFullTitle.substring(_ci + 1).trim();
+        }
+      }
+
+      if (item._cwLine1) {
+        var titleText;
+        if (prettyId && cleanFullTitle) {
+          titleText = prettyId + ' \u2014 ' + cleanFullTitle;
+        } else if (prettyId) {
+          titleText = prettyId + (rawTitle ? ' \u2014 ' + rawTitle : '');
+        } else if (cleanFullTitle) {
+          titleText = cleanFullTitle;
+        } else {
+          titleText = null; // keep existing title
+        }
+        var titleSpan = item._cwLine1.querySelector('span');
+
+        // Update the title span with the full API title if we have one
+        if (titleSpan && titleText) titleSpan.textContent = titleText;
+
+        // Expand: unwrap text so full title is visible, keep bold
         var showFull = function () {
-          item._cwLine1.textContent = fullTitle;
-          item._cwLine1.style.whiteSpace = 'normal';
-          item._cwLine1.style.overflow = 'visible';
+          if (titleSpan) {
+            titleSpan.style.whiteSpace = 'normal';
+            titleSpan.style.overflow = 'visible';
+          }
           if (item._cwLine2) {
             item._cwLine2.style.whiteSpace = 'normal';
             item._cwLine2.style.overflow = 'visible';
           }
         };
-        // Save original collapsed content
-        var origLine1Html = item._cwLine1.innerHTML;
-        var origLine1WS = item._cwLine1.style.whiteSpace;
-        var origLine1OV = item._cwLine1.style.overflow;
         showFull();
         item._cwShowFullTitle = showFull;
         item._cwRestoreTitle = function () {
-          item._cwLine1.innerHTML = origLine1Html;
-          item._cwLine1.style.whiteSpace = origLine1WS;
-          item._cwLine1.style.overflow = origLine1OV;
+          if (titleSpan) {
+            titleSpan.style.whiteSpace = 'nowrap';
+            titleSpan.style.overflow = 'hidden';
+          }
           if (item._cwLine2) {
             item._cwLine2.style.whiteSpace = 'nowrap';
             item._cwLine2.style.overflow = 'hidden';
           }
         };
-      } else if (fullTitle && item._cwQuestionEl) {
-        // React text path: helper to show full title
+      } else if (item._cwQuestionEl) {
         var showFullReact = function () {
-          item._cwQuestionEl.textContent = fullTitle;
+          item._cwQuestionEl.textContent = rawTitle || item._cwOrigQuestion;
           item._cwQuestionEl.classList.remove('line-clamp-2');
           if (item._cwBillTitleEl) item._cwBillTitleEl.style.display = 'none';
         };
@@ -972,7 +1096,7 @@
     if (!rawId || !congress) return "";
     var id = rawId.replace(/[.\s]/g, "").toUpperCase().trim();
     var c = parseInt(congress, 10);
-    if (!c || c < 1) return "";
+    if (!c || c < 1 || c < 93) return "";
     var suffix = c === 1 ? "st" : c === 2 ? "nd" : c === 3 ? "rd" : "th";
     var base = "https://www.congress.gov/";
 
@@ -1146,55 +1270,35 @@
         'Result: ' + esc(voteResult) + '</div>';
     }
 
-    // 2. Party-alignment badge (shown inline on vote item already)
-
-    // 3. Full bill name + number
-    var prettyId = formatBillId(billDisplay);
-    var rawTitle = (bill && bill.title) || bTitle || "";
-
-    // Strip redundant bill number prefix from title (e.g. "H.R. 8029: Pay Our..." → "Pay Our...")
-    var fullTitle = rawTitle;
-    if (prettyId && fullTitle) {
-      var _colonIdx = fullTitle.indexOf(":");
-      if (_colonIdx > 0 && _colonIdx < 20) {
-        var _before = fullTitle.substring(0, _colonIdx).replace(/[.\s]/g, "").toUpperCase();
-        var _idNorm = prettyId.replace(/[.\s]/g, "").toUpperCase();
-        if (_before === _idNorm) {
-          fullTitle = fullTitle.substring(_colonIdx + 1).trim();
-        }
-      }
+    // 2. Party-alignment badge — prominent display
+    if (alignment) {
+      var alBg = alignment === "with" ? "hsl(var(--primary)/0.12)" : "hsla(0,70%,50%,0.12)";
+      var alColor = alignment === "with" ? "hsl(var(--primary))" : "hsl(0,70%,55%)";
+      var alLabel = alignment === "with" ? "\u2713 Voted with party" : "\u2717 Voted against party";
+      html += '<div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:5px;background:' + alBg + ';color:' + alColor + ';margin-bottom:10px;">' + alLabel + '</div>';
     }
 
-    // Determine if section 4 has genuinely new information
-    var sec4Text = "";
-    if (bill && bill.officialTitle) {
-      var _oNorm = bill.officialTitle.toLowerCase().trim();
-      var _fNorm = fullTitle.toLowerCase().trim();
-      // Show section 4 only if officialTitle adds new info (not contained in fullTitle)
-      if (_oNorm !== _fNorm && !_fNorm.includes(_oNorm) && !_oNorm.includes(_fNorm)) {
-        sec4Text = bill.officialTitle;
-      }
-    } else if (bTitle && bTitle !== rawTitle && bTitle !== fullTitle) {
-      var _bNorm = bTitle.toLowerCase().trim();
-      var _fNorm2 = fullTitle.toLowerCase().trim();
-      if (_bNorm !== _fNorm2 && !_fNorm2.includes(_bNorm) && !_bNorm.includes(_fNorm2)) {
-        sec4Text = bTitle;
-      }
+    // Title is shown in the bold header line above — do not repeat it in the body
+
+    // Question text — only show if it adds info beyond what's in the secondary line
+    if (questionDetails && questionDetails !== qText) {
+      html += '<div style="font-size:11px;color:hsl(var(--muted-foreground));font-style:italic;margin-bottom:8px;">' + esc(questionDetails) + '</div>';
     }
 
-    // Smart truncation: shorten section 3 title when it's very long AND section 4 will show full text
-    var TRUNC_LIMIT = 120;
-    var displayTitle = fullTitle;
-    if (fullTitle.length > TRUNC_LIMIT && sec4Text) {
-      displayTitle = fullTitle.substring(0, TRUNC_LIMIT).replace(/[\s,;:\-]+$/, '') + '\u2026';
-    }
-
-    // Sections 3 & 4 (bill title) omitted — full title shown in the collapsed header area above
-
-    // 5. Sponsor
+    // 5. Sponsor — shown prominently
     if (bill && bill.sponsor) {
-      html += '<div style="font-size:11px;color:hsl(var(--muted-foreground));margin-bottom:8px;">' +
-        'Sponsor: <strong style="color:hsl(var(--foreground));">' + esc(bill.sponsor) + '</strong></div>';
+      html += '<div style="font-size:12px;color:hsl(var(--foreground));margin-bottom:6px;">' +
+        'Sponsor: <strong>' + esc(bill.sponsor) + '</strong>' +
+        (bill.cosponsors > 0 ? ' <span style="color:hsl(var(--muted-foreground));font-weight:400;">(' + bill.cosponsors + ' cosponsor' + (bill.cosponsors !== 1 ? 's' : '') + ')</span>' : '') +
+        '</div>';
+    }
+
+    // 5b. Status
+    var meta = [];
+    if (bill && bill.status) meta.push('<span>' + esc(bill.status) + (bill.statusDate ? ' (' + bill.statusDate + ')' : '') + '</span>');
+    if (meta.length) {
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:hsl(var(--muted-foreground));margin-bottom:8px;">' +
+        meta.join("") + '</div>';
     }
 
     // 7. Bill links — primary bill + any referenced bills from procedural text
@@ -1228,7 +1332,7 @@
     }
 
     if (billUrl) {
-      html += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid hsl(var(--border)/0.3);display:flex;flex-wrap:wrap;gap:6px;align-items:center;">';
+      html += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid hsl(var(--border)/0.3);display:flex;flex-wrap:wrap;gap:8px;align-items:center;">';
       html += '<a href="' + billUrl + '" target="_blank" rel="noopener noreferrer" ' + linkStyle + '>' +
         billLinkLabel + '</a>';
       html += '</div>';

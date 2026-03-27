@@ -9,6 +9,7 @@
  */
 (function () {
   "use strict";
+  console.log("[CongressWatch] data-loader.js v20260327c loaded");
 
   var CONGRESS = 119;
   var VOTEVIEW_HOUSE = "https://voteview.com/static/data/out/members/H" + CONGRESS + "_members.csv";
@@ -369,88 +370,33 @@
     });
   }
 
-  /* ================================================================
-     VOTEVIEW  VOTE  DATA  LOADING
-     Uses pre-processed local JSON files (data/votes/{C}{congress}.json)
-     generated from Voteview CSV data by scripts/fetch_vote_data.py.
+  // Passive cache — populated when the bundle fetches members-index.json (see fetch intercept above)
+  var _membersIndex = null;
 
-     JSON format:
-       r: [[rollnum,date,bill,question,result,yea,nay,desc], ...]
-       v: { "icpsr": "16119..." }  (cast codes as single-digit string)
+  /* ================================================================
+     GOVTRACK  PERSON  LOOKUP
+     Resolves a bioguideId to a GovTrack person ID when govtrackId
+     is not available in the static data.
      ================================================================ */
 
-  var _membersIndex = null;
-  var _congressVoteCache = {}; // "H119" -> parsed JSON data
+  var _govtrackIdCache = {}; // bioguideId -> govtrackId
 
-  function ensureMembersIndex() {
-    if (_membersIndex) return Promise.resolve(_membersIndex);
-    return originalFetch.call(window, "./data/members-index.json")
-      .then(function (r) { return r.json(); })
-      .then(function (data) { _membersIndex = data; return data; });
-  }
-
-  /**
-   * Load and cache pre-processed vote data for a chamber/congress pair.
-   */
-  function loadCongressVoteData(chamberCode, congress) {
-    var key = chamberCode + congress;
-    if (_congressVoteCache[key]) return Promise.resolve(_congressVoteCache[key]);
-
-    var url = "./data/votes/" + key + ".json";
+  function lookupGovTrackId(bioguideId) {
+    if (_govtrackIdCache[bioguideId]) return Promise.resolve(_govtrackIdCache[bioguideId]);
+    var url = "https://www.govtrack.us/api/v2/person?bioguideid=" +
+      encodeURIComponent(bioguideId) + "&limit=1";
     return originalFetch.call(window, url).then(function (r) {
-      if (!r.ok) throw new Error(key + " " + r.status);
+      if (!r.ok) throw new Error("Person lookup " + r.status);
       return r.json();
     }).then(function (data) {
-      _congressVoteCache[key] = data;
-      return data;
-    });
-  }
-
-  function castCodeToPosition(cc) {
-    if (cc >= 1 && cc <= 3) return "Yes";
-    if (cc >= 4 && cc <= 6) return "No";
-    if (cc === 7) return "Present";
-    return "Not Voting";
-  }
-
-  /**
-   * Get a specific member's votes for one congress from pre-processed data.
-   * Rollcall format: [rollnum, date, bill, question, result, yea, nay, desc]
-   * Vote string: one digit per rollcall (0=missing, 1-3=Yea, 4-6=Nay, 7=Present, 8-9=NV)
-   */
-  function getMemberVotesForCongress(icpsr, chamberCode, congress) {
-    return loadCongressVoteData(chamberCode, congress).then(function (data) {
-      var voteStr = data.v[String(icpsr)] || "";
-      if (!voteStr) return [];
-
-      var out = [];
-      var chLabel = chamberCode === "H" ? "House" : "Senate";
-
-      for (var i = 0; i < data.r.length; i++) {
-        var cc = parseInt(voteStr.charAt(i), 10) || 0;
-        if (cc === 0) continue; // missing
-
-        var rc = data.r[i];
-        // rc: [rollnum, date, bill, question, result, yea, nay, desc]
-        out.push({
-          question: rc[3] || "Roll Call Vote #" + rc[0],
-          position: castCodeToPosition(cc),
-          voteDate: rc[1] || "",
-          result: rc[4] || undefined,
-          billId: rc[2] || undefined,
-          billTitle: rc[7] || undefined,
-          description: undefined,
-          category: undefined,
-          chamber: chLabel,
-          congress: congress,
-          voteId: rc[0] || 0,
-          totalPlus: rc[5] || 0,
-          totalMinus: rc[6] || 0,
-          totalOther: 0,
-          questionDetails: rc[7] || undefined
-        });
+      var objects = data.objects || [];
+      if (objects.length > 0 && objects[0].id) {
+        var id = objects[0].id;
+        _govtrackIdCache[bioguideId] = id;
+        console.log("[CongressWatch] Resolved", bioguideId, "-> GovTrack person", id);
+        return id;
       }
-      return out;
+      throw new Error("No GovTrack person found for " + bioguideId);
     });
   }
 
@@ -459,11 +405,15 @@
    * Returns an array of vote objects in the same shape as Voteview votes.
    * If afterDate is provided, only returns votes after that date.
    */
+  // Global maps for vote metadata not exposed via React data attributes
+  window.__cwVoteLinks = window.__cwVoteLinks || {};
+  window.__cwVoteDates = window.__cwVoteDates || {};
+
   function fetchGovTrackVotes(govtrackId, afterDate) {
     var GT_API = "https://www.govtrack.us/api/v2";
     var allVotes = [];
     var offset = 0;
-    var pageSize = 600;
+    var pageSize = 500;
     var maxVotes = 2000;
 
     function mapVote(item) {
@@ -482,7 +432,25 @@
       var rbDisplay = rbIsObj ? rb.display_number : undefined;
       var rbTitle = rbIsObj ? rb.title : undefined;
 
-      return {
+      // When related_bill is just an integer, parse bill ID + title from the question text
+      // Question format: "H.R. 7084: Defending American Property Abroad Act of 2026"
+      // or "On Motion to Recommit: H.R. 8029: Pay Our Homeland Defenders Act"
+      var q = vote.question || "";
+      if (!rbDisplay && q) {
+        var billRe = /\b(H\.?\s*R\.?\s*\d+|H\.?\s*(?:Con\.?\s*)?(?:J\.?\s*)?Res\.?\s*\d+|S\.?\s*(?:Con\.?\s*)?(?:J\.?\s*)?(?:Res\.?\s*)?\s*\d+|PN\s*\d+)\b/i;
+        var billMatch = q.match(billRe);
+        if (billMatch) {
+          rbDisplay = billMatch[1].replace(/\s+/g, " ").trim();
+          // Extract title after the bill ID — look for ": Title" or just "ID Title"
+          var afterBill = q.substring(billMatch.index + billMatch[0].length);
+          var titleMatch = afterBill.match(/^[:\s]+(.+)/);
+          if (titleMatch && !rbTitle) {
+            rbTitle = titleMatch[1].trim();
+          }
+        }
+      }
+
+      var mapped = {
         question: vote.question || "Roll Call Vote",
         position: position,
         voteDate: (vote.created || "").substring(0, 10),
@@ -494,13 +462,25 @@
         category: vote.category || undefined,
         chamber: vote.chamber_label || undefined,
         congress: vote.congress || undefined,
-        voteId: vote.id || undefined,
+        voteId: vote.number || vote.id || undefined,
         totalPlus: vote.total_plus || 0,
         totalMinus: vote.total_minus || 0,
         totalOther: vote.total_other || 0,
         questionDetails: vote.question_details || undefined,
         _source: "govtrack"
       };
+
+      // Store metadata in global maps for enhancement layer
+      var voteNum = vote.number || vote.id;
+      var voteCongress = vote.congress;
+      var voteChamber = (vote.chamber || "").charAt(0);
+      if (voteNum && voteCongress && voteChamber) {
+        var vKey = String(voteCongress) + voteChamber + String(voteNum);
+        if (vote.link) window.__cwVoteLinks[vKey] = vote.link;
+        if (vote.created) window.__cwVoteDates[vKey] = (vote.created || "").substring(0, 10);
+      }
+
+      return mapped;
     }
 
     function fetchPage() {
@@ -530,6 +510,10 @@
           return allVotes;
         }
         return fetchPage();
+      }).catch(function (pageErr) {
+        // On page-level error (CORS / rate-limit), return what we have so far
+        console.warn("[CongressWatch] Page fetch failed at offset " + offset + ", returning " + allVotes.length + " votes collected so far:", pageErr.message);
+        return allVotes;
       });
     }
 
@@ -538,94 +522,24 @@
 
   /**
    * Global hook called by the bundle's ra() function.
-   * Loads voting records from pre-processed Voteview data files,
-   * then supplements with live GovTrack API data if Voteview is stale.
+   * Uses GovTrack API as the sole vote data source.
+   * If govtrackId is missing, resolves it via person lookup first.
    */
   window.__cwLoadVotes = function (bioguideId, govtrackId) {
-    return ensureMembersIndex().then(function () {
-      var member = null;
-      for (var i = 0; i < _membersIndex.length; i++) {
-        var m = _membersIndex[i];
-        if (m.b === bioguideId || (govtrackId && m.g === govtrackId)) {
-          member = m;
-          break;
-        }
-      }
+    console.log("[CongressWatch] __cwLoadVotes called:", bioguideId, "govtrackId:", govtrackId);
+    // Resolve govtrackId if not provided
+    var idPromise = govtrackId
+      ? Promise.resolve(govtrackId)
+      : lookupGovTrackId(bioguideId);
 
-      if (!member || !member.i) {
-        console.warn("[CongressWatch] No ICPSR for", bioguideId);
-        // Fall back to GovTrack API directly if we have a govtrackId
-        if (govtrackId) {
-          return fetchGovTrackVotes(govtrackId, null).then(function (votes) {
-            return { votes: votes, source: "govtrack.us", totalCount: votes.length };
-          }).catch(function () {
-            return { votes: [], source: "none", totalCount: 0 };
-          });
-        }
-        return { votes: [], source: "voteview", totalCount: 0 };
-      }
-
-      var icpsr = member.i;
-      var ch = member.c; // "H" or "S"
-      var last = member.l;
-      var first = member.fc || last;
-
-      // Load up to 5 most recent congresses
-      var congresses = [];
-      for (var c = last; c >= first && congresses.length < 5; c--) {
-        congresses.push(c);
-      }
-
-      console.log("[CongressWatch] Loading votes for ICPSR", icpsr,
-        ch === "H" ? "House" : "Senate", "congresses:", congresses.join(","));
-
-      return Promise.all(congresses.map(function (cong) {
-        return getMemberVotesForCongress(icpsr, ch, cong)
-          .catch(function (err) {
-            console.warn("[CongressWatch] No vote data for", ch + cong, err.message);
-            return [];
-          });
-      })).then(function (arrays) {
-        var all = [];
-        for (var j = 0; j < arrays.length; j++) {
-          all = all.concat(arrays[j]);
-        }
-        all.sort(function (a, b) {
-          return (b.voteDate || "").localeCompare(a.voteDate || "");
-        });
-
-        // Check if Voteview data is stale (most recent vote > 14 days old)
-        var latestDate = all.length > 0 ? all[0].voteDate : "";
-        var now = new Date();
-        var staleThreshold = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-        var staleDate = staleThreshold.toISOString().substring(0, 10);
-        var isStale = !latestDate || latestDate < staleDate;
-
-        if (isStale && govtrackId) {
-          console.log("[CongressWatch] Voteview data stale (latest: " + latestDate +
-            "), fetching recent votes from GovTrack API...");
-
-          return fetchGovTrackVotes(govtrackId, latestDate).then(function (gtVotes) {
-            if (gtVotes.length > 0) {
-              console.log("[CongressWatch] Got " + gtVotes.length + " newer votes from GovTrack");
-              all = gtVotes.concat(all);
-              // Re-sort by date descending
-              all.sort(function (a, b) {
-                return (b.voteDate || "").localeCompare(a.voteDate || "");
-              });
-            }
-            return { votes: all, source: "voteview+govtrack", totalCount: all.length };
-          }).catch(function (err) {
-            console.warn("[CongressWatch] GovTrack supplement failed:", err.message);
-            return { votes: all, source: "voteview", totalCount: all.length };
-          });
-        }
-
-        console.log("[CongressWatch] Loaded", all.length, "total votes");
-        return { votes: all, source: "voteview", totalCount: all.length };
+    return idPromise.then(function (resolvedId) {
+      console.log("[CongressWatch] Fetching votes from GovTrack API for person", resolvedId);
+      return fetchGovTrackVotes(resolvedId, null).then(function (gtVotes) {
+        console.log("[CongressWatch] Loaded", gtVotes.length, "votes from GovTrack API");
+        return { votes: gtVotes, source: "govtrack.us", totalCount: gtVotes.length };
       });
     }).catch(function (err) {
-      console.error("[CongressWatch] Vote loading failed:", err);
+      console.error("[CongressWatch] Vote loading failed:", err.message, err.stack || err);
       return { votes: [], source: "error", totalCount: 0 };
     });
   };
