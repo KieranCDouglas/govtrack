@@ -167,7 +167,10 @@
       var style = document.createElement("style");
       style.id = "cw-vote-styles";
       style.textContent =
-        ".cw-replaced > :not(.cw-bill-line):not(.cw-proc-line):not(.cw-vote-panel) { display: none !important; }";
+        ".cw-replaced > :not(.cw-bill-line):not(.cw-proc-line):not(.cw-vote-panel) { display: none !important; }" +
+        "@keyframes cw-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }" +
+        "@keyframes cw-shimmer { 0% { opacity:0.5; } 50% { opacity:1; } 100% { opacity:0.5; } }" +
+        "@media (max-width:640px) { .cw-recent-grid { grid-template-columns:1fr !important; } }";
       document.head.appendChild(style);
     }
 
@@ -1256,24 +1259,29 @@
   }
 
   /* ================================================================
-     3.  RECENT  VOTES  EXPANSION  (home page)
+     3.  RECENT  VOTES  (home page)
      ================================================================ */
 
-  var _recentVotesData = null;
-  var _recentVotesFetching = false;
+  var RECENT_PER_PAGE = 10;
+  var _recentVoteCache = {}; // key: "house:0" or "senate:0" → { votes, total }
 
-  function fetchRecentVotesData() {
-    if (_recentVotesData) return Promise.resolve(_recentVotesData);
-    if (_recentVotesFetching) return _recentVotesFetching;
-    _recentVotesFetching = fetch("https://www.govtrack.us/api/v2/vote?congress=119&limit=15&order_by=-created")
+  function fetchRecentVotesByChamber(chamber, offset) {
+    var key = chamber + ":" + offset;
+    if (_recentVoteCache[key]) return Promise.resolve(_recentVoteCache[key]);
+    var url = "https://www.govtrack.us/api/v2/vote?congress=119&chamber=" +
+      encodeURIComponent(chamber) + "&limit=" + RECENT_PER_PAGE +
+      "&offset=" + offset + "&order_by=-created";
+    return fetch(url)
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (d) {
-        _recentVotesData = (d && d.objects) || [];
-        return _recentVotesData;
+        var result = { votes: (d && d.objects) || [], total: (d && d.meta && d.meta.total_count) || 0 };
+        _recentVoteCache[key] = result;
+        return result;
       })
-      .catch(function () { _recentVotesData = []; return []; });
-    return _recentVotesFetching;
+      .catch(function () { return { votes: [], total: 0 }; });
   }
+
+
 
   function enhanceRecentVotes() {
     // Find the "Recent Congressional Votes" section on the home page
@@ -1290,62 +1298,359 @@
     var section = recentHeading.closest(".mb-8");
     if (!section) return;
 
-    var voteList = section.querySelector(".space-y-2");
-    if (!voteList) return;
-
-    var items = voteList.querySelectorAll(":scope > a");
-    if (!items.length) return;
-
     // Check if already enhanced
-    if (voteList.dataset.cwRecent) return;
-    voteList.dataset.cwRecent = "1";
+    if (section.dataset.cwRecentV2) return;
+    section.dataset.cwRecentV2 = "1";
 
-    // Fetch vote data and enhance each item
-    fetchRecentVotesData().then(function (votes) {
-      items.forEach(function (link, idx) {
-        var voteData = votes[idx] || null;
+    // Remove the existing vote list and "View all on GovTrack" link
+    var voteList = section.querySelector(".space-y-2");
+    var viewAllLink = section.querySelector('a[href*="govtrack.us/congress/votes"]');
+    if (viewAllLink && viewAllLink.closest(".mb-8") === section) {
+      viewAllLink.remove();
+    }
+    if (voteList) voteList.remove();
 
-        // Replace <a> with a <div> so clicking doesn't navigate
-        var wrapper = document.createElement("div");
-        wrapper.className = link.className;
-        wrapper.innerHTML = link.innerHTML;
-        wrapper.style.cursor = "pointer";
-        link.parentNode.replaceChild(wrapper, link);
+    // Build new two-column layout
+    var container = document.createElement("div");
+    container.className = "cw-recent-votes-container";
 
-        // Build expansion panel
-        var panel = document.createElement("div");
-        panel.className = "cw-recent-panel";
-        panel.style.cssText =
-          "display:none;margin-top:10px;padding:14px 16px;border-radius:8px;" +
-          "background:hsl(var(--muted)/0.35);font-size:12px;line-height:1.6;" +
-          "color:hsl(var(--muted-foreground));border-top:1px solid hsl(var(--border)/0.3);";
-        wrapper.appendChild(panel);
+    // -- Recent Votes Section --
+    var recentSection = document.createElement("div");
+    recentSection.className = "cw-recent-section";
 
-        var loaded = false;
+    // Search bar (shared across both columns)
+    var searchBar = document.createElement("div");
+    searchBar.style.cssText = "margin-bottom:12px;display:flex;gap:8px;align-items:center;";
+    searchBar.addEventListener("click", function (ev) { ev.stopPropagation(); });
+    var inputCss = "padding:6px 10px;border-radius:6px;border:1px solid hsl(var(--border));" +
+      "background:hsl(var(--muted)/0.3);color:hsl(var(--foreground));font-size:12px;outline:none;";
+    searchBar.innerHTML =
+      '<input type="text" placeholder="Search votes\u2026" class="cw-recent-search" ' +
+        'style="flex:1;min-width:160px;' + inputCss + '" />';
+    recentSection.appendChild(searchBar);
 
-        wrapper.addEventListener("mouseenter", function () {
-          if (panel.style.display === "none")
-            wrapper.style.backgroundColor = "hsl(var(--muted)/0.15)";
-        });
-        wrapper.addEventListener("mouseleave", function () {
-          if (panel.style.display === "none")
-            wrapper.style.backgroundColor = "";
-        });
+    // Two-column grid for House and Senate
+    var votesGrid = document.createElement("div");
+    votesGrid.className = "cw-recent-grid";
+    votesGrid.style.cssText = "display:grid;grid-template-columns:1fr 1fr;gap:16px;";
+    recentSection.appendChild(votesGrid);
 
-        wrapper.addEventListener("click", function (ev) {
-          // Allow clicks on links inside the panel
-          if (ev.target.tagName === "A" || ev.target.closest("a")) return;
-          var open = panel.style.display !== "none";
-          panel.style.display = open ? "none" : "block";
-          wrapper.style.backgroundColor = open ? "" : "hsl(var(--muted)/0.25)";
+    // House column
+    var houseCol = document.createElement("div");
+    houseCol.className = "cw-chamber-col";
+    houseCol.style.cssText = "min-width:0;";
+    houseCol.innerHTML =
+      '<div style="font-size:13px;font-weight:600;color:hsl(var(--foreground));margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid hsl(210,70%,50%);display:flex;justify-content:space-between;align-items:center;">' +
+        '<span>House</span>' +
+        '<span class="cw-house-live" style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:500;color:hsl(var(--muted-foreground));">' +
+          '<span style="width:6px;height:6px;border-radius:50%;background:hsl(142,60%,45%);animation:cw-pulse 2s ease-in-out infinite;"></span>Live' +
+        '</span>' +
+      '</div>' +
+      '<div class="cw-house-list" style="display:flex;flex-direction:column;gap:6px;"></div>' +
+      '<div class="cw-house-pag" style="display:flex;justify-content:center;align-items:center;gap:10px;margin-top:10px;font-size:12px;"></div>';
+    votesGrid.appendChild(houseCol);
 
-          if (!open && !loaded) {
-            loaded = true;
-            renderRecentPanel(panel, voteData);
-          }
-        });
-      });
+    // Senate column
+    var senateCol = document.createElement("div");
+    senateCol.className = "cw-chamber-col";
+    senateCol.style.cssText = "min-width:0;";
+    senateCol.innerHTML =
+      '<div style="font-size:13px;font-weight:600;color:hsl(var(--foreground));margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid hsl(0,65%,50%);display:flex;justify-content:space-between;align-items:center;">' +
+        '<span>Senate</span>' +
+        '<span class="cw-senate-live" style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:500;color:hsl(var(--muted-foreground));">' +
+          '<span style="width:6px;height:6px;border-radius:50%;background:hsl(142,60%,45%);animation:cw-pulse 2s ease-in-out infinite;"></span>Live' +
+        '</span>' +
+      '</div>' +
+      '<div class="cw-senate-list" style="display:flex;flex-direction:column;gap:6px;"></div>' +
+      '<div class="cw-senate-pag" style="display:flex;justify-content:center;align-items:center;gap:10px;margin-top:10px;font-size:12px;"></div>';
+    votesGrid.appendChild(senateCol);
+
+    container.appendChild(recentSection);
+
+    // Insert the new layout after the heading row
+    var headingRow = recentHeading.parentElement;
+    if (headingRow && headingRow.parentElement === section) {
+      headingRow.after(container);
+    } else {
+      section.appendChild(container);
+    }
+
+    // State tracking for pagination
+    var state = {
+      house: { page: 0, total: 0, search: "" },
+      senate: { page: 0, total: 0, search: "" }
+    };
+
+    var houseListEl = houseCol.querySelector(".cw-house-list");
+    var senateListEl = senateCol.querySelector(".cw-senate-list");
+    var housePagEl = houseCol.querySelector(".cw-house-pag");
+    var senatePagEl = senateCol.querySelector(".cw-senate-pag");
+    var searchInput = searchBar.querySelector(".cw-recent-search");
+
+    // Debounced search
+    var searchTimeout;
+    searchInput.addEventListener("input", function () {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(function () {
+        var q = searchInput.value.trim().toLowerCase();
+        state.house.search = q;
+        state.senate.search = q;
+        state.house.page = 0;
+        state.senate.page = 0;
+        // Clear cache so filtered results get fresh data
+        _recentVoteCache = {};
+        loadColumn("house");
+        loadColumn("senate");
+      }, 300);
     });
+
+    function loadColumn(chamber) {
+      var listEl = chamber === "house" ? houseListEl : senateListEl;
+      var pagEl = chamber === "house" ? housePagEl : senatePagEl;
+      var s = state[chamber];
+      var offset = s.page * RECENT_PER_PAGE;
+
+      // Show skeleton
+      listEl.innerHTML = buildSkeletons(4);
+
+      fetchRecentVotesByChamber(chamber, offset).then(function (data) {
+        s.total = data.total;
+        var votes = data.votes;
+
+        // Client-side search filter
+        if (s.search) {
+          votes = votes.filter(function (v) {
+            var text = ((v.question || "") + " " + (v.related_bill ? v.related_bill.title || "" : "") +
+              " " + (v.related_bill ? v.related_bill.display_number || "" : "") +
+              " " + (v.result || "") + " " + (v.category_label || "")).toLowerCase();
+            return text.indexOf(s.search) >= 0;
+          });
+        }
+
+        listEl.innerHTML = "";
+
+        if (!votes.length) {
+          listEl.innerHTML = '<div style="text-align:center;padding:20px;color:hsl(var(--muted-foreground));font-size:12px;">' +
+            (s.search ? 'No votes matching "' + esc(s.search) + '"' : 'No votes found') + '</div>';
+        } else {
+          votes.forEach(function (vote) {
+            listEl.appendChild(buildRecentVoteCard(vote));
+          });
+        }
+
+        // Pagination controls
+        var totalPages = Math.max(1, Math.ceil(s.total / RECENT_PER_PAGE));
+        pagEl.innerHTML = "";
+
+        var prevBtn = document.createElement("button");
+        prevBtn.textContent = "\u2190 Prev";
+        prevBtn.disabled = s.page === 0;
+        prevBtn.style.cssText = recentBtnCss(prevBtn.disabled);
+        prevBtn.addEventListener("click", function (ev) {
+          ev.stopPropagation();
+          if (s.page > 0) { s.page--; loadColumn(chamber); }
+        });
+        pagEl.appendChild(prevBtn);
+
+        var info = document.createElement("span");
+        info.style.cssText = "font-size:11px;color:hsl(var(--muted-foreground));white-space:nowrap;";
+        info.textContent = "Page " + (s.page + 1) + " of " + totalPages;
+        pagEl.appendChild(info);
+
+        var nextBtn = document.createElement("button");
+        nextBtn.textContent = "Next \u2192";
+        nextBtn.disabled = s.page >= totalPages - 1;
+        nextBtn.style.cssText = recentBtnCss(nextBtn.disabled);
+        nextBtn.addEventListener("click", function (ev) {
+          ev.stopPropagation();
+          if (s.page < totalPages - 1) { s.page++; loadColumn(chamber); }
+        });
+        pagEl.appendChild(nextBtn);
+      });
+    }
+
+    function recentBtnCss(disabled) {
+      return "padding:4px 12px;border-radius:6px;border:1px solid hsl(var(--border));" +
+        "background:hsl(var(--muted)/0.3);color:" + (disabled ? "hsl(var(--muted-foreground)/0.4)" : "hsl(var(--foreground))") +
+        ";font-size:11px;cursor:" + (disabled ? "default" : "pointer") + ";transition:background .15s;outline:none;";
+    }
+
+    function buildSkeletons(count) {
+      var html = "";
+      for (var i = 0; i < count; i++) {
+        html += '<div style="padding:10px 12px;border-radius:8px;background:hsl(var(--muted)/0.2);margin-bottom:6px;">' +
+          '<div style="height:14px;width:60%;border-radius:4px;background:hsl(var(--muted)/0.4);margin-bottom:6px;animation:cw-shimmer 1.5s ease-in-out infinite;"></div>' +
+          '<div style="height:10px;width:80%;border-radius:4px;background:hsl(var(--muted)/0.3);animation:cw-shimmer 1.5s ease-in-out infinite;"></div>' +
+          '</div>';
+      }
+      return html;
+    }
+
+    function buildRecentVoteCard(vote) {
+      var card = document.createElement("div");
+      card.style.cssText = "padding:10px 12px;border-radius:8px;border:1px solid hsl(var(--border)/0.4);" +
+        "cursor:pointer;transition:background .15s;overflow:hidden;";
+
+      // Extract vote info
+      var billDisplay = (vote.related_bill && vote.related_bill.display_number) || "";
+      var billTitle = (vote.related_bill && vote.related_bill.title_without_number) ||
+                      (vote.related_bill && vote.related_bill.title) || "";
+      var question = vote.question || "";
+      var result = vote.result || "";
+      var passed = /pass|agree|confirm|approved/i.test(result);
+      var failed = /fail|reject|not agreed|defeated/i.test(result);
+      var tp = vote.total_plus || 0;
+      var tm = vote.total_minus || 0;
+      var voteDate = vote.created ? vote.created.slice(0, 10) : "";
+
+      var prettyBillId = formatBillId(billDisplay) || "";
+
+      // Header row: bill ID + result badge
+      var header = document.createElement("div");
+      header.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:8px;";
+
+      // Clean title: strip bill number prefix if it duplicates the ID
+      var cleanTitle = billTitle;
+      if (prettyBillId && cleanTitle) {
+        var colonIdx = cleanTitle.indexOf(":");
+        if (colonIdx > 0 && colonIdx < 20) {
+          var beforeColon = cleanTitle.substring(0, colonIdx).replace(/[.\s]/g, "").toUpperCase();
+          var billIdNorm = prettyBillId.replace(/[.\s]/g, "").toUpperCase();
+          if (beforeColon === billIdNorm) cleanTitle = cleanTitle.substring(colonIdx + 1).trim();
+        }
+      }
+
+      var titleDiv = document.createElement("div");
+      titleDiv.className = "cw-bill-line";
+      titleDiv.style.cssText = "font-size:13px;color:hsl(var(--foreground));line-height:1.4;flex:1;min-width:0;" +
+        "white-space:nowrap;overflow:hidden;text-overflow:ellipsis;";
+      if (prettyBillId) {
+        var idSpan = document.createElement("span");
+        idSpan.style.fontWeight = "700";
+        idSpan.textContent = prettyBillId;
+        titleDiv.appendChild(idSpan);
+        if (cleanTitle) {
+          titleDiv.appendChild(document.createTextNode(" \u2014 "));
+          var titleSpan = document.createElement("span");
+          titleSpan.style.fontWeight = "700";
+          titleSpan.textContent = cleanTitle;
+          titleDiv.appendChild(titleSpan);
+        }
+      } else {
+        titleDiv.style.fontWeight = "600";
+        titleDiv.textContent = question;
+      }
+      header.appendChild(titleDiv);
+
+      // Store refs for expand/collapse title swap
+      card._cwTitleDiv = titleDiv;
+      card._cwPrettyBillId = prettyBillId;
+      card._cwCleanTitle = cleanTitle;
+      card._cwBillTitle = billTitle;
+      card._cwQuestion = question;
+      // Save collapsed innerHTML for restore
+      card._cwCollapsedHtml = titleDiv.innerHTML;
+
+      // Result badge
+      var badge = document.createElement("span");
+      badge.style.cssText = "font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0;";
+      if (passed) {
+        badge.textContent = "Passed";
+        badge.style.background = "hsl(142,60%,42%,0.15)";
+        badge.style.color = "hsl(142,60%,35%)";
+      } else if (failed) {
+        badge.textContent = "Failed";
+        badge.style.background = "hsl(0,65%,50%,0.15)";
+        badge.style.color = "hsl(0,65%,45%)";
+      } else {
+        badge.textContent = result || "Vote";
+        badge.style.background = "hsl(var(--muted)/0.3)";
+        badge.style.color = "hsl(var(--muted-foreground))";
+      }
+      header.appendChild(badge);
+
+      card.appendChild(header);
+
+      // Secondary line: procedure text + tally + date
+      var secondary = document.createElement("div");
+      secondary.className = "cw-proc-line";
+      secondary.style.cssText = "font-size:11px;color:hsl(var(--muted-foreground));margin-top:3px;" +
+        "white-space:nowrap;overflow:hidden;text-overflow:ellipsis;";
+      var secondaryText = "";
+      if (tp || tm) secondaryText += tp + "-" + tm;
+      if (voteDate) secondaryText += (secondaryText ? " \u00b7 " : "") + voteDate;
+      if (vote.category_label) secondaryText += (secondaryText ? " \u00b7 " : "") + vote.category_label;
+      if (vote.question_details) secondaryText += (secondaryText ? " \u00b7 " : "") + vote.question_details;
+      secondary.textContent = secondaryText;
+      card.appendChild(secondary);
+
+      // Expansion panel
+      var panel = document.createElement("div");
+      panel.className = "cw-recent-panel";
+      panel.style.cssText =
+        "display:none;margin-top:10px;padding:12px 14px;border-radius:8px;" +
+        "background:hsl(var(--muted)/0.35);font-size:12px;line-height:1.6;" +
+        "color:hsl(var(--muted-foreground));";
+      card.appendChild(panel);
+
+      var loaded = false;
+
+      card.addEventListener("mouseenter", function () {
+        if (panel.style.display === "none")
+          card.style.backgroundColor = "hsl(var(--muted)/0.15)";
+      });
+      card.addEventListener("mouseleave", function () {
+        if (panel.style.display === "none")
+          card.style.backgroundColor = "";
+      });
+      card.addEventListener("click", function (ev) {
+        if (ev.target.tagName === "A" || ev.target.closest("a")) return;
+        var open = panel.style.display !== "none";
+        panel.style.display = open ? "none" : "block";
+        card.style.backgroundColor = open ? "" : "hsl(var(--muted)/0.25)";
+
+        // Toggle title: show full unwrapped title when expanded, truncated "ID — Title" when collapsed
+        var td = card._cwTitleDiv;
+        if (td && card._cwPrettyBillId) {
+          if (!open) {
+            // Expanding — show full title unwrapped
+            var fullTitle = card._cwBillTitle || card._cwCleanTitle || card._cwQuestion || "";
+            td.innerHTML = "";
+            var fullId = document.createElement("span");
+            fullId.style.fontWeight = "700";
+            fullId.textContent = card._cwPrettyBillId;
+            td.appendChild(fullId);
+            if (fullTitle) {
+              td.appendChild(document.createTextNode(" \u2014 "));
+              var fullTitleSpan = document.createElement("span");
+              fullTitleSpan.style.fontWeight = "700";
+              fullTitleSpan.textContent = fullTitle;
+              td.appendChild(fullTitleSpan);
+            }
+            td.style.whiteSpace = "normal";
+            td.style.overflow = "visible";
+            td.style.textOverflow = "clip";
+          } else {
+            // Collapsing — restore truncated "ID — Title"
+            td.innerHTML = card._cwCollapsedHtml;
+            td.style.whiteSpace = "nowrap";
+            td.style.overflow = "hidden";
+            td.style.textOverflow = "ellipsis";
+          }
+        }
+
+        if (!open && !loaded) {
+          loaded = true;
+          renderRecentPanel(panel, vote);
+        }
+      });
+
+      return card;
+    }
+
+    // Load initial data
+    loadColumn("house");
+    loadColumn("senate");
   }
 
   function renderRecentPanel(panel, vote) {
@@ -1431,18 +1736,10 @@
           esc(vote.question_details) + '</div>';
       }
 
-      // 3. Bill title (from the vote data or from bill summary)
-      var displayTitle = (bill && bill.title) || billTitle || "";
-      if (displayTitle) {
-        html += '<div style="margin-bottom:8px;font-size:12px;line-height:1.7;color:hsl(var(--foreground)/0.9);">' +
-          (billDisplayNum ? '<strong>' + esc(billDisplayNum) + ':</strong> ' : '') +
-          esc(displayTitle) + '</div>';
-      }
-
-      // 4. Official title (if different)
+      // 3. Official title (if different from main title — skip main title since it's shown in the card header)
       if (bill && bill.officialTitle && bill.officialTitle !== bill.title) {
-        html += '<div style="margin-bottom:8px;font-size:11px;line-height:1.7;color:hsl(var(--foreground)/0.75);">' +
-          esc(bill.officialTitle) + '</div>';
+        html += '<div style="margin-bottom:8px;font-size:11px;line-height:1.7;color:hsl(var(--foreground)/0.75);">'
+          + esc(bill.officialTitle) + '</div>';
       }
 
       // 5. Metadata
