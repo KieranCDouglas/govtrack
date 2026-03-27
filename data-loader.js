@@ -488,7 +488,7 @@
         voteDate: (vote.created || "").substring(0, 10),
         result: vote.result || undefined,
         billId: rbDisplay || undefined,
-        billTitle: rbTitle ? rbTitle.substring(0, 200) : undefined,
+        billTitle: rbTitle || undefined,
         billGovtrackId: rbId || undefined,
         description: vote.category_label || undefined,
         category: vote.category || undefined,

@@ -380,8 +380,13 @@
           var t = typeMap[data.bill_type_label] || "";
           if (t) cgUrl = "https://www.congress.gov/bill/" + data.congress + (data.congress === 1 ? "st" : data.congress === 2 ? "nd" : data.congress === 3 ? "rd" : "th") + "-congress/" + t + "/" + data.number;
         }
+        // GovTrack's data.title can be truncated; build full title from title_without_number + display_number
+        var twn = data.title_without_number || "";
+        var dn = data.display_number || "";
+        var fullTitleWithNum = (dn && twn) ? (dn + ": " + twn) : (data.title || twn);
         return {
-          title: data.title_without_number || data.title || "",
+          title: twn || data.title || "",
+          titleWithNumber: fullTitleWithNum,
           officialTitle: officialTitle,
           number: data.display_number || "",
           status: data.current_status_description || "",
@@ -448,8 +453,25 @@
       .then(function (data) {
         if (!data || !data.objects || !data.objects.length) return null;
         var b = data.objects[0];
-        // Fetch full details using the bill ID
-        return fetchBillSummary(b.id);
+        // Fetch full details using the bill ID (if available)
+        if (b.id) return fetchBillSummary(b.id);
+        // No id — extract what we can from search result directly
+        var sponsorName = b.sponsor ? b.sponsor.name : "";
+        var twn = b.title_without_number || "";
+        var dn = b.display_number || "";
+        var fullTitleWithNum = (dn && twn) ? (dn + ": " + twn) : (b.title || twn);
+        return {
+          title: twn || b.title || "",
+          titleWithNumber: fullTitleWithNum,
+          officialTitle: "",
+          number: dn,
+          status: b.current_status_description || "",
+          statusDate: (b.current_status_date || "").substring(0, 10),
+          sponsor: sponsorName,
+          cosponsors: 0,
+          link: b.link || "",
+          congressDotGov: ""
+        };
       })
       .catch(function () { return null; });
 
@@ -782,15 +804,12 @@
         // Determine what to show on collapsed tab:
         // - Short titles (<= 80 chars): "H.R. 29 — Short Title Here"
         // - Long titles or no title: just "H.R. 29"
-        var COLLAPSE_TITLE_LIMIT = 80;
-        var showTitleInline = prettyBillId && cleanTitle && cleanTitle.length <= COLLAPSE_TITLE_LIMIT;
-
         // Always replace React's text if we have a bill ID
         if (prettyBillId) {
           // Mark parent so CSS hides ALL React children (survives React re-renders)
           textParent.classList.add("cw-replaced");
 
-          // Create new primary line (bill ID always bold)
+          // Create new primary line (bill ID only — full title shown on expand)
           var cwLine1 = document.createElement("div");
           cwLine1.className = "cw-bill-line";
           cwLine1.style.cssText = "font-size:14px;color:hsl(var(--foreground));line-height:1.4;";
@@ -798,9 +817,6 @@
           idSpan.style.fontWeight = "700";
           idSpan.textContent = prettyBillId;
           cwLine1.appendChild(idSpan);
-          if (showTitleInline) {
-            cwLine1.appendChild(document.createTextNode(" \u2014 " + cleanTitle));
-          }
 
           // Create new secondary line (vote procedure)
           var cwLine2 = document.createElement("div");
@@ -819,6 +835,15 @@
           if (descEl) descEl.style.display = "none";
         }
       }
+
+      // Store references for title update after async load
+      item._cwLine1 = typeof cwLine1 !== 'undefined' ? cwLine1 : null;
+      item._cwLine2 = typeof cwLine2 !== 'undefined' ? cwLine2 : null;
+      item._cwQuestionEl = questionEl || null;
+      item._cwBillTitleEl = billTitleEl || null;
+      item._cwPrettyBillId = prettyBillId || '';
+      item._cwOrigQuestion = origQuestion || '';
+      item._cwOrigBillTitle = origBillTitle || '';
 
       // build expandable panel
       var panel = document.createElement("div");
@@ -850,6 +875,10 @@
         panel.style.display = open ? "none" : "block";
         item.style.backgroundColor = open ? "" : "hsl(var(--muted)/0.25)";
 
+        // Restore truncated title when collapsing, re-show full title when expanding
+        if (open && item._cwRestoreTitle) item._cwRestoreTitle();
+        if (!open && item._cwShowFullTitle) item._cwShowFullTitle();
+
         if (!open && !loaded) {
           loaded = true;
           renderPanel(panel, gtId, billDisplay, voteResult, alignment, questionDetails, item, congress, chamber, totalPlus, totalMinus, voteIdNum, position);
@@ -877,6 +906,53 @@
 
     function renderContent(bill) {
       panel.innerHTML = buildExpandedHtml(bill, voteResult, alignment, questionDetails, qText, bTitle, billDisplay, congress, chamber, totalPlus, totalMinus, voteIdNum, position);
+
+      // Update the header title with the full (non-truncated) title from the API
+      // Use title_with_number so the display matches the collapsed format (includes bill ID prefix)
+      var fullTitle = (bill && (bill.titleWithNumber || bill.title || bill.officialTitle)) || bTitle || '';
+      var prettyId = item._cwPrettyBillId || formatBillId(billDisplay);
+
+      if (fullTitle && item._cwLine1) {
+        // cw-replaced path: show full title text (already includes bill ID prefix)
+        var showFull = function () {
+          item._cwLine1.textContent = fullTitle;
+          item._cwLine1.style.whiteSpace = 'normal';
+          item._cwLine1.style.overflow = 'visible';
+          if (item._cwLine2) {
+            item._cwLine2.style.whiteSpace = 'normal';
+            item._cwLine2.style.overflow = 'visible';
+          }
+        };
+        // Save original collapsed content
+        var origLine1Html = item._cwLine1.innerHTML;
+        var origLine1WS = item._cwLine1.style.whiteSpace;
+        var origLine1OV = item._cwLine1.style.overflow;
+        showFull();
+        item._cwShowFullTitle = showFull;
+        item._cwRestoreTitle = function () {
+          item._cwLine1.innerHTML = origLine1Html;
+          item._cwLine1.style.whiteSpace = origLine1WS;
+          item._cwLine1.style.overflow = origLine1OV;
+          if (item._cwLine2) {
+            item._cwLine2.style.whiteSpace = 'nowrap';
+            item._cwLine2.style.overflow = 'hidden';
+          }
+        };
+      } else if (fullTitle && item._cwQuestionEl) {
+        // React text path: helper to show full title
+        var showFullReact = function () {
+          item._cwQuestionEl.textContent = fullTitle;
+          item._cwQuestionEl.classList.remove('line-clamp-2');
+          if (item._cwBillTitleEl) item._cwBillTitleEl.style.display = 'none';
+        };
+        showFullReact();
+        item._cwShowFullTitle = showFullReact;
+        item._cwRestoreTitle = function () {
+          item._cwQuestionEl.textContent = item._cwOrigQuestion;
+          item._cwQuestionEl.classList.add('line-clamp-2');
+          if (item._cwBillTitleEl) item._cwBillTitleEl.style.display = '';
+        };
+      }
     }
 
     if (gtId) {
@@ -1067,22 +1143,7 @@
         'Result: ' + esc(voteResult) + '</div>';
     }
 
-    // 2. Party-alignment badge
-    if (alignment) {
-      var aColor, aBg, aLabel;
-      if (alignment === "with") {
-        aColor = "hsl(var(--primary))";
-        aBg    = "hsl(var(--primary)/0.12)";
-        aLabel = "\u2713 Voted with party";
-      } else {
-        aColor = "hsl(0,70%,55%)";
-        aBg    = "hsla(0,70%,50%,0.12)";
-        aLabel = "\u2717 Voted against party";
-      }
-      html += '<div style="display:inline-block;font-size:11px;font-weight:600;' +
-        'padding:3px 10px;border-radius:5px;background:' + aBg + ';color:' + aColor + ';' +
-        'margin-bottom:10px;">' + aLabel + '</div>';
-    }
+    // 2. Party-alignment badge (shown inline on vote item already)
 
     // 3. Full bill name + number
     var prettyId = formatBillId(billDisplay);
@@ -1125,43 +1186,12 @@
       displayTitle = fullTitle.substring(0, TRUNC_LIMIT).replace(/[\s,;:\-]+$/, '') + '\u2026';
     }
 
-    if (prettyId || displayTitle) {
-      html += '<div style="margin-bottom:8px;">';
-      if (prettyId && displayTitle) {
-        html += '<div style="font-size:13px;font-weight:600;color:hsl(var(--foreground));line-height:1.5;">' +
-          esc(prettyId) + ' \u2014 ' + esc(displayTitle) + '</div>';
-      } else if (displayTitle) {
-        html += '<div style="font-size:13px;font-weight:600;color:hsl(var(--foreground));line-height:1.5;">' +
-          esc(displayTitle) + '</div>';
-      } else {
-        html += '<div style="font-size:13px;font-weight:600;color:hsl(var(--foreground));line-height:1.5;">' +
-          esc(prettyId) + '</div>';
-      }
-      html += '</div>';
-    }
+    // Sections 3 & 4 (bill title) omitted — full title shown in the collapsed header area above
 
-    // 4. Official bill title / purpose (only when it adds new information)
-    if (sec4Text) {
-      html += '<div style="margin-bottom:10px;font-size:12px;line-height:1.7;color:hsl(var(--foreground)/0.8);">' +
-        esc(sec4Text) + '</div>';
-    }
-
-    // 5. Vote procedure (e.g. "On Motion to Suspend the Rules and Pass")
-    if (qText) {
-      html += '<div style="font-size:11px;color:hsl(var(--muted-foreground));margin-bottom:8px;font-style:italic;">' +
-        'Procedure: ' + esc(qText) + '</div>';
-    }
-
-    // 6. Metadata row
-    var meta = [];
-    if (bill) {
-      if (bill.sponsor) meta.push('<span>Sponsor: <strong style="color:hsl(var(--foreground));">' + esc(bill.sponsor) + '</strong></span>');
-      if (bill.cosponsors > 0) meta.push('<span>' + bill.cosponsors + ' cosponsor' + (bill.cosponsors !== 1 ? 's' : '') + '</span>');
-      if (bill.status) meta.push('<span>' + esc(bill.status) + (bill.statusDate ? ' (' + bill.statusDate + ')' : '') + '</span>');
-    }
-    if (meta.length) {
-      html += '<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:hsl(var(--muted-foreground));margin-bottom:8px;">' +
-        meta.join("") + '</div>';
+    // 5. Sponsor
+    if (bill && bill.sponsor) {
+      html += '<div style="font-size:11px;color:hsl(var(--muted-foreground));margin-bottom:8px;">' +
+        'Sponsor: <strong style="color:hsl(var(--foreground));">' + esc(bill.sponsor) + '</strong></div>';
     }
 
     // 7. Bill links — primary bill + any referenced bills from procedural text
@@ -1170,11 +1200,6 @@
       'background:hsl(var(--primary)/0.08);transition:background .15s;" ' +
       'onmouseover="this.style.background=\'hsl(var(--primary)/0.15)\'" ' +
       'onmouseout="this.style.background=\'hsl(var(--primary)/0.08)\'"';
-    var refLinkStyle = 'style="color:hsl(var(--primary));font-size:11px;text-decoration:none;' +
-      'display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;' +
-      'background:hsl(var(--primary)/0.05);transition:background .15s;" ' +
-      'onmouseover="this.style.background=\'hsl(var(--primary)/0.12)\'" ' +
-      'onmouseout="this.style.background=\'hsl(var(--primary)/0.05)\'"';
 
     var billUrl = "";
     var billLinkLabel = "";
@@ -1199,41 +1224,10 @@
       billLinkLabel = "View bill on GovTrack \u2197";
     }
 
-    // Extract referenced bill IDs from procedural text (e.g. "H.R. 8029", "S. 1234", "H.J.Res. 45")
-    var refBills = [];
-    var refSources = [qText, rawTitle].join(" ");
-    if (congress && refSources) {
-      var billRefRe = /\b(H\.?\s*(?:Con\.?\s*)?(?:J\.?\s*)?(?:Res\.?\s*)?|S\.?\s*(?:Con\.?\s*)?(?:J\.?\s*)?(?:Res\.?\s*)?)\s*(\d+)\b/gi;
-      var refMatch;
-      var seenRef = {};
-      // Normalize the main billDisplay so we can skip it
-      var mainNorm = billDisplay ? billDisplay.replace(/[.\s]/g, "").toUpperCase() : "";
-      while ((refMatch = billRefRe.exec(refSources)) !== null) {
-        var refPrefix = refMatch[1].replace(/[\s.]/g, "").toUpperCase();
-        var refNum = refMatch[2];
-        var refRaw = refPrefix + refNum;
-        // Skip the main bill and duplicates
-        if (refRaw === mainNorm || seenRef[refRaw]) continue;
-        seenRef[refRaw] = true;
-        var refUrl = billIdToCongressGovUrl(refRaw, congress);
-        if (refUrl && refUrl !== billUrl) {
-          // Reconstruct a pretty label from the match text
-          var refLabel = refMatch[0].replace(/\s+/g, " ").trim();
-          refBills.push({ label: refLabel, url: refUrl });
-        }
-      }
-    }
-
-    if (billUrl || refBills.length) {
+    if (billUrl) {
       html += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid hsl(var(--border)/0.3);display:flex;flex-wrap:wrap;gap:6px;align-items:center;">';
-      if (billUrl) {
-        html += '<a href="' + billUrl + '" target="_blank" rel="noopener noreferrer" ' + linkStyle + '>' +
-          billLinkLabel + '</a>';
-      }
-      for (var ri = 0; ri < refBills.length; ri++) {
-        html += '<a href="' + refBills[ri].url + '" target="_blank" rel="noopener noreferrer" ' + refLinkStyle + '>' +
-          esc(refBills[ri].label) + ' \u2197</a>';
-      }
+      html += '<a href="' + billUrl + '" target="_blank" rel="noopener noreferrer" ' + linkStyle + '>' +
+        billLinkLabel + '</a>';
       html += '</div>';
     } else if (billDisplay) {
       // Fallback: link to congress.gov search
