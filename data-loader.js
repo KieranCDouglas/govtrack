@@ -290,7 +290,12 @@
         });
       }).catch(function (err) {
         console.warn("[Civicism] Live data fetch failed, using static fallback:", err.message);
-        return originalFetch.apply(window, [input, init]);
+        return originalFetch.apply(window, [input, init]).then(function (resp) {
+          resp.clone().json().then(function (staticMembers) {
+            _exposeLastNames(staticMembers);
+          }).catch(function () {});
+          return resp;
+        });
       });
     }
 

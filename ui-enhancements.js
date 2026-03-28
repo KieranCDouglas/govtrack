@@ -80,21 +80,10 @@
         return m ? m[1] : null;
       }
 
-      // Detect if "Former only" filter is active.
-      // Strategy 1: React fiber value via _readSelect (same method used by filter persistence)
-      var fiberVal = _readSelect("select-current");
-      console.log("[Civicism] select-current fiber value:", fiberVal);
-      var formerOnly = fiberVal !== null && fiberVal !== "current" && fiberVal !== "all";
-      // Strategy 2: scan combobox buttons for visible "Former" text as fallback
-      if (!formerOnly) {
-        var comboboxes = document.querySelectorAll('[role="combobox"]');
-        for (var ci = 0; ci < comboboxes.length; ci++) {
-          var cbText = (comboboxes[ci].getAttribute("aria-label") || comboboxes[ci].textContent || "").toLowerCase();
-          console.log("[Civicism] combobox text:", cbText);
-          if (cbText.indexOf("former") !== -1) { formerOnly = true; break; }
-        }
-      }
-      console.log("[Civicism] formerOnly:", formerOnly);
+      // Detect "Former only" by counting visible member links.
+      // Current-only renders ~540 members; former-only renders ~12,000.
+      // This is more reliable than reading React fiber state or combobox text.
+      var formerOnly = uniqueLinks.length > 600;
 
       // Sort key from global maps (populated by data-loader.js), with link-text fallback
       function getSortKey(link) {
