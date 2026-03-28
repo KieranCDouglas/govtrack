@@ -33,7 +33,15 @@
       style.id = "cw-vote-styles";
       style.textContent =
         ".cw-replaced > :not(.cw-bill-line):not(.cw-proc-line):not(.cw-vote-panel) { display: none !important; }" +
-        "header { height: auto !important; min-height: 4rem; padding-top: 4px !important; padding-bottom: 4px !important; }" +
+        "img[alt='CongressWatch logo'] { display: none !important; }" +
+        "header a[href='/'] span { display: none !important; }" +
+        "header [data-testid='button-theme-toggle'] ~ * { display: none !important; }" +
+        "header { height: 120px !important; overflow: hidden !important; padding: 0 !important; display: flex !important; align-items: center !important; }" +
+        "header > div { display: grid !important; grid-template-columns: 1fr auto 1fr !important; grid-template-rows: 120px !important; align-items: center !important; gap: 0 !important; height: 120px !important; }" +
+        "header > div > a:first-child { justify-self: start !important; }" +
+        "header nav { justify-self: center !important; white-space: nowrap !important; }" +
+        "header > div > div:last-child { justify-self: end !important; }" +
+        "html:not(.light) .cw-new-logo { filter: invert(1) contrast(5) brightness(0.75) sepia(1) hue-rotate(155deg) saturate(0.7) !important; }" +
         "@keyframes cw-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }" +
         "@keyframes cw-shimmer { 0% { opacity:0.5; } 50% { opacity:1; } 100% { opacity:0.5; } }" +
         "@media (max-width:640px) { .cw-recent-grid { grid-template-columns:1fr !important; } }";
@@ -67,6 +75,21 @@
       renameBrand();
       sortMembersAlphabetically();
       enhanceCompassPage();
+      enhanceHeaderLayout();
+    }
+
+    function enhanceHeaderLayout() {
+      var header = document.querySelector('header');
+      if (!header) return;
+      var themeToggle = header.querySelector('[data-testid="button-theme-toggle"]');
+      if (!themeToggle) return;
+      var rightDiv = themeToggle.parentElement;
+      if (!rightDiv) return;
+      Array.from(rightDiv.querySelectorAll('a, button')).forEach(function (el) {
+        if (el.textContent.trim().toLowerCase().includes('take the quiz')) {
+          el.style.display = 'none';
+        }
+      });
     }
 
     function sortMembersAlphabetically() {
@@ -173,7 +196,7 @@
             newLogo.src = './civicism-logo.png';
             newLogo.alt = 'Civicism';
             newLogo.className = 'cw-new-logo flex-shrink-0';
-            newLogo.style.cssText = 'height:220px;width:auto;display:block;filter:contrast(5) brightness(0.75);margin-top:30px;';
+            newLogo.style.cssText = 'height:260px;width:auto;display:block;filter:contrast(5) brightness(0.75);align-self:center;margin-top:0;margin-right:40px;';
             oldLogo.parentElement.insertBefore(newLogo, oldLogo);
           }
         }
