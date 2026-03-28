@@ -46,6 +46,13 @@
     });
     ob.observe(root, { childList: true, subtree: true });
 
+    // Rename brand text immediately on any DOM change — no debounce — so the
+    // old names never flash before being replaced.
+    var brandOb = new MutationObserver(function () {
+      renameBrand();
+    });
+    brandOb.observe(root, { childList: true, subtree: true });
+
     window.addEventListener("hashchange", function () {
       setTimeout(run, 300);
     });
@@ -58,6 +65,7 @@
       injectMemberSummary();
       renameBrand();
       sortMembersAlphabetically();
+      enhanceCompassPage();
     }
 
     function sortMembersAlphabetically() {
@@ -510,9 +518,48 @@
     });
   }
 
+  /* ---- 2c  Full compass page: fixed view + polished overlays ---- */
+
+  function enhanceCompassPage() {
+    // Only target the large full-page compass canvas (900×700)
+    var canvas = null;
+    document.querySelectorAll("canvas").forEach(function (cv) {
+      if (parseInt(cv.getAttribute("width") || cv.width, 10) >= 500) canvas = cv;
+    });
+    if (!canvas || canvas._cwCompassFixed) return;
+    canvas._cwCompassFixed = true;
+
+    // --- Block pan (mousedown) and zoom (wheel); keep hover + click intact ---
+    canvas.addEventListener("mousedown", function (e) {
+      e.stopPropagation();
+    }, true);
+    canvas.addEventListener("wheel", function (e) {
+      e.stopPropagation();
+      // Do NOT preventDefault — let the browser scroll the page normally
+    }, { capture: true, passive: true });
+    // Remove the "grab" cursor — show pointer when over a member, default otherwise
+    canvas.style.setProperty("cursor", "default", "important");
+
+    // --- Polish the container ---
+    var container = canvas.parentElement;
+    if (!container || container._cwCompassStyled) return;
+    container._cwCompassStyled = true;
+    container.style.position = "relative";
+    container.style.borderRadius = "16px";
+    container.style.border = "1px solid rgba(94,177,191,0.35)";
+    container.style.boxShadow =
+      "0 8px 40px rgba(0,0,0,0.45), 0 2px 10px rgba(0,0,0,0.25), " +
+      "inset 0 1px 0 rgba(94,177,191,0.15)";
+
+    // --- Overlay: quadrant corner labels + axis direction labels ---
+  }
+
   /* ---- 2b  Expandable vote items with party-line detection & filtering ---- */
 
   var billCache = {};
+  // Stores resolved full titles so enhanceVotes can apply them synchronously on re-renders
+  // keyed by gtId, or by billDisplay+"_"+congress when no gtId
+  var resolvedTitleMap = {};
 
   function fetchBillSummary(gtId) {
     if (billCache[gtId]) return billCache[gtId];
@@ -661,7 +708,10 @@
       else if (prettyId) newTitle = prettyId + (rawTitle ? " \u2014 " + rawTitle : "");
       else if (clean) newTitle = clean;
       else return;
-      var span = item._cwLine1.querySelector("span");
+      // Cache so enhanceVotes uses the full title synchronously on future re-renders
+      var cacheKey = gtId || (billDisplay + "_" + (congress || ""));
+      resolvedTitleMap[cacheKey] = newTitle;
+      var span = item._cwLine1 && item._cwLine1.querySelector("span");
       if (span) span.textContent = newTitle;
     }
 
@@ -775,12 +825,13 @@
     var currentPage = 0;
 
     // Collect all vote items once for full-dataset search
-    var allVoteItems = Array.from(voteSection.querySelectorAll(":scope > div")).filter(function (item) {
-      return item.dataset.cwExp;
-    });
-
     function applyFilters(resetPage) {
       if (resetPage) currentPage = 0;
+
+      // Re-query each time so items enhanced after addVoteFilters ran are included
+      var allVoteItems = Array.from(voteSection.querySelectorAll(":scope > div")).filter(function (item) {
+        return item.dataset.cwExp;
+      });
 
       var q = searchIn.value.toLowerCase().trim();
       var pv = posSel.value;
@@ -973,14 +1024,18 @@
           // Mark parent so CSS hides ALL React children (survives React re-renders)
           textParent.classList.add("cw-replaced");
 
-          // Build primary title: "H.R. 7084 — Title" or just question text for procedural votes
-          var primaryTitle = "";
-          if (prettyBillId && cleanTitle) {
-            primaryTitle = prettyBillId + " \u2014 " + cleanTitle;
-          } else if (prettyBillId) {
-            primaryTitle = prettyBillId + (origBillTitle ? " \u2014 " + origBillTitle : "");
-          } else {
-            primaryTitle = origBillTitle || origQuestion || "Roll Call Vote";
+          // Check resolved title cache first (populated by fetchTitleForItem on prior renders)
+          var _cacheKey = gtId || (billDisplay + "_" + (congress || ""));
+          var primaryTitle = resolvedTitleMap[_cacheKey] || "";
+
+          if (!primaryTitle) {
+            if (prettyBillId && cleanTitle) {
+              primaryTitle = prettyBillId + " \u2014 " + cleanTitle;
+            } else if (prettyBillId) {
+              primaryTitle = prettyBillId + (origBillTitle ? " \u2014 " + origBillTitle : "");
+            } else {
+              primaryTitle = origBillTitle || origQuestion || "Roll Call Vote";
+            }
           }
 
           // Create new primary line with title + badge
