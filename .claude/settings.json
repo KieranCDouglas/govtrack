@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/kieran/Documents/GitHub/govtrack log --oneline -20)",
+      "Bash(gh run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"fix: remove non-existent @radix-ui/react-slot@^2.0.0 from dependencies:*)",
+      "Bash(git push:*)",
+      "Bash(git commit -m \"fix: correct CSS import path in main.tsx \\(input.css not index.css\\):*)",
+      "Bash(git commit -m \"fix: syntax error in QuizPage computed property assignment:*)",
+      "Bash(brew install:*)",
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")",
+      "Bash(npm --version)",
+      "Bash(find /Users/kieran/Documents/GitHub/govtrack -type f -name *compass*)",
+      "Bash(git log:*)",
+      "Bash(grep -E \"\\\\.\\(tsx?|jsx?\\)$\")",
+      "Bash(python3:*)",
+      "Bash(R --version)",
+      "Bash(Rscript -e \"pkgs <- c\\(''ggplot2'',''ggiraph'',''jsonlite'',''htmlwidgets''\\); missing <- pkgs[!pkgs %in% installed.packages\\(\\)[,''Package'']]; if\\(length\\(missing\\)\\) { cat\\(''Installing:'', paste\\(missing, collapse='', ''\\), ''\\\\n''\\); install.packages\\(missing, repos=''https://cloud.r-project.org'', quiet=TRUE\\) } else cat\\(''All packages already installed\\\\n''\\)\")",
+      "Bash(Rscript -e \"pkgs <- c\\(''ggplot2'',''ggiraph'',''jsonlite'',''htmlwidgets''\\); installed <- pkgs[pkgs %in% installed.packages\\(\\)[,''Package'']]; cat\\(''Installed:'', paste\\(installed, collapse='', ''\\), ''\\\\n''\\)\")",
+      "Bash(Rscript -e \"install.packages\\(''''ggiraph'''', repos=''''https://cloud.r-project.org'''', quiet=FALSE\\)\")",
+      "Bash(Rscript scripts/generate_compass.R)",
+      "Bash(find /Users/kieran/Documents/GitHub/govtrack -type f -name *.tsx -o -name *.ts)",
+      "Bash(git -C /Users/kieran/Documents/GitHub/govtrack status --short)",
+      "Bash(grep -r compass /Users/kieran/Documents/GitHub/govtrack --include=*.js --include=*.jsx --include=*.ts --include=*.tsx --include=*.html --include=*.css)",
+      "Bash(grep -n \"compass\\\\|Compass\\\\|COMPASS\" /Users/kieran/Documents/GitHub/govtrack/*.js)",
+      "Bash(find /Users/kieran/Documents/GitHub/govtrack -type f \\\\\\(-name *.ts -o -name *.tsx -o -name *.jsx \\\\\\))",
+      "Bash(jq .[0:2])",
+      "Bash(node -e \":*)"
+    ]
+  }
+}

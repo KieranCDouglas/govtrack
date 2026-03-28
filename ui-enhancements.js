@@ -33,6 +33,7 @@
       style.id = "cw-vote-styles";
       style.textContent =
         ".cw-replaced > :not(.cw-bill-line):not(.cw-proc-line):not(.cw-vote-panel) { display: none !important; }" +
+        "header { height: auto !important; min-height: 4rem; padding-top: 4px !important; padding-bottom: 4px !important; }" +
         "@keyframes cw-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }" +
         "@keyframes cw-shimmer { 0% { opacity:0.5; } 50% { opacity:1; } 100% { opacity:0.5; } }" +
         "@media (max-width:640px) { .cw-recent-grid { grid-template-columns:1fr !important; } }";
@@ -164,11 +165,27 @@
     function renameBrand() {
       var header = document.querySelector("header");
       if (header) {
+        // Inject new unified logo once
+        if (!header.querySelector('.cw-new-logo')) {
+          var oldLogo = header.querySelector('img[alt="CongressWatch logo"]');
+          if (oldLogo) {
+            var newLogo = document.createElement('img');
+            newLogo.src = '/civicism-logo.png';
+            newLogo.alt = 'Civicism';
+            newLogo.className = 'cw-new-logo flex-shrink-0';
+            newLogo.style.cssText = 'height:220px;width:auto;display:block;filter:contrast(5) brightness(0.75);';
+            oldLogo.parentElement.insertBefore(newLogo, oldLogo);
+          }
+        }
+        // Hide old logo img and brand text span
+        var oldImg = header.querySelector('img[alt="CongressWatch logo"]');
+        if (oldImg) oldImg.style.display = 'none';
         var walker = document.createTreeWalker(header, NodeFilter.SHOW_TEXT);
         var node;
         while ((node = walker.nextNode())) {
-          if (node.nodeValue.includes("CongressWatch")) {
-            node.nodeValue = node.nodeValue.replace(/CongressWatch/g, "Civicism");
+          var val = node.nodeValue.trim();
+          if (val === "CongressWatch" || val === "Civicism") {
+            node.parentElement.style.display = 'none';
           }
         }
       }
