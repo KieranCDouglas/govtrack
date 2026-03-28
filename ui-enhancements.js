@@ -58,11 +58,12 @@
         "@media (max-width:640px) { .cw-recent-grid { grid-template-columns:1fr !important; } }" +
         "@media (max-width:767px) {" +
         "  header { height: auto !important; overflow: visible !important; padding: 0 !important; }" +
-        "  header > div { display: flex !important; align-items: center !important; justify-content: center !important; position: relative !important; width: 100% !important; min-width: 0 !important; height: auto !important; padding: 8px 12px !important; box-sizing: border-box !important; }" +
+        "  header > div { display: flex !important; flex-direction: column !important; align-items: center !important; position: relative !important; width: 100% !important; min-width: 0 !important; height: auto !important; padding: 8px 0 !important; }" +
         "  header > div > a:first-child { flex: 0 0 auto !important; overflow: hidden !important; }" +
         "  .cw-new-logo { height: 160px !important; transition: none !important; }" +
-        "  header nav { display: none !important; opacity: 1 !important; }" +
-        "  header > div > div:last-child { position: absolute !important; right: 12px !important; top: 50% !important; transform: translateY(-50%) !important; display: flex !important; align-items: center !important; overflow: visible !important; }" +
+        "  header nav { display: flex !important; flex-wrap: wrap !important; justify-content: center !important; opacity: 1 !important; padding: 4px 16px 8px !important; gap: 4px !important; }" +
+        "  header > div > div:last-child { position: absolute !important; right: 12px !important; top: 16px !important; display: flex !important; align-items: center !important; }" +
+        "  header [aria-label='Menu'] { display: none !important; }" +
         "}";
       document.head.appendChild(style);
     }
