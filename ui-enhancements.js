@@ -170,7 +170,7 @@
           var oldLogo = header.querySelector('img[alt="CongressWatch logo"]');
           if (oldLogo) {
             var newLogo = document.createElement('img');
-            newLogo.src = '/civicism-logo.png';
+            newLogo.src = './civicism-logo.png';
             newLogo.alt = 'Civicism';
             newLogo.className = 'cw-new-logo flex-shrink-0';
             newLogo.style.cssText = 'height:220px;width:auto;display:block;filter:contrast(5) brightness(0.75);';
