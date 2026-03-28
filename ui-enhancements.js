@@ -14,6 +14,19 @@
   window.__getPositions = function () { return []; };
 
   /* ================================================================
+     2a. FLASH-PREVENTION STYLES (injected immediately, before React renders)
+     ================================================================ */
+  (function () {
+    var s = document.createElement("style");
+    s.id = "cw-flash-prevention";
+    s.textContent =
+      "img[alt='CongressWatch logo'] { display: none !important; }" +
+      "header a[href='/'] span { display: none !important; }" +
+      "header [data-testid='button-theme-toggle'] ~ * { display: none !important; }";
+    document.head.appendChild(s);
+  })();
+
+  /* ================================================================
      2.  DOM  ENHANCEMENTS  (after app renders)
      ================================================================ */
 
@@ -33,14 +46,12 @@
       style.id = "cw-vote-styles";
       style.textContent =
         ".cw-replaced > :not(.cw-bill-line):not(.cw-proc-line):not(.cw-vote-panel) { display: none !important; }" +
-        "img[alt='CongressWatch logo'] { display: none !important; }" +
-        "header a[href='/'] span { display: none !important; }" +
-        "header [data-testid='button-theme-toggle'] ~ * { display: none !important; }" +
         "header { height: 120px !important; overflow: hidden !important; padding: 0 !important; display: flex !important; align-items: center !important; }" +
-        "header > div { display: grid !important; grid-template-columns: 1fr auto 1fr !important; grid-template-rows: 120px !important; align-items: center !important; gap: 0 !important; height: 120px !important; }" +
-        "header > div > a:first-child { justify-self: start !important; }" +
-        "header nav { justify-self: center !important; white-space: nowrap !important; }" +
-        "header > div > div:last-child { justify-self: end !important; }" +
+        "header > div { display: grid !important; grid-template-columns: auto 1fr auto !important; grid-template-rows: 120px !important; align-items: center !important; gap: 0 !important; height: 120px !important; overflow: hidden !important; }" +
+        "header > div > a:first-child { justify-self: start !important; flex-shrink: 0 !important; }" +
+        "header nav { display: flex !important; justify-content: center !important; white-space: nowrap !important; overflow: hidden !important; min-width: 0 !important; }" +
+        "header > div > div:last-child { justify-self: end !important; flex-shrink: 0 !important; }" +
+        ".cw-new-logo { height: 260px !important; width: auto !important; max-width: none !important; flex-shrink: 0 !important; }" +
         "html:not(.light) .cw-new-logo { filter: invert(1) contrast(5) brightness(0.75) sepia(1) hue-rotate(155deg) saturate(0.7) !important; }" +
         "@keyframes cw-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }" +
         "@keyframes cw-shimmer { 0% { opacity:0.5; } 50% { opacity:1; } 100% { opacity:0.5; } }" +
