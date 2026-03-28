@@ -13,7 +13,7 @@
  */
 (function () {
   "use strict";
-  console.log("[Civicism] data-loader.js v20260327g loaded");
+  console.log("[Civicism] data-loader.js v20260327h loaded");
 
   var CONGRESS = 119;
 
@@ -180,7 +180,7 @@
     var allVotes = [];
     var offset = 0;
     var pageSize = 500;
-    var maxVotes = 2000;
+    var maxVotes = 1000; // GovTrack's voter API returns 400 beyond offset ~1500
 
     function mapVote(item) {
       var vote = item.vote || {};
