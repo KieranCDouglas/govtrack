@@ -47,10 +47,10 @@
       style.textContent =
         ".cw-replaced > :not(.cw-bill-line):not(.cw-proc-line):not(.cw-vote-panel) { display: none !important; }" +
         "header { height: 120px !important; overflow: hidden !important; padding: 0 !important; display: flex !important; align-items: center !important; }" +
-        "header > div { display: flex !important; align-items: center !important; position: relative !important; height: 120px !important; padding-left: 0 !important; margin-left: 0 !important; width: 100% !important; max-width: 100% !important; }" +
-        "header > div > a:first-child { flex: 0 0 auto !important; padding-left: 0 !important; position: relative !important; z-index: 2 !important; }" +
-        "header nav { position: absolute !important; left: 50% !important; transform: translateX(-50%) !important; white-space: nowrap !important; z-index: 1 !important; }" +
-        "header > div > div:last-child { flex: 0 0 auto !important; margin-left: auto !important; position: relative !important; z-index: 2 !important; }" +
+        "header > div { display: grid !important; grid-template-columns: 1fr auto 1fr !important; align-items: center !important; height: 120px !important; padding-left: 0 !important; margin-left: 0 !important; width: 100% !important; max-width: 100% !important; overflow: hidden !important; }" +
+        "header > div > a:first-child { justify-self: start !important; overflow: hidden !important; min-width: 0 !important; padding-left: 0 !important; }" +
+        "header nav { justify-self: center !important; white-space: nowrap !important; overflow: hidden !important; min-width: 0 !important; }" +
+        "header > div > div:last-child { justify-self: end !important; overflow: hidden !important; min-width: 0 !important; }" +
         ".cw-new-logo { height: 260px !important; width: auto !important; max-width: none !important; flex-shrink: 0 !important; }" +
         "html:not(.light) .cw-new-logo { filter: invert(1) contrast(5) brightness(0.75) sepia(1) hue-rotate(155deg) saturate(0.7) !important; }" +
         "@keyframes cw-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }" +
