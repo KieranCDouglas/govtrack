@@ -56,7 +56,7 @@
         "@keyframes cw-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }" +
         "@keyframes cw-shimmer { 0% { opacity:0.5; } 50% { opacity:1; } 100% { opacity:0.5; } }" +
         "@media (max-width:640px) { .cw-recent-grid { grid-template-columns:1fr !important; } }" +
-        "@media (max-width:767px) { header > div { min-width: 0 !important; grid-template-columns: auto 1fr auto !important; } header nav { display: none !important; } .cw-new-logo { height: 160px !important; } header { height: 80px !important; } header > div { height: 80px !important; grid-template-rows: 80px !important; } }";
+        "@media (max-width:767px) { header { height: 80px !important; overflow: hidden !important; } header > div { display: flex !important; align-items: center !important; justify-content: space-between !important; min-width: 0 !important; width: 100% !important; height: 80px !important; padding: 0 12px !important; box-sizing: border-box !important; } header > div > a:first-child { flex: 0 0 auto !important; overflow: hidden !important; } .cw-new-logo { height: 130px !important; } header nav { display: none !important; } header > div > div:last-child { flex: 0 0 auto !important; display: flex !important; align-items: center !important; } }";
       document.head.appendChild(style);
     }
 
