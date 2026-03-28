@@ -235,7 +235,28 @@
     } catch (e) {
       // Storage might be full or unavailable
     }
+    _exposeLastNames(members);
   }
+
+  function _exposeLastNames(members) {
+    if (!Array.isArray(members)) return;
+    window.__cwLastNameMap = window.__cwLastNameMap || {};
+    window.__cwFirstNameMap = window.__cwFirstNameMap || {};
+    members.forEach(function (m) {
+      if (m.bioguideId && m.displayName) {
+        var parts = m.displayName.split(/\s+/);
+        window.__cwLastNameMap[m.bioguideId] = parts[parts.length - 1];
+        window.__cwFirstNameMap[m.bioguideId] = parts[0];
+      }
+    });
+    window.dispatchEvent(new CustomEvent("cwMembersLoaded"));
+  }
+
+  // Populate from session cache on page load (so ui-enhancements.js can use it immediately)
+  (function () {
+    var cached = getCachedMembers();
+    if (cached) _exposeLastNames(cached);
+  })();
 
   /**
    * Override window.fetch to intercept data file requests.
@@ -336,17 +357,6 @@
     ]).then(function (counts) {
       var historicalCount = _membersIndex ? _membersIndex.length : 12579;
 
-      // Compute full-congress totals from Voteview cached members
-      var cachedMembers = getCachedMembers();
-      var congressTotal = 0, congressHouse = 0, congressSenate = 0;
-      if (cachedMembers) {
-        congressTotal = cachedMembers.length;
-        for (var i = 0; i < cachedMembers.length; i++) {
-          if (cachedMembers[i].chamber === "House") congressHouse++;
-          else congressSenate++;
-        }
-      }
-
       var stats = {
         total_historical: historicalCount,
         current_total: counts[0],
@@ -356,9 +366,9 @@
         current_reps: counts[4],
         current_ind: counts[0] - counts[3] - counts[4],
         congress: CONGRESS,
-        congress_total: congressTotal || 547,
-        congress_house: congressHouse || 445,
-        congress_senate: congressSenate || 102
+        congress_total: counts[0],
+        congress_house: counts[1],
+        congress_senate: counts[2]
       };
       _govtrackStatsCache = stats;
       try { sessionStorage.setItem("cw_govtrack_stats", JSON.stringify(stats)); } catch (e) { /* ignore */ }

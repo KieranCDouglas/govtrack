@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.govtrack.us)",
+      "Bash(curl -s -H \"User-Agent: Mozilla/5.0\" \"https://www.govtrack.us/congress/members\")",
+      "Bash(curl -s -H \"User-Agent: Mozilla/5.0\" \"https://www.govtrack.us/congress/members/current\")",
+      "Bash(curl -s -H \"User-Agent: Mozilla/5.0\" \"https://www.govtrack.us/api/v2/person?current_role__current=true&limit=1\")",
+      "Bash(curl -s -H \"User-Agent: Mozilla/5.0\" \"https://www.govtrack.us/api/v2/role?current=true&limit=1\")",
+      "Bash(awk '{print \"\"\"\"members-index entries: check\"\"\"\"}')",
+      "Bash(python3 -c \":*)"
+    ]
+  }
+}
