@@ -634,6 +634,44 @@
     return p;
   }
 
+  /* -- Fetch and update the collapsed title for a single vote item (lazy, per-page) -- */
+  function fetchTitleForItem(item) {
+    if (item._cwTitleFetched || !item._cwLine1) return;
+    item._cwTitleFetched = true;
+
+    var gtId = item.dataset.billGtId || "";
+    var billDisplay = item.dataset.billDisplay || "";
+    var congress = item.dataset.congress || "";
+
+    function applyTitle(bill) {
+      if (!bill) return;
+      var rawTitle = bill.title || bill.officialTitle || "";
+      var prettyId = item._cwPrettyBillId || formatBillId(billDisplay);
+      var clean = rawTitle;
+      if (prettyId && clean) {
+        var ci = clean.indexOf(":");
+        if (ci > 0 && ci < 20) {
+          var bf = clean.substring(0, ci).replace(/[.\s]/g, "").toUpperCase();
+          var idn = prettyId.replace(/[.\s]/g, "").toUpperCase();
+          if (bf === idn) clean = clean.substring(ci + 1).trim();
+        }
+      }
+      var newTitle;
+      if (prettyId && clean) newTitle = prettyId + " \u2014 " + clean;
+      else if (prettyId) newTitle = prettyId + (rawTitle ? " \u2014 " + rawTitle : "");
+      else if (clean) newTitle = clean;
+      else return;
+      var span = item._cwLine1.querySelector("span");
+      if (span) span.textContent = newTitle;
+    }
+
+    if (gtId) {
+      fetchBillSummary(gtId).then(applyTitle).catch(function () {});
+    } else if (billDisplay && congress) {
+      fetchBillByDisplayId(billDisplay, congress).then(applyTitle).catch(function () {});
+    }
+  }
+
   /* -- Detect the member's party from the page -- */
   function detectMemberParty() {
     var el = document.querySelector(".party-dem, .party-rep, .party-ind");
@@ -801,7 +839,9 @@
       var end = start + VOTES_PER_PAGE;
 
       matching.forEach(function (item, idx) {
-        item.style.display = (idx >= start && idx < end) ? "" : "none";
+        var visible = idx >= start && idx < end;
+        item.style.display = visible ? "" : "none";
+        if (visible) fetchTitleForItem(item);
       });
 
       var showingEnd = Math.min(end, totalMatching);
