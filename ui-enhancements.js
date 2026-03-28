@@ -56,7 +56,14 @@
         "@keyframes cw-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }" +
         "@keyframes cw-shimmer { 0% { opacity:0.5; } 50% { opacity:1; } 100% { opacity:0.5; } }" +
         "@media (max-width:640px) { .cw-recent-grid { grid-template-columns:1fr !important; } }" +
-        "@media (max-width:767px) { header { height: 80px !important; overflow: hidden !important; } header > div { display: flex !important; align-items: center !important; justify-content: space-between !important; min-width: 0 !important; width: 100% !important; height: 80px !important; padding: 0 12px !important; box-sizing: border-box !important; } header > div > a:first-child { flex: 0 0 auto !important; overflow: hidden !important; } .cw-new-logo { height: 130px !important; } header nav { display: none !important; } header > div > div:last-child { flex: 0 0 auto !important; display: flex !important; align-items: center !important; } }";
+        "@media (max-width:767px) {" +
+        "  header { height: auto !important; overflow: visible !important; padding: 0 !important; }" +
+        "  header > div { display: flex !important; align-items: center !important; justify-content: center !important; position: relative !important; width: 100% !important; min-width: 0 !important; height: auto !important; padding: 8px 12px !important; box-sizing: border-box !important; }" +
+        "  header > div > a:first-child { flex: 0 0 auto !important; overflow: hidden !important; }" +
+        "  .cw-new-logo { height: 160px !important; transition: none !important; }" +
+        "  header nav { display: none !important; opacity: 1 !important; }" +
+        "  header > div > div:last-child { position: absolute !important; right: 12px !important; top: 50% !important; transform: translateY(-50%) !important; display: flex !important; align-items: center !important; overflow: visible !important; }" +
+        "}";
       document.head.appendChild(style);
     }
 
@@ -109,6 +116,7 @@
       var nav = document.querySelector('header nav');
       if (!nav) return;
       var w = window.innerWidth;
+      if (w <= 767) return;
       // Fade nav out between 1000px and 800px viewport width
       var opacity = Math.max(0, Math.min(1, (w - 800) / 200));
       nav.style.opacity = opacity;
