@@ -47,10 +47,10 @@
       style.textContent =
         ".cw-replaced > :not(.cw-bill-line):not(.cw-proc-line):not(.cw-vote-panel) { display: none !important; }" +
         "header { height: 120px !important; overflow: hidden !important; padding: 0 !important; display: flex !important; align-items: center !important; }" +
-        "header > div { display: grid !important; grid-template-columns: auto 1fr auto !important; grid-template-rows: 120px !important; align-items: center !important; gap: 0 !important; height: 120px !important; overflow: hidden !important; }" +
-        "header > div > a:first-child { justify-self: start !important; flex-shrink: 0 !important; }" +
-        "header nav { display: flex !important; justify-content: center !important; white-space: nowrap !important; overflow: hidden !important; min-width: 0 !important; }" +
-        "header > div > div:last-child { justify-self: end !important; flex-shrink: 0 !important; }" +
+        "header > div { display: flex !important; align-items: center !important; position: relative !important; height: 120px !important; padding-left: 0 !important; margin-left: 0 !important; width: 100% !important; max-width: 100% !important; }" +
+        "header > div > a:first-child { flex: 0 0 auto !important; padding-left: 0 !important; position: relative !important; z-index: 2 !important; }" +
+        "header nav { position: absolute !important; left: 50% !important; transform: translateX(-50%) !important; white-space: nowrap !important; z-index: 1 !important; }" +
+        "header > div > div:last-child { flex: 0 0 auto !important; margin-left: auto !important; position: relative !important; z-index: 2 !important; }" +
         ".cw-new-logo { height: 260px !important; width: auto !important; max-width: none !important; flex-shrink: 0 !important; }" +
         "html:not(.light) .cw-new-logo { filter: invert(1) contrast(5) brightness(0.75) sepia(1) hue-rotate(155deg) saturate(0.7) !important; }" +
         "@keyframes cw-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }" +
@@ -207,7 +207,7 @@
             newLogo.src = './civicism-logo.png';
             newLogo.alt = 'Civicism';
             newLogo.className = 'cw-new-logo flex-shrink-0';
-            newLogo.style.cssText = 'height:260px;width:auto;display:block;filter:contrast(5) brightness(0.75);align-self:center;margin-top:0;margin-right:40px;';
+            newLogo.style.cssText = 'height:260px;width:auto;display:block;filter:contrast(5) brightness(0.75);align-self:center;margin-top:0;margin-right:0;';
             oldLogo.parentElement.insertBefore(newLogo, oldLogo);
           }
         }
