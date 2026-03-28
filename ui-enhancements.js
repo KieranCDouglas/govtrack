@@ -46,12 +46,12 @@
       style.id = "cw-vote-styles";
       style.textContent =
         ".cw-replaced > :not(.cw-bill-line):not(.cw-proc-line):not(.cw-vote-panel) { display: none !important; }" +
-        "header { height: 120px !important; overflow: hidden !important; padding: 0 !important; display: flex !important; align-items: center !important; }" +
-        "header > div { display: grid !important; grid-template-columns: 1fr auto 1fr !important; align-items: center !important; height: 120px !important; padding-left: 0 !important; margin-left: 0 !important; width: 100% !important; max-width: 100% !important; min-width: 800px !important; }" +
+        "header { height: clamp(70px, 8vw, 120px) !important; overflow: hidden !important; padding: 0 !important; display: flex !important; align-items: center !important; transition: height 0.15s ease !important; }" +
+        "header > div { display: grid !important; grid-template-columns: 1fr auto 1fr !important; align-items: center !important; height: clamp(70px, 8vw, 120px) !important; grid-template-rows: clamp(70px, 8vw, 120px) !important; padding-left: 0 !important; margin-left: 0 !important; width: 100% !important; max-width: 100% !important; min-width: 600px !important; transition: height 0.15s ease !important; }" +
         "header > div > a:first-child { overflow: hidden !important; display: flex !important; align-items: center !important; padding-left: 0 !important; }" +
-        "header nav { justify-self: center !important; white-space: nowrap !important; overflow: hidden !important; min-width: 0 !important; }" +
+        "header nav { justify-self: center !important; white-space: nowrap !important; overflow: hidden !important; min-width: 0 !important; transition: opacity 0.2s ease !important; }" +
         "header > div > div:last-child { justify-self: end !important; overflow: hidden !important; min-width: 0 !important; }" +
-        ".cw-new-logo { height: 260px !important; width: auto !important; max-width: none !important; flex-shrink: 0 !important; }" +
+        ".cw-new-logo { height: clamp(120px, 17vw, 260px) !important; width: auto !important; max-width: none !important; flex-shrink: 0 !important; transition: height 0.15s ease !important; }" +
         "html:not(.light) .cw-new-logo { filter: invert(1) contrast(5) brightness(0.75) sepia(1) hue-rotate(155deg) saturate(0.7) !important; }" +
         "@keyframes cw-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }" +
         "@keyframes cw-shimmer { 0% { opacity:0.5; } 50% { opacity:1; } 100% { opacity:0.5; } }" +
@@ -104,6 +104,19 @@
         }
       });
     }
+
+    function updateNavFade() {
+      var nav = document.querySelector('header nav');
+      if (!nav) return;
+      var w = window.innerWidth;
+      // Fade nav out between 1000px and 800px viewport width
+      var opacity = Math.max(0, Math.min(1, (w - 800) / 200));
+      nav.style.opacity = opacity;
+      nav.style.pointerEvents = opacity < 0.05 ? 'none' : 'auto';
+    }
+
+    updateNavFade();
+    window.addEventListener('resize', updateNavFade);
 
     function sortMembersAlphabetically() {
       if (!_isOnMembersList()) return;
