@@ -1059,57 +1059,6 @@
         }
       });
 
-      // Eagerly fetch full bill title so it displays immediately (not on click)
-      if (gtId && item._cwLine1) {
-        (function (cardItem, cardGtId, cardBillDisplay) {
-          var fetcher = fetchBillSummary(cardGtId);
-          fetcher.then(function (bill) {
-            if (!bill) return;
-            var rawTitle = bill.title || bill.officialTitle || '';
-            var prettyId = cardItem._cwPrettyBillId || formatBillId(cardBillDisplay);
-            var clean = rawTitle;
-            if (prettyId && clean) {
-              var ci = clean.indexOf(':');
-              if (ci > 0 && ci < 20) {
-                var bf = clean.substring(0, ci).replace(/[.\s]/g, '').toUpperCase();
-                var idn = prettyId.replace(/[.\s]/g, '').toUpperCase();
-                if (bf === idn) clean = clean.substring(ci + 1).trim();
-              }
-            }
-            var newTitle;
-            if (prettyId && clean) newTitle = prettyId + ' \u2014 ' + clean;
-            else if (prettyId) newTitle = prettyId + (rawTitle ? ' \u2014 ' + rawTitle : '');
-            else if (clean) newTitle = clean;
-            else return;
-            var span = cardItem._cwLine1.querySelector('span');
-            if (span) span.textContent = newTitle;
-          }).catch(function () { /* title stays as-is */ });
-        })(item, gtId, billDisplay);
-      } else if (!gtId && billDisplay && congress && item._cwLine1) {
-        (function (cardItem, cardBillDisplay, cardCongress) {
-          fetchBillByDisplayId(cardBillDisplay, cardCongress).then(function (bill) {
-            if (!bill) return;
-            var rawTitle = bill.title || bill.officialTitle || '';
-            var prettyId = cardItem._cwPrettyBillId || formatBillId(cardBillDisplay);
-            var clean = rawTitle;
-            if (prettyId && clean) {
-              var ci = clean.indexOf(':');
-              if (ci > 0 && ci < 20) {
-                var bf = clean.substring(0, ci).replace(/[.\s]/g, '').toUpperCase();
-                var idn = prettyId.replace(/[.\s]/g, '').toUpperCase();
-                if (bf === idn) clean = clean.substring(ci + 1).trim();
-              }
-            }
-            var newTitle;
-            if (prettyId && clean) newTitle = prettyId + ' \u2014 ' + clean;
-            else if (prettyId) newTitle = prettyId + (rawTitle ? ' \u2014 ' + rawTitle : '');
-            else if (clean) newTitle = clean;
-            else return;
-            var span = cardItem._cwLine1.querySelector('span');
-            if (span) span.textContent = newTitle;
-          }).catch(function () { /* title stays as-is */ });
-        })(item, billDisplay, congress);
-      }
     });
 
     // Now that all items are marked with cwExp, trigger pagination
