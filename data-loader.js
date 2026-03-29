@@ -43,10 +43,50 @@
     // and expose name maps for ui-enhancements.js sorting.
     if (url.indexOf("members-current.json") !== -1) {
       return originalFetch.apply(window, arguments).then(function (resp) {
-        resp.clone().json().then(function (members) {
+        return resp.json().then(function (members) {
           _exposeLastNames(members);
-        }).catch(function () {});
-        return resp;
+          window.__cwIdeologyMap = window.__cwIdeologyMap || {};
+          window.__cwMembersData = window.__cwMembersData || {};
+          members.forEach(function (m) {
+            if (m.bioguideId && m.dim1 !== undefined && m.dim1 !== null) {
+              window.__cwIdeologyMap[m.bioguideId] = m.dim1;
+            }
+            if (m.bioguideId) {
+              window.__cwMembersData[m.bioguideId] = m;
+            }
+          });
+
+          // When "All historical" mode is active the bundle prepends members-current.json
+          // to members-index.json, putting all current members above former ones.
+          // Returning [] forces the bundle to use only members-index.json (which already
+          // contains current 119th-congress members, sorted alphabetically).
+          // Detect "all" mode via the DOM trigger (if rendered) or saved sessionStorage.
+          var isAllMode = false;
+          try {
+            var trigger = document.querySelector('[data-testid="select-current"]');
+            if (trigger && /all\s+historical/i.test(trigger.textContent || "")) {
+              isAllMode = true;
+            }
+            if (!isAllMode) {
+              var sf = JSON.parse(sessionStorage.getItem("cw-member-filters") || "{}");
+              if (sf.current === "all") isAllMode = true;
+            }
+          } catch (e) { /* ignore */ }
+
+          if (isAllMode) {
+            return new Response("[]", { status: 200, headers: { "Content-Type": "application/json" } });
+          }
+
+          // Sort by last name before handing data to React
+          members.sort(function (a, b) {
+            var la = (a.displayName || "").trim().split(/\s+/).pop().toLowerCase();
+            var lb = (b.displayName || "").trim().split(/\s+/).pop().toLowerCase();
+            return la.localeCompare(lb);
+          });
+          return new Response(JSON.stringify(members), {
+            status: 200, headers: { "Content-Type": "application/json" }
+          });
+        });
       });
     }
 
@@ -65,13 +105,40 @@
       });
     }
 
-    // Cache members-index.json when it's fetched by the bundle
+    // Cache members-index.json, sort by last name, then return sorted response to React
     if (url.indexOf("members-index.json") !== -1) {
       return originalFetch.apply(window, arguments).then(function (resp) {
-        resp.clone().json().then(function (data) {
+        return resp.json().then(function (data) {
           _membersIndex = data;
+          if (Array.isArray(data)) {
+            window.__cwLastNameMap = window.__cwLastNameMap || {};
+            window.__cwFirstNameMap = window.__cwFirstNameMap || {};
+            window.__cwIdeologyMap = window.__cwIdeologyMap || {};
+            data.forEach(function (m) {
+              if (m.b && m.n) {
+                var parts = m.n.trim().split(/\s+/);
+                window.__cwFirstNameMap[m.b] = parts[0];
+                window.__cwLastNameMap[m.b] = parts[parts.length - 1];
+              }
+              if (m.b && m.x !== undefined && m.x !== null) {
+                window.__cwIdeologyMap[m.b] = m.x;
+              }
+            });
+            window.dispatchEvent(new CustomEvent("cwMembersLoaded"));
+            // Sort by last name before handing data to React
+            // Normalize `l` (last congress) so the bundle can't re-sort current vs former;
+            // our alphabetical sort below will be the only ordering that takes effect.
+            data.forEach(function (m) { m.l = 1; });
+            data.sort(function (a, b) {
+              var la = (a.n || "").trim().split(/\s+/).pop().toLowerCase();
+              var lb = (b.n || "").trim().split(/\s+/).pop().toLowerCase();
+              return la.localeCompare(lb);
+            });
+          }
+          return new Response(JSON.stringify(data), {
+            status: 200, headers: { "Content-Type": "application/json" }
+          });
         });
-        return resp;
       });
     }
 

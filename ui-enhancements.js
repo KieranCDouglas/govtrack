@@ -23,6 +23,7 @@
       "img[alt='CongressWatch logo'] { display: none !important; }" +
       "header a[href='/'] span { display: none !important; }" +
       "header [data-testid='button-theme-toggle'] ~ a { display: none !important; }";
+
     document.head.appendChild(s);
   })();
 
@@ -95,7 +96,6 @@
       enhanceRecentVotes();
       injectMemberSummary();
       renameBrand();
-      sortMembersAlphabetically();
       enhanceCompassPage();
       enhanceHeaderLayout();
     }
@@ -143,99 +143,6 @@
       lastScrollY = currentScrollY;
     }, { passive: true });
 
-    function sortMembersAlphabetically() {
-      if (!_isOnMembersList()) return;
-
-      // Collect all member links, deduped by href (cards may have multiple links each)
-      var allLinks = Array.from(document.querySelectorAll('a[href*="/member/"]'));
-      if (allLinks.length < 2) return;
-
-      var hrefToLink = {};
-      allLinks.forEach(function (link) {
-        var href = link.getAttribute("href") || "";
-        if (!hrefToLink[href]) hrefToLink[href] = link;
-      });
-      var uniqueLinks = Object.keys(hrefToLink).map(function (h) { return hrefToLink[h]; });
-
-      // Extract bioguideId from href e.g. "#/member/A000001"
-      function getBioguideId(link) {
-        var m = (link.getAttribute("href") || "").match(/\/member\/([^/?#]+)/);
-        return m ? m[1] : null;
-      }
-
-      // Detect "Former only" by counting visible member links.
-      // Current-only renders ~540 members; former-only renders ~12,000.
-      // This is more reliable than reading React fiber state or combobox text.
-      var formerOnly = uniqueLinks.length > 600;
-
-      // Sort key from global maps (populated by data-loader.js), with link-text fallback
-      function getSortKey(link) {
-        var id = getBioguideId(link);
-        if (formerOnly) {
-          // Former members: sort by first name
-          if (id && window.__cwFirstNameMap && window.__cwFirstNameMap[id]) {
-            return window.__cwFirstNameMap[id].toLowerCase();
-          }
-          // Fallback: first word of link text
-          return (link.textContent || "").trim().split(/\s+/).shift().toLowerCase();
-        } else {
-          // Current/all members: sort by last name
-          if (id && window.__cwLastNameMap && window.__cwLastNameMap[id]) {
-            return window.__cwLastNameMap[id].toLowerCase();
-          }
-          // Fallback: last word of link text
-          return (link.textContent || "").trim().split(/\s+/).pop().toLowerCase();
-        }
-      }
-
-      // Walk up from a link to find the row/card that is a direct child of the list container.
-      // Stop when the parent's direct children include more than one element containing a member link.
-      function findCard(link) {
-        var el = link;
-        while (el.parentElement) {
-          var parent = el.parentElement;
-          var childrenWithLinks = 0;
-          for (var i = 0; i < parent.children.length; i++) {
-            if (parent.children[i].querySelector('a[href*="/member/"]') ||
-                ((parent.children[i].getAttribute && parent.children[i].getAttribute("href") || "").indexOf("/member/") !== -1)) {
-              childrenWithLinks++;
-              if (childrenWithLinks > 1) break;
-            }
-          }
-          if (childrenWithLinks > 1) return el; // el is the card, parent is the container
-          el = parent;
-        }
-        return null;
-      }
-
-      var containerMap = new Map();
-      uniqueLinks.forEach(function (link) {
-        var card = findCard(link);
-        if (!card || !card.parentElement) return;
-        var container = card.parentElement;
-        if (!containerMap.has(container)) containerMap.set(container, []);
-        var cards = containerMap.get(container);
-        if (!cards.includes(card)) cards.push(card);
-      });
-
-      containerMap.forEach(function (cards, container) {
-        if (cards.length < 2) return;
-        var sorted = cards.slice().sort(function (a, b) {
-          var linkA = a.matches('a[href*="/member/"]') ? a : a.querySelector('a[href*="/member/"]');
-          var linkB = b.matches('a[href*="/member/"]') ? b : b.querySelector('a[href*="/member/"]');
-          return getSortKey(linkA).localeCompare(getSortKey(linkB));
-        });
-        var alreadySorted = sorted.every(function (c, i) { return c === cards[i]; });
-        if (alreadySorted) return;
-        sorted.forEach(function (card) { container.appendChild(card); });
-      });
-    }
-
-    // Re-sort when data-loader finishes populating window.__cwLastNameMap
-    window.addEventListener("cwMembersLoaded", function () {
-      if (_isOnMembersList()) setTimeout(sortMembersAlphabetically, 0);
-    });
-
     function renameBrand() {
       var header = document.querySelector("header");
       if (header) {
@@ -274,6 +181,7 @@
         }
       }
     }
+
   });
 
   /* ================================================================
@@ -438,7 +346,7 @@
   window.addEventListener("hashchange", _handleMembersNav);
   // Handle initial page load on #/members
   if (_isOnMembersList()) {
-    setTimeout(_handleMembersNav, 600);
+    setTimeout(_handleMembersNav, 0);
   }
 
   /* ---- 2a-pre  Member policy summary injection ---- */
