@@ -77,10 +77,10 @@
             return new Response("[]", { status: 200, headers: { "Content-Type": "application/json" } });
           }
 
-          // Sort by last name before handing data to React
+          // Sort by first name before handing data to React
           members.sort(function (a, b) {
-            var la = (a.displayName || "").trim().split(/\s+/).pop().toLowerCase();
-            var lb = (b.displayName || "").trim().split(/\s+/).pop().toLowerCase();
+            var la = ((a.displayName || "").trim().split(/\s+/)[0] || "").toLowerCase();
+            var lb = ((b.displayName || "").trim().split(/\s+/)[0] || "").toLowerCase();
             return la.localeCompare(lb);
           });
           return new Response(JSON.stringify(members), {
@@ -125,13 +125,10 @@
               }
             });
             window.dispatchEvent(new CustomEvent("cwMembersLoaded"));
-            // Sort by last name before handing data to React
-            // Normalize `l` (last congress) so the bundle can't re-sort current vs former;
-            // our alphabetical sort below will be the only ordering that takes effect.
-            data.forEach(function (m) { m.l = 1; });
+            // Sort by first name before handing data to React
             data.sort(function (a, b) {
-              var la = (a.n || "").trim().split(/\s+/).pop().toLowerCase();
-              var lb = (b.n || "").trim().split(/\s+/).pop().toLowerCase();
+              var la = ((a.n || "").trim().split(/\s+/)[0] || "").toLowerCase();
+              var lb = ((b.n || "").trim().split(/\s+/)[0] || "").toLowerCase();
               return la.localeCompare(lb);
             });
           }

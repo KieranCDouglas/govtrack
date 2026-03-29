@@ -349,6 +349,97 @@
     setTimeout(_handleMembersNav, 0);
   }
 
+  /* ================================================================
+     1c.  MEMBER  LIST  DOM  SORT  (first name, enforced after every render)
+     Prevents the flash of wrong order that occurs when React Query serves
+     stale/previous-query cached data before the fresh sorted response arrives.
+     ================================================================ */
+
+  var _sortObserver = null;
+  var _sortScheduled = false;
+
+  function _sortMemberRows() {
+    var container = document.querySelector(".divide-y.divide-border\\/50");
+    if (!container) return;
+
+    // Collect anchor children that wrap member rows
+    var rows = Array.from(container.children).filter(function (el) {
+      return el.querySelector('[data-testid^="row-member-"]');
+    });
+    if (rows.length < 2) return;
+
+    // Sort by first name using the global map; fall back to text content
+    rows.sort(function (a, b) {
+      var rowA = a.querySelector('[data-testid^="row-member-"]');
+      var rowB = b.querySelector('[data-testid^="row-member-"]');
+      var idA = rowA ? (rowA.getAttribute("data-testid") || "").replace("row-member-", "") : "";
+      var idB = rowB ? (rowB.getAttribute("data-testid") || "").replace("row-member-", "") : "";
+
+      var fnA = (window.__cwFirstNameMap && window.__cwFirstNameMap[idA]) ||
+                (rowA ? (rowA.querySelector(".font-medium.text-sm") || rowA).textContent.trim().split(/\s+/)[0] : "");
+      var fnB = (window.__cwFirstNameMap && window.__cwFirstNameMap[idB]) ||
+                (rowB ? (rowB.querySelector(".font-medium.text-sm") || rowB).textContent.trim().split(/\s+/)[0] : "");
+
+      var lnA = (window.__cwLastNameMap && window.__cwLastNameMap[idA]) || "";
+      var lnB = (window.__cwLastNameMap && window.__cwLastNameMap[idB]) || "";
+
+      var cmp = fnA.toLowerCase().localeCompare(fnB.toLowerCase());
+      return cmp !== 0 ? cmp : lnA.toLowerCase().localeCompare(lnB.toLowerCase());
+    });
+
+    // Re-append in sorted order only if order changed
+    var changed = false;
+    var children = Array.from(container.children).filter(function (el) {
+      return el.querySelector('[data-testid^="row-member-"]');
+    });
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i] !== children[i]) { changed = true; break; }
+    }
+    if (!changed) return;
+
+    // Disconnect observer while we mutate to avoid re-entrancy
+    if (_sortObserver) _sortObserver.disconnect();
+    rows.forEach(function (row) { container.appendChild(row); });
+    if (_sortObserver) _sortObserver.observe(container, { childList: true, subtree: false });
+  }
+
+  function _scheduleSortMemberRows() {
+    if (_sortScheduled) return;
+    _sortScheduled = true;
+    requestAnimationFrame(function () {
+      _sortScheduled = false;
+      _sortMemberRows();
+    });
+  }
+
+  function _startMemberSortObserver() {
+    if (_sortObserver) { _sortObserver.disconnect(); _sortObserver = null; }
+    var container = document.querySelector(".divide-y.divide-border\\/50");
+    if (!container) return;
+    _sortObserver = new MutationObserver(_scheduleSortMemberRows);
+    _sortObserver.observe(container, { childList: true, subtree: false });
+    _sortMemberRows(); // sort immediately on attach
+  }
+
+  function _stopMemberSortObserver() {
+    if (_sortObserver) { _sortObserver.disconnect(); _sortObserver = null; }
+  }
+
+  // Watch for the member list container appearing/disappearing as route changes
+  var _rootSortObserver = new MutationObserver(function () {
+    if (_isOnMembersList()) {
+      var container = document.querySelector(".divide-y.divide-border\\/50");
+      if (container && !_sortObserver) {
+        _startMemberSortObserver();
+      } else if (!container && _sortObserver) {
+        _stopMemberSortObserver();
+      }
+    } else {
+      _stopMemberSortObserver();
+    }
+  });
+  _rootSortObserver.observe(document.body, { childList: true, subtree: true });
+
   /* ---- 2a-pre  Member policy summary injection ---- */
 
   var _summariesData = null;
