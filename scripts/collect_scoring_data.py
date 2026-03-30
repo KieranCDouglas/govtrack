@@ -3,30 +3,27 @@
 Collect and cache per-member scoring inputs for the LLM ideology pipeline.
 
 For each current member of Congress, fetches and caches:
-  1. Full substantive voting record (from existing vote JSON files)
-  2. Bill titles from Congress.gov API (cached in data/bill-cache.json)
-  3. Sponsored/cosponsored legislation from Congress.gov API
-  4. Platform text from official .gov website (best-effort)
+  1. Voting records across Congress 117, 118, and 119 (from local vote JSON files)
+  2. Bill titles from Congress.gov API (cached)
+  3. Sponsored/cosponsored legislation from GovTrack API (no key required)
+  4. Committee assignments from unitedstates/congress-legislators (no key required)
 
 Output: data/scoring-inputs/{bioguideId}.json per member
-        data/bill-cache.json (persistent across runs)
-        data/sponsorship-cache.json (persistent across runs)
-        data/platform-cache.json (persistent across runs)
+        data/bill-cache.json
+        data/sponsorship-cache.json
+        data/committee-cache.json
 
 Usage:
   python3 scripts/collect_scoring_data.py              # all current members
   python3 scripts/collect_scoring_data.py --members S000033,C001098
-  python3 scripts/collect_scoring_data.py --congress 119
 """
 import argparse
 import json
 import os
 import re
 import ssl
-import sys
 import time
 import urllib.request
-import urllib.parse
 import urllib.error
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -37,11 +34,20 @@ INPUTS_DIR = os.path.join(DATA_DIR, "scoring-inputs")
 
 BILL_CACHE_PATH        = os.path.join(DATA_DIR, "bill-cache.json")
 SPONSORSHIP_CACHE_PATH = os.path.join(DATA_DIR, "sponsorship-cache.json")
-PLATFORM_CACHE_PATH    = os.path.join(DATA_DIR, "platform-cache.json")
+COMMITTEE_CACHE_PATH   = os.path.join(DATA_DIR, "committee-cache.json")
 
-CONGRESS_API_KEY = os.environ.get("CONGRESS_API_KEY", "")
-_SKIP_CONGRESS_API = not CONGRESS_API_KEY  # skip if no key provided
-CONGRESS_BASE    = "https://api.congress.gov/v3"
+CONGRESS_API_KEY  = os.environ.get("CONGRESS_API_KEY", "")
+_SKIP_CONGRESS_API = not CONGRESS_API_KEY
+CONGRESS_BASE     = "https://api.congress.gov/v3"
+
+GOVTRACK_BASE     = "https://www.govtrack.us/api/v2"
+LEGISLATORS_BASE  = "https://unitedstates.github.io/congress-legislators"
+
+# Congresses to pull votes from (most recent first for prompt ordering)
+VOTE_CONGRESSES = [119, 118, 117]
+
+# Max substantive votes to include per congress (keeps prompts manageable)
+MAX_VOTES_PER_CONGRESS = 150
 
 # SSL context — macOS sometimes can't verify certs
 ctx = ssl.create_default_context()
@@ -49,7 +55,7 @@ ctx.check_hostname = False
 ctx.verify_mode    = ssl.CERT_NONE
 
 # ── Procedural vote filter ────────────────────────────────────────────────────
-# Vote questions that carry no ideological signal
+
 PROCEDURAL_PATTERNS = [
     r"on the journal",
     r"on the motion to (table|proceed|adjourn|recommit|waive|instruct|concur)",
@@ -60,17 +66,15 @@ PROCEDURAL_PATTERNS = [
     r"sine die",
     r"engrossment",
     r"on (the )?nomination",
-    r"on the amendment$",          # bare amendment votes with no bill context
+    r"on the amendment$",
 ]
-PROCEDURAL_RE = re.compile("|".join(PROCEDURAL_PATTERNS), re.IGNORECASE)
-
-PROCEDURAL_BILL_RE = re.compile(r"^PN\d", re.IGNORECASE)  # presidential nominations
+PROCEDURAL_RE      = re.compile("|".join(PROCEDURAL_PATTERNS), re.IGNORECASE)
+PROCEDURAL_BILL_RE = re.compile(r"^PN\d", re.IGNORECASE)
 
 
 def is_procedural(question, bill_number):
     if PROCEDURAL_BILL_RE.match(bill_number or ""):
         return True
-    # Keep "on the amendment" votes that have an actual bill number
     q = (question or "").strip()
     if re.match(r"on the amendment$", q, re.IGNORECASE) and not (bill_number or "").strip():
         return True
@@ -79,21 +83,19 @@ def is_procedural(question, bill_number):
 
 # ── HTTP helpers ──────────────────────────────────────────────────────────────
 
-def fetch_json(url, retries=2, delay=1.0):
-    """Fetch a URL and return parsed JSON, or None on failure."""
+def fetch_json(url, retries=2, delay=1.0, timeout=10):
     for attempt in range(retries + 1):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "Civicism/1.0"})
-            with urllib.request.urlopen(req, context=ctx, timeout=15) as r:
+            with urllib.request.urlopen(req, context=ctx, timeout=timeout) as r:
                 return json.loads(r.read())
         except urllib.error.HTTPError as e:
             if e.code == 429:
-                # Rate limited — wait progressively but give up after 2 retries
                 wait = 60 * (attempt + 1)
                 print(f"    rate-limited, waiting {wait}s…")
                 time.sleep(wait)
             elif e.code == 403:
-                return None  # blocked — skip silently
+                return None
             elif attempt < retries:
                 time.sleep(delay * (attempt + 1))
             else:
@@ -106,29 +108,10 @@ def fetch_json(url, retries=2, delay=1.0):
     return None
 
 
-def fetch_text(url, retries=2):
-    """Fetch a URL and return plain text, or None on failure."""
-    for attempt in range(retries + 1):
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-            with urllib.request.urlopen(req, context=ctx, timeout=12) as r:
-                raw = r.read()
-                encoding = r.headers.get_content_charset() or "utf-8"
-                return raw.decode(encoding, errors="replace")
-        except Exception:
-            if attempt < retries:
-                time.sleep(1)
-            else:
-                return None
-    return None
-
-
-# ── Congress.gov API helpers ──────────────────────────────────────────────────
+# ── Congress.gov: bill titles ─────────────────────────────────────────────────
 
 def normalize_bill_number(raw):
-    """Convert 'HR29', 'S5', 'HRES5', 'SCONRES7' to (type, number) for API."""
     raw = (raw or "").strip().upper()
-    # Map common prefixes to API types
     patterns = [
         (r"^H\.?R\.?(\d+)$",        "hr"),
         (r"^S\.?(\d+)$",             "s"),
@@ -149,7 +132,6 @@ def normalize_bill_number(raw):
 
 
 def get_bill_title(bill_number, congress, bill_cache):
-    """Return bill title from cache or Congress.gov API (skipped if no API key)."""
     if not bill_number:
         return None
     key = f"{congress}/{bill_number}"
@@ -160,7 +142,6 @@ def get_bill_title(bill_number, congress, bill_cache):
 
     bill_type, num = normalize_bill_number(bill_number)
     if not bill_type:
-        bill_cache[key] = None
         return None
 
     url = f"{CONGRESS_BASE}/bill/{congress}/{bill_type}/{num}?api_key={CONGRESS_API_KEY}"
@@ -168,198 +149,249 @@ def get_bill_title(bill_number, congress, bill_cache):
     title = None
     if data and "bill" in data:
         title = data["bill"].get("title") or data["bill"].get("shortTitle")
-    # Only cache successful lookups — don't cache None so failed calls get retried next run
     if title is not None:
         bill_cache[key] = title
-    time.sleep(0.5)  # ~120 req/min, well under 1000 req/hr free tier limit
+    time.sleep(0.5)
     return title
 
 
-def get_sponsorships(bio, congress, sponsorship_cache):
-    """Return (sponsored_bills, cosponsored_bills) from cache or Congress.gov API."""
-    key = f"{bio}/{congress}"
+# ── GovTrack: sponsored + cosponsored bills ───────────────────────────────────
+
+def get_sponsorships_govtrack(govtrack_id, sponsorship_cache):
+    """
+    Fetch sponsored and cosponsored bills from GovTrack API across congresses 117-119.
+    No API key required. Results cached in sponsorship-cache.json.
+    """
+    key = f"gt/{govtrack_id}"
     if key in sponsorship_cache:
         cached = sponsorship_cache[key]
         return cached.get("sponsored", []), cached.get("cosponsored", [])
-    if _SKIP_CONGRESS_API:
-        sponsorship_cache[key] = {"sponsored": [], "cosponsored": []}
+
+    if not govtrack_id:
         return [], []
 
-    def fetch_bills(endpoint):
-        url = f"{CONGRESS_BASE}/member/{bio}/{endpoint}?limit=20&api_key={CONGRESS_API_KEY}"
-        data = fetch_json(url)
-        if not data:
-            return []
-        field = "sponsoredLegislation" if "sponsored" in endpoint else "cosponsoredLegislation"
-        bills = data.get(field, [])
-        result = []
-        for b in bills:
-            if b.get("congress", 0) != congress:
-                continue
-            policy = b.get("policyArea", {})
-            area = policy.get("name", "") if isinstance(policy, dict) else ""
-            result.append({
-                "number": b.get("number", ""),
-                "title": (b.get("title") or "")[:120],
-                "policyArea": area,
-            })
-        return result
+    sponsored   = []
+    cosponsored = []
+    min_congress = 117
 
-    sponsored   = fetch_bills("sponsored-legislation")
-    time.sleep(0.2)
-    cosponsored = fetch_bills("cosponsored-legislation")
-    time.sleep(0.2)
+    # Sponsored bills — fetch most recent, filter client-side to congress 117+
+    url = (f"{GOVTRACK_BASE}/bill?sponsor={govtrack_id}"
+           f"&limit=50&order_by=-introduced_date"
+           f"&fields=title,display_number,congress,current_status_label,introduced_date,committees")
+    data = fetch_json(url)
+    if data and "objects" in data:
+        for b in data["objects"]:
+            if (b.get("congress") or 0) < min_congress:
+                continue
+            committees = [c.get("name", "") for c in (b.get("committees") or []) if c.get("name")]
+            sponsored.append({
+                "number":     b.get("display_number", ""),
+                "title":      (b.get("title") or "")[:120],
+                "congress":   b.get("congress"),
+                "status":     b.get("current_status_label", ""),
+                "committees": committees[:3],
+            })
+    time.sleep(0.3)
+
+    # Cosponsored bills
+    url = (f"{GOVTRACK_BASE}/bill?cosponsors={govtrack_id}"
+           f"&limit=50&order_by=-introduced_date"
+           f"&fields=title,display_number,congress,current_status_label,introduced_date")
+    data = fetch_json(url)
+    if data and "objects" in data:
+        for b in data["objects"]:
+            if (b.get("congress") or 0) < min_congress:
+                continue
+            cosponsored.append({
+                "number":   b.get("display_number", ""),
+                "title":    (b.get("title") or "")[:120],
+                "congress": b.get("congress"),
+                "status":   b.get("current_status_label", ""),
+            })
+    time.sleep(0.3)
 
     sponsorship_cache[key] = {"sponsored": sponsored, "cosponsored": cosponsored}
     return sponsored, cosponsored
 
 
-# ── Platform text scraper ─────────────────────────────────────────────────────
+# ── Committee assignments ─────────────────────────────────────────────────────
 
-def scrub_html(html):
-    """Strip HTML tags and collapse whitespace."""
-    text = re.sub(r"<script[^>]*>.*?</script>", " ", html, flags=re.DOTALL | re.IGNORECASE)
-    text = re.sub(r"<style[^>]*>.*?</style>",  " ", text, flags=re.DOTALL | re.IGNORECASE)
-    text = re.sub(r"<[^>]+>", " ", text)
-    text = re.sub(r"&[a-zA-Z]+;", " ", text)
-    text = re.sub(r"\s+", " ", text)
-    return text.strip()
+def load_committee_data(committee_cache):
+    """
+    Fetch current committee membership from unitedstates/congress-legislators.
+    Returns bio -> list of {committee, role, rank} dicts.
+    Cached in committee-cache.json (refreshed if older than 7 days).
+    """
+    import time as _time
+
+    cache_key = "_committee_membership"
+    cached = committee_cache.get(cache_key, {})
+
+    # Refresh if empty or older than 7 days
+    fetched_at = committee_cache.get("_fetched_at", 0)
+    if cached and (_time.time() - fetched_at) < 7 * 86400:
+        return cached
+
+    print("  Fetching committee membership from congress-legislators…")
+
+    # Fetch committee definitions (for human-readable names)
+    committees_url  = f"{LEGISLATORS_BASE}/committees-current.json"
+    membership_url  = f"{LEGISLATORS_BASE}/committee-membership-current.json"
+
+    committee_defs  = fetch_json(committees_url)  or []
+    membership_data = fetch_json(membership_url)  or {}
+
+    # Build thomas_id -> committee name map
+    id_to_name = {}
+    for c in committee_defs:
+        tid = c.get("thomas_id") or c.get("committee_id", "")
+        if tid:
+            id_to_name[tid] = c.get("name", tid)
+        for sub in c.get("subcommittees", []):
+            sub_id = tid + sub.get("thomas_id", "")
+            id_to_name[sub_id] = f"{c.get('name', tid)} — {sub.get('name', '')}"
+
+    # Build bio -> committees
+    bio_committees = {}
+    for committee_id, members in membership_data.items():
+        cname = id_to_name.get(committee_id, committee_id)
+        for m in members:
+            bio = m.get("bioguide")
+            if not bio:
+                continue
+            if bio not in bio_committees:
+                bio_committees[bio] = []
+            entry = {"committee": cname}
+            if m.get("title"):
+                entry["role"] = m["title"]
+            elif m.get("rank") == 1:
+                entry["role"] = "Chair/Ranking Member"
+            bio_committees[bio].append(entry)
+
+    committee_cache[cache_key]    = bio_committees
+    committee_cache["_fetched_at"] = _time.time()
+    return bio_committees
 
 
-def get_platform_text(bio, chamber, platform_cache):
-    """Scrape the member's official .gov issues/legislation page."""
-    if bio in platform_cache:
-        return platform_cache[bio]
+# ── Vote record builder (multi-congress) ─────────────────────────────────────
 
-    bio_low = bio.lower()
-    if chamber == "House":
-        candidates = [
-            f"https://{bio_low}.house.gov/issues",
-            f"https://{bio_low}.house.gov/legislation",
-            f"https://{bio_low}.house.gov/priorities",
-        ]
-    else:
-        candidates = [
-            f"https://{bio_low}.senate.gov/issues",
-            f"https://{bio_low}.senate.gov/legislation",
-        ]
-
-    text = None
-    for url in candidates:
-        html = fetch_text(url)
-        if html and len(html) > 500:
-            scraped = scrub_html(html)
-            if len(scraped) > 200:
-                text = scraped[:2000]
-                break
-        time.sleep(0.3)
-
-    platform_cache[bio] = text
-    return text
-
-
-# ── Vote record builder ───────────────────────────────────────────────────────
-
-def build_vote_record(bio, chamber, congress, bio_to_icpsr, bill_cache):
-    """Return list of substantive vote dicts for this member."""
+def build_vote_record(bio, chamber, bio_to_icpsr, bill_cache):
+    """Return combined vote list across VOTE_CONGRESSES, most recent first."""
     chamber_code = "H" if chamber == "House" else "S"
-    vote_file = os.path.join(VOTES_DIR, f"{chamber_code}{congress}.json")
-    if not os.path.exists(vote_file):
-        return []
+    all_votes = []
+    new_title_fetches = [0]  # mutable counter (list so inner scope can modify)
 
-    with open(vote_file) as f:
-        vdata = json.load(f)
-
-    icpsr = str(bio_to_icpsr.get(bio, ""))
-    if not icpsr or icpsr not in vdata["v"]:
-        return []
-
-    vote_str  = vdata["v"][icpsr]
-    rollcalls = vdata["r"]
-
-    votes = []
-    bill_fetch_count = 0
-    for i, rc in enumerate(rollcalls):
-        if i >= len(vote_str):
-            break
-        v = vote_str[i]
-        if v not in ("1", "6"):
-            continue  # absent / not-voting
-
-        rc_num, date, bill_num, question, result, yeas, nays, desc = (
-            rc[0], rc[1], rc[2] or "", rc[3] or "", rc[4] or "",
-            rc[5] if len(rc) > 5 else 0,
-            rc[6] if len(rc) > 6 else 0,
-            rc[7] if len(rc) > 7 else "",
-        )
-
-        if is_procedural(question, bill_num):
+    for congress in VOTE_CONGRESSES:
+        vote_file = os.path.join(VOTES_DIR, f"{chamber_code}{congress}.json")
+        if not os.path.exists(vote_file):
             continue
 
-        position = "Yea" if v == "1" else "Nay"
+        with open(vote_file) as f:
+            vdata = json.load(f)
 
-        # Fetch bill title if we have a bill number (rate-limited)
-        title = None
-        if bill_num and bill_fetch_count < 200:
-            title = get_bill_title(bill_num, congress, bill_cache)
-            if title is not None:
-                bill_fetch_count += 1
+        icpsr = str(bio_to_icpsr.get(bio, ""))
+        if not icpsr or icpsr not in vdata["v"]:
+            continue
 
-        votes.append({
-            "date":      date,
-            "bill":      bill_num,
-            "title":     title or desc or question,
-            "question":  question,
-            "position":  position,
-            "yeas":      yeas,
-            "nays":      nays,
-        })
+        vote_str  = vdata["v"][icpsr]
+        rollcalls = vdata["r"]
 
-    return votes
+        for i, rc in enumerate(rollcalls):
+            if i >= len(vote_str):
+                break
+            v = vote_str[i]
+            if v not in ("1", "6"):
+                continue  # absent / not-voting
+
+            rc_num, date, bill_num, question, result, yeas, nays, desc = (
+                rc[0], rc[1], rc[2] or "", rc[3] or "", rc[4] or "",
+                rc[5] if len(rc) > 5 else 0,
+                rc[6] if len(rc) > 6 else 0,
+                rc[7] if len(rc) > 7 else "",
+            )
+
+            if is_procedural(question, bill_num):
+                continue
+
+            position = "Yea" if v == "1" else "Nay"
+
+            # Use cached titles freely; only fetch new ones for congress 119,
+            # and cap at 50 new fetches total per run to avoid long stalls.
+            title = None
+            if bill_num:
+                cache_key = f"{congress}/{bill_num}"
+                if cache_key in bill_cache:
+                    title = bill_cache[cache_key]
+                elif congress == 119 and new_title_fetches[0] < 50:
+                    title = get_bill_title(bill_num, congress, bill_cache)
+                    if title:
+                        new_title_fetches[0] += 1
+
+            congress_votes = [v for v in all_votes if v.get("congress") == congress]
+            if len(congress_votes) >= MAX_VOTES_PER_CONGRESS:
+                continue
+
+            all_votes.append({
+                "congress": congress,
+                "date":     date,
+                "bill":     bill_num,
+                "title":    title or desc or question,
+                "question": question,
+                "position": position,
+                "yeas":     yeas,
+                "nays":     nays,
+            })
+
+    return all_votes
 
 
 # ── Main per-member builder ───────────────────────────────────────────────────
 
-def build_member_input(member, congress, bio_to_icpsr,
-                       bill_cache, sponsorship_cache, platform_cache):
-    """Assemble and return the full scoring-input dict for one member."""
+def build_member_input(member, bio_to_icpsr, bill_cache,
+                       sponsorship_cache, committee_data):
     bio     = member["bioguideId"]
     chamber = member["chamber"]
+    govtrack_id = str(member.get("govtrackId", ""))
 
     print(f"  [{bio}] {member['displayName']} ({member['party']}, {member['state']})")
 
-    # 1. Voting record
-    votes = build_vote_record(bio, chamber, congress, bio_to_icpsr, bill_cache)
-    print(f"         votes: {len(votes)} substantive")
+    # 1. Voting record (117-119)
+    print(f"         fetching votes…", flush=True)
+    votes = build_vote_record(bio, chamber, bio_to_icpsr, bill_cache)
+    print(f"         votes: {len(votes)} substantive (congresses {VOTE_CONGRESSES})", flush=True)
 
-    # 2. Sponsorship
-    sponsored, cosponsored = get_sponsorships(bio, congress, sponsorship_cache)
-    print(f"         sponsored: {len(sponsored)}  cosponsored: {len(cosponsored)}")
+    # 2. Sponsorship via GovTrack
+    print(f"         fetching sponsorship…", flush=True)
+    sponsored, cosponsored = get_sponsorships_govtrack(govtrack_id, sponsorship_cache)
+    print(f"         sponsored: {len(sponsored)}  cosponsored: {len(cosponsored)}", flush=True)
 
-    # 3. Platform text
-    platform = get_platform_text(bio, chamber, platform_cache)
-    print(f"         platform: {'yes' if platform else 'none'}")
+    # 3. Committee assignments
+    committees = committee_data.get(bio, [])
+    print(f"         committees: {len(committees)}")
 
-    # 4. Interest-group ratings (read from existing file, no API call needed)
-    # Loaded by caller and passed in via member dict if available
+    # 4. Interest-group ratings
     ig_ratings = member.get("_ig_ratings", {})
 
+    # 5. Donor industries
+    donor_industries = member.get("_donor_industries", [])
+
     return {
-        "bioguideId":     bio,
-        "displayName":    member["displayName"],
-        "party":          member["party"],
-        "state":          member["state"],
-        "chamber":        chamber,
-        "lastCongress":   member.get("lastCongress", congress),
-        "firstCongress":  member.get("_firstCongress"),
-        "dim1":           member.get("dim1"),
-        "dim2":           member.get("dim2"),
-        "partyAlignmentRate": None,   # filled in by compute_member_metrics.py
-        "votes":          votes,
-        "sponsored":      sponsored,
-        "cosponsored":    cosponsored,
-        "interestGroups": ig_ratings,
-        "platformText":   platform,
+        "bioguideId":         bio,
+        "displayName":        member["displayName"],
+        "party":              member["party"],
+        "state":              member["state"],
+        "chamber":            chamber,
+        "lastCongress":       member.get("lastCongress", 119),
+        "firstCongress":      member.get("_firstCongress"),
+        "dim1":               member.get("dim1"),
+        "dim2":               member.get("dim2"),
+        "partyAlignmentRate": None,   # filled by compute_member_metrics.py
+        "votes":              votes,
+        "sponsored":          sponsored,
+        "cosponsored":        cosponsored,
+        "committees":         committees,
+        "interestGroups":     ig_ratings,
+        "donorIndustries":    donor_industries,
     }
 
 
@@ -381,89 +413,86 @@ def save_cache(path, data):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--congress", type=int, default=119)
-    parser.add_argument("--members",  type=str, default=None,
+    parser.add_argument("--members", type=str, default=None,
                         help="Comma-separated bioguide IDs to limit run")
     args = parser.parse_args()
 
-    congress      = args.congress
-    filter_bios   = set(args.members.split(",")) if args.members else None
+    filter_bios = set(args.members.split(",")) if args.members else None
 
     os.makedirs(INPUTS_DIR, exist_ok=True)
 
     if _SKIP_CONGRESS_API:
-        print("NOTE: CONGRESS_API_KEY not set — skipping bill title enrichment and sponsorship lookup.")
-        print("      Set CONGRESS_API_KEY env var to enable. Votes will use raw question text only.\n")
+        print("NOTE: CONGRESS_API_KEY not set — bill titles will use fallback text.")
+        print("      Set CONGRESS_API_KEY to enable full title enrichment.\n")
 
     # Load members
-    members_path = os.path.join(DATA_DIR, "members-current.json")
-    with open(members_path) as f:
+    with open(os.path.join(DATA_DIR, "members-current.json")) as f:
         all_members = json.load(f)
 
     if filter_bios:
         members = [m for m in all_members if m["bioguideId"] in filter_bios]
-        print(f"Filtered to {len(members)} members: {filter_bios}")
+        print(f"Filtered to {len(members)} members")
     else:
         members = all_members
-    print(f"Collecting data for {len(members)} members (Congress {congress})\n")
+    print(f"Collecting data for {len(members)} members (congresses {VOTE_CONGRESSES})\n")
 
     # Build bioguide → ICPSR map
-    index_path = os.path.join(DATA_DIR, "members-index.json")
-    with open(index_path) as f:
+    with open(os.path.join(DATA_DIR, "members-index.json")) as f:
         index = json.load(f)
-    bio_to_icpsr    = {m["b"]: str(m["i"]) for m in index if m.get("b") and m.get("i")}
-    bio_to_fc       = {m["b"]: m.get("fc") for m in index if m.get("b")}
+    bio_to_icpsr = {m["b"]: str(m["i"]) for m in index if m.get("b") and m.get("i")}
+    bio_to_fc    = {m["b"]: m.get("fc") for m in index if m.get("b")}
 
-    # Load interest-group scores and build per-member lookup
+    # Load donor industry data
+    donor_by_bio = {}
+    donor_path = os.path.join(DATA_DIR, "donor-industries.json")
+    if os.path.exists(donor_path):
+        with open(donor_path) as f:
+            donor_by_bio = json.load(f).get("donors", {})
+        print(f"Loaded donor data for {len(donor_by_bio)} members")
+
+    # Load interest-group scores
+    ig_by_bio = {}
     ig_path = os.path.join(DATA_DIR, "interest-group-scores.json")
-    ig_by_bio = {}   # bioguideId -> {org_name: score_str}
     if os.path.exists(ig_path):
         with open(ig_path) as f:
             ig_data = json.load(f)
         orgs = ig_data.get("organizations", {})
-        # interest-group scores are keyed by ICPSR; convert to bioguide
-        icpsr_to_bio = {v: k for k, v in bio_to_icpsr.items()}
         for org_key, org_info in orgs.items():
-            org_name    = org_info.get("name", org_key)
-            org_scores  = org_info.get("scores", {})
-            polarity    = org_info.get("polarity", "conservative_high")
-            for icpsr_str, score in org_scores.items():
-                bio = icpsr_to_bio.get(icpsr_str)
-                if not bio:
-                    continue
+            org_name = org_info.get("name", org_key)
+            polarity = org_info.get("polarity", "conservative_high")
+            for bio, score in org_info.get("scores", {}).items():
                 if bio not in ig_by_bio:
                     ig_by_bio[bio] = {}
-                # Store as human-readable label
                 label = f"{org_name}: {score}%"
-                if polarity == "progressive_high":
-                    label += " (100%=most progressive)"
-                else:
-                    label += " (100%=most conservative)"
+                label += " (100%=most progressive)" if polarity == "progressive_high" else " (100%=most conservative)"
                 ig_by_bio[bio][org_key] = label
 
     # Load caches
     bill_cache        = load_cache(BILL_CACHE_PATH)
     sponsorship_cache = load_cache(SPONSORSHIP_CACHE_PATH)
-    platform_cache    = load_cache(PLATFORM_CACHE_PATH)
+    committee_cache   = load_cache(COMMITTEE_CACHE_PATH)
+
+    # Load committee data (fetched once, cached)
+    committee_data = load_committee_data(committee_cache)
+    save_cache(COMMITTEE_CACHE_PATH, committee_cache)
 
     bill_cache_size_before = len(bill_cache)
-
     errors = []
+
     for i, member in enumerate(members, 1):
         bio = member["bioguideId"]
         print(f"\n[{i}/{len(members)}] Processing {member['displayName']}…")
 
-        # Attach supplementary data
         member["_ig_ratings"]    = ig_by_bio.get(bio, {})
+        member["_donor_industries"] = donor_by_bio.get(bio, [])
         member["_firstCongress"] = bio_to_fc.get(bio)
 
         try:
             result = build_member_input(
-                member, congress, bio_to_icpsr,
-                bill_cache, sponsorship_cache, platform_cache,
+                member, bio_to_icpsr, bill_cache,
+                sponsorship_cache, committee_data,
             )
-            out_path = os.path.join(INPUTS_DIR, f"{bio}.json")
-            with open(out_path, "w") as f:
+            with open(os.path.join(INPUTS_DIR, f"{bio}.json"), "w") as f:
                 json.dump(result, f, indent=2)
         except Exception as e:
             print(f"  ERROR: {e}")
@@ -473,18 +502,14 @@ def main():
         if i % 20 == 0:
             save_cache(BILL_CACHE_PATH,        bill_cache)
             save_cache(SPONSORSHIP_CACHE_PATH,  sponsorship_cache)
-            save_cache(PLATFORM_CACHE_PATH,     platform_cache)
             print(f"  [caches saved at member {i}]")
 
-    # Final cache save
     save_cache(BILL_CACHE_PATH,        bill_cache)
     save_cache(SPONSORSHIP_CACHE_PATH,  sponsorship_cache)
-    save_cache(PLATFORM_CACHE_PATH,     platform_cache)
 
-    new_bills = len(bill_cache) - bill_cache_size_before
     print(f"\n{'='*60}")
     print(f"Done. {len(members) - len(errors)} members written to {INPUTS_DIR}/")
-    print(f"New bill titles fetched: {new_bills}")
+    print(f"New bill titles fetched: {len(bill_cache) - bill_cache_size_before}")
     if errors:
         print(f"Errors ({len(errors)}):")
         for bio, msg in errors:

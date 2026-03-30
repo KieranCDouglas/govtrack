@@ -95,11 +95,12 @@ def build_prompt(inp):
     alignment   = inp.get("partyAlignmentRate")
     alignment_s = f"{alignment:.0%}" if alignment is not None else "unknown"
 
-    sponsored   = inp.get("sponsored",   [])
-    cosponsored = inp.get("cosponsored", [])
-    ig_ratings  = inp.get("interestGroups", {})
-    votes       = inp.get("votes", [])
-    platform    = inp.get("platformText") or ""
+    sponsored        = inp.get("sponsored",   [])
+    cosponsored      = inp.get("cosponsored", [])
+    committees       = inp.get("committees",  [])
+    ig_ratings       = inp.get("interestGroups", {})
+    donor_industries = inp.get("donorIndustries", [])
+    votes            = inp.get("votes", [])
 
     lines = []
 
@@ -135,18 +136,32 @@ AXIS DEFINITIONS:
         f"  Party alignment rate (votes with own party): {alignment_s}\n"
     )
 
+    if committees:
+        lines.append("COMMITTEE ASSIGNMENTS (signals policy priorities):")
+        for c in committees:
+            role = f" [{c['role']}]" if c.get("role") else ""
+            lines.append(f"  {c['committee']}{role}")
+        lines.append("")
+
     if sponsored:
-        lines.append("BILLS SPONSORED THIS CONGRESS (member chose to champion — strongest signal):")
-        for b in sponsored[:15]:
-            area = f"[{b['policyArea']}] " if b.get("policyArea") else ""
-            lines.append(f"  {area}{b['number']}: {b['title']}")
+        lines.append("BILLS SPONSORED (member chose to champion — strongest signal):")
+        for b in sponsored[:20]:
+            congress_tag = f"[{b['congress']}] " if b.get("congress") else ""
+            status = f" ({b['status']})" if b.get("status") else ""
+            lines.append(f"  {congress_tag}{b['number']}: {b['title']}{status}")
         lines.append("")
 
     if cosponsored:
-        lines.append("BILLS COSPONSORED:")
-        for b in cosponsored[:10]:
-            area = f"[{b['policyArea']}] " if b.get("policyArea") else ""
-            lines.append(f"  {area}{b['number']}: {b['title']}")
+        lines.append("BILLS COSPONSORED (signals agreement — secondary signal):")
+        for b in cosponsored[:15]:
+            congress_tag = f"[{b['congress']}] " if b.get("congress") else ""
+            lines.append(f"  {congress_tag}{b['number']}: {b['title']}")
+        lines.append("")
+
+    if donor_industries:
+        lines.append("TOP PAC DONOR INDUSTRIES (2022 cycle — signals who funds this member):")
+        for d in donor_industries:
+            lines.append(f"  ${d['amount']:>10,}  {d['industry']}")
         lines.append("")
 
     if ig_ratings:
@@ -156,17 +171,13 @@ AXIS DEFINITIONS:
         lines.append("")
 
     if votes:
-        lines.append(f"ROLL-CALL VOTES ({len(votes)} substantive votes — procedural filtered out):")
-        lines.append("  Date       | Bill       | Title/Description                          | Vote")
-        lines.append("  " + "-" * 80)
+        lines.append(f"ROLL-CALL VOTES ({len(votes)} substantive votes across congresses 117-119 — procedural filtered):")
+        lines.append("  Congress | Date       | Bill       | Title/Description                          | Vote")
+        lines.append("  " + "-" * 90)
         for v in votes:
-            title = (v.get("title") or v.get("question") or "")[:55]
-            lines.append(f"  {v['date']} | {v['bill']:10} | {title:<55} | {v['position']}")
-        lines.append("")
-
-    if platform:
-        lines.append("OFFICIAL PLATFORM (from .gov website):")
-        lines.append(platform[:2000])
+            title   = (v.get("title") or v.get("question") or "")[:50]
+            congress = v.get("congress", "")
+            lines.append(f"  {congress}    | {v['date']} | {v['bill']:10} | {title:<50} | {v['position']}")
         lines.append("")
 
     lines.append(
@@ -175,6 +186,8 @@ AXIS DEFINITIONS:
         "  a single left-right axis.\n"
         "- Do not let party affiliation substitute for evidence. A Democrat who\n"
         "  consistently votes with Republicans on certain issues should reflect that.\n"
+        "- Weight sponsored legislation and committee assignments heavily — these\n"
+        "  reflect deliberate choices, not just party-line voting.\n"
         "- Use the anchor calibration to anchor your scale, not your priors.\n"
         "- Keep reasoning concise (1-3 sentences per axis).\n"
     )
