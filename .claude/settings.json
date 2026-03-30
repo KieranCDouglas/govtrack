@@ -36,7 +36,17 @@
       "Bash(grep -oP '.{0,40}[a-z]\\\\.l\\\\s*[-<>!]|\\\\bsort\\\\b.{0,100}' /Users/kieran/Documents/GitHub/govtrack/assets/index-C3q1xJnh.js)",
       "Bash(grep -o 'sort\\(function[^\\)]\\\\{1,200\\\\}\\)' /Users/kieran/Documents/GitHub/govtrack/assets/index-C3q1xJnh.js)",
       "Bash(grep -o '.sort\\(\\\\\\([^\\)]\\\\{1,150\\\\}\\\\\\)\\)' /Users/kieran/Documents/GitHub/govtrack/assets/index-C3q1xJnh.js)",
-      "Bash(grep -o '.sort\\(\\(b,N\\)[^;]\\\\{1,300\\\\}' /Users/kieran/Documents/GitHub/govtrack/assets/index-C3q1xJnh.js)"
+      "Bash(grep -o '.sort\\(\\(b,N\\)[^;]\\\\{1,300\\\\}' /Users/kieran/Documents/GitHub/govtrack/assets/index-C3q1xJnh.js)",
+      "Bash(grep -r \"DW-NOMINATE\\\\|Voteview\\\\|ICPSR\\\\|ideology\" /Users/kieran/Documents/GitHub/govtrack/*.js /Users/kieran/Documents/GitHub/govtrack/*.html)",
+      "WebSearch",
+      "WebFetch(domain:acuratings.conservative.org)",
+      "WebFetch(domain:adaction.org)",
+      "WebFetch(domain:aflcio.org)",
+      "WebFetch(domain:www.uschamber.com)",
+      "WebFetch(domain:www.aclu.org)",
+      "WebFetch(domain:www.nrapvf.org)",
+      "WebFetch(domain:www.plannedparenthoodaction.org)",
+      "WebFetch(domain:ratings.conservative.org)"
     ]
   }
 }

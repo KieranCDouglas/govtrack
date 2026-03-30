@@ -224,72 +224,109 @@ def update_members_current(congress, index):
     except (FileNotFoundError, json.JSONDecodeError):
         pass
 
-    # Load social scores
+    # Load LLM scores (primary source for compass coordinates)
+    llm_path = os.path.join(DATA_DIR, "llm-scores.json")
+    llm_lookup = {}
+    try:
+        with open(llm_path, "r") as f:
+            llm_lookup = json.load(f).get("scores", {})
+        print(f"  Loaded {len(llm_lookup)} LLM scores")
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("  WARNING: llm-scores.json not found, falling back to social/NOMINATE scores")
+
+    # Load social scores (fallback if LLM score unavailable)
     social_path = os.path.join(DATA_DIR, "social-scores.json")
     social_lookup = {}
     try:
         with open(social_path, "r") as f:
             social_lookup = json.load(f).get("scores", {})
-        print(f"  Loaded {len(social_lookup)} social scores")
+        print(f"  Loaded {len(social_lookup)} social scores (fallback)")
     except (FileNotFoundError, json.JSONDecodeError):
         print("  WARNING: social-scores.json not found, using dim2 fallback for all")
+
+    # Load member metrics (policy fingerprint, party alignment)
+    metrics_path = os.path.join(DATA_DIR, "member-metrics.json")
+    metrics_lookup = {}
+    try:
+        with open(metrics_path, "r") as f:
+            metrics_lookup = json.load(f)
+        print(f"  Loaded {len(metrics_lookup)} member metrics")
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("  WARNING: member-metrics.json not found, policyFingerprint will be empty")
 
     party_names = {"D": "Democrat", "R": "Republican", "O": "Independent"}
 
     members_out = []
-    social_used = 0
-    social_fallback = 0
+    score_source_counts = {"llm": 0, "social_votes": 0, "nominate": 0}
+
     for m in current:
         bio = m["b"]
         old = old_lookup.get(bio, {})
         dim1 = m.get("x")
         dim2 = m.get("y")
 
-        # Look up social score by ICPSR
-        icpsr_str = str(m.get("i", ""))
-        ss = social_lookup.get(icpsr_str)
-        social_score = None
-        social_votes = 0
-        is_fallback = True
-        if ss and not ss.get("fallback", True):
-            social_score = ss["score"]
-            social_votes = ss["socialVotes"]
-            is_fallback = False
-            social_used += 1
-        else:
-            social_fallback += 1
+        # ── Compass coordinates — three-tier fallback chain ──────────────────
+        # 1. LLM normalized scores (primary)
+        # 2. social-scores.json (curated votes + NumbersUSA)
+        # 3. NOMINATE dim1/dim2 from Voteview
 
-        # Compute compass coordinates
-        compass_x = None
-        compass_y = None
-        if dim1 is not None:
-            compass_x = round(max(-1, min(1, dim1)), 4)
-        if social_score is not None:
-            compass_y = round(max(-1, min(1, social_score)), 4)
-        elif dim2 is not None:
-            compass_y = round(max(-1, min(1, dim2)), 4)
+        llm = llm_lookup.get(bio, {})
+        icpsr_str = str(m.get("i", ""))
+        ss = social_lookup.get(icpsr_str, {})
+
+        llm_econ   = llm.get("econ_normalized")
+        llm_social = llm.get("social_normalized")
+        social_score = ss.get("score") if ss and not ss.get("fallback", True) else None
+
+        if llm_econ is not None and llm_social is not None:
+            compass_x    = round(max(-1, min(1, llm_econ)),   4)
+            compass_y    = round(max(-1, min(1, llm_social)),  4)
+            score_source = "llm"
+        elif social_score is not None:
+            compass_x    = round(max(-1, min(1, dim1)),        4) if dim1 is not None else None
+            compass_y    = round(max(-1, min(1, social_score)),4)
+            score_source = "social_votes"
+        else:
+            compass_x    = round(max(-1, min(1, dim1)), 4) if dim1 is not None else None
+            compass_y    = round(max(-1, min(1, dim2)), 4) if dim2 is not None else None
+            score_source = "nominate"
+
+        score_source_counts[score_source] += 1
+
+        # ── Policy fingerprint (replaces policyHeterodoxy) ───────────────────
+        metrics = metrics_lookup.get(bio, {})
+        policy_fingerprint = metrics.get("policy_fingerprint") or old.get("policyHeterodoxy", {})
+        party_alignment    = metrics.get("party_alignment_overall")
 
         members_out.append({
-            "bioguideId": bio,
-            "displayName": m["n"],
-            "chamber": "House" if m["c"] == "H" else "Senate",
-            "state": m["s"],
-            "district": None,
-            "party": party_names.get(m["p"], "Independent"),
-            "partyCode": {"D": "100", "R": "200"}.get(m["p"], "328"),
-            "born": old.get("born"),
-            "lastCongress": congress,
-            "dim1": round(dim1, 3) if dim1 is not None else None,
-            "dim2": round(dim2, 3) if dim2 is not None else None,
-            "numVotes": old.get("numVotes", 0),
-            "compassX": compass_x,
-            "compassY": compass_y,
-            "socialScore": social_score,
-            "socialVotes": social_votes,
-            "socialFallback": is_fallback,
-            "govtrackId": old.get("govtrackId") or m.get("g"),
-            "isCurrent": True,
-            "policyHeterodoxy": old.get("policyHeterodoxy", {}),
+            "bioguideId":       bio,
+            "displayName":      m["n"],
+            "chamber":          "House" if m["c"] == "H" else "Senate",
+            "state":            m["s"],
+            "district":         None,
+            "party":            party_names.get(m["p"], "Independent"),
+            "partyCode":        {"D": "100", "R": "200"}.get(m["p"], "328"),
+            "born":             old.get("born"),
+            "lastCongress":     congress,
+            "dim1":             round(dim1, 3) if dim1 is not None else None,
+            "dim2":             round(dim2, 3) if dim2 is not None else None,
+            "numVotes":         old.get("numVotes", 0),
+            "compassX":         compass_x,
+            "compassY":         compass_y,
+            # LLM score fields
+            "llmEconScore":     llm_econ,
+            "llmSocialScore":   llm_social,
+            "llmLowConfidence": llm.get("low_confidence", False),
+            "scoreSource":      score_source,
+            # Legacy social-score fields (kept for backward compat)
+            "socialScore":      social_score,
+            "socialVotes":      ss.get("socialVotes", 0) if ss else 0,
+            "socialFallback":   not bool(social_score),
+            # Metrics
+            "policyFingerprint":  policy_fingerprint,
+            "partyAlignmentRate": party_alignment,
+            "govtrackId":         old.get("govtrackId") or m.get("g"),
+            "isCurrent":          True,
         })
 
     members_out.sort(key=lambda x: x["displayName"])
@@ -298,7 +335,9 @@ def update_members_current(congress, index):
         json.dump(members_out, f, separators=(",", ":"))
 
     print(f"  {len(members_out)} current members written")
-    print(f"  Social scores: {social_used} used, {social_fallback} fallback to dim2")
+    print(f"  Score sources: LLM={score_source_counts['llm']}  "
+          f"social_votes={score_source_counts['social_votes']}  "
+          f"nominate={score_source_counts['nominate']}")
     return members_out
 
 
