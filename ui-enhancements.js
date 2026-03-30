@@ -438,7 +438,13 @@
       _stopMemberSortObserver();
     }
   });
-  _rootSortObserver.observe(document.body, { childList: true, subtree: true });
+  if (document.body) {
+    _rootSortObserver.observe(document.body, { childList: true, subtree: true });
+  } else {
+    document.addEventListener("DOMContentLoaded", function () {
+      _rootSortObserver.observe(document.body, { childList: true, subtree: true });
+    });
+  }
 
   /* ---- 2a-pre  Member policy summary injection ---- */
 

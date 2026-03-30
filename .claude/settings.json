@@ -46,7 +46,11 @@
       "WebFetch(domain:www.aclu.org)",
       "WebFetch(domain:www.nrapvf.org)",
       "WebFetch(domain:www.plannedparenthoodaction.org)",
-      "WebFetch(domain:ratings.conservative.org)"
+      "WebFetch(domain:ratings.conservative.org)",
+      "Bash(open http://localhost:5173)",
+      "Bash(open http://localhost:3000)",
+      "Bash(open http://localhost:4173)",
+      "Bash(open http://localhost:8080)"
     ]
   }
 }
