@@ -79,7 +79,7 @@ def is_procedural(question, bill_number):
 
 # ── HTTP helpers ──────────────────────────────────────────────────────────────
 
-def fetch_json(url, retries=3, delay=0.3):
+def fetch_json(url, retries=2, delay=1.0):
     """Fetch a URL and return parsed JSON, or None on failure."""
     for attempt in range(retries + 1):
         try:
@@ -88,7 +88,8 @@ def fetch_json(url, retries=3, delay=0.3):
                 return json.loads(r.read())
         except urllib.error.HTTPError as e:
             if e.code == 429:
-                wait = 10 * (attempt + 1)
+                # Rate limited — wait progressively but give up after 2 retries
+                wait = 60 * (attempt + 1)
                 print(f"    rate-limited, waiting {wait}s…")
                 time.sleep(wait)
             elif e.code == 403:
@@ -167,8 +168,10 @@ def get_bill_title(bill_number, congress, bill_cache):
     title = None
     if data and "bill" in data:
         title = data["bill"].get("title") or data["bill"].get("shortTitle")
-    bill_cache[key] = title
-    time.sleep(0.12)  # stay well under 1000 req/hr
+    # Only cache successful lookups — don't cache None so failed calls get retried next run
+    if title is not None:
+        bill_cache[key] = title
+    time.sleep(0.5)  # ~120 req/min, well under 1000 req/hr free tier limit
     return title
 
 

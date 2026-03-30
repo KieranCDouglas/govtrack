@@ -23,6 +23,7 @@ Environment variables:
   OPENAI_API_KEY
 """
 import argparse
+import csv
 import json
 import os
 import re
@@ -191,7 +192,14 @@ def call_claude(prompt, model="claude-sonnet-4-6"):
         max_tokens=512,
         messages=[{"role": "user", "content": prompt}],
     )
-    return json.loads(msg.content[0].text.strip())
+    text = msg.content[0].text.strip()
+    # Strip markdown code fences if present (```json ... ``` or ``` ... ```)
+    text = re.sub(r"^```(?:json)?\s*", "", text)
+    text = re.sub(r"\s*```$", "", text)
+    text = text.strip()
+    # Fix Claude's habit of using +0.20 (invalid JSON — + prefix not allowed)
+    text = re.sub(r':\s*\+(\d)', r': \1', text)
+    return json.loads(text)
 
 
 def call_gpt(prompt, model="gpt-4o"):
@@ -420,9 +428,10 @@ def main():
             (social_div is not None and social_div > LOW_CONFIDENCE_THRESHOLD)
         )
 
+        ediv_str = f"{econ_div:.2f}"   if econ_div   is not None else "N/A"
+        sdiv_str = f"{social_div:.2f}" if social_div is not None else "N/A"
         print(f"  Raw:  econ={avg_econ:+.3f}  social={avg_social:+.3f}"
-              f"  divergence: E={econ_div:.2f if econ_div is not None else 'N/A'}  "
-              f"S={social_div:.2f if social_div is not None else 'N/A'}"
+              f"  divergence: E={ediv_str}  S={sdiv_str}"
               f"{'  ⚠ LOW CONFIDENCE' if low_conf else ''}")
 
         if bio in ANCHORS:
@@ -523,6 +532,44 @@ def main():
             print(f"  {ANCHORS[bio]['name']:<22}"
                   f" {target['econ']:>+9.2f} {norm['econ_normalized']:>+10.3f}"
                   f" {target['social']:>+9.2f} {norm['social_normalized']:>+10.3f}")
+
+    # Write CSV for sanity-checking
+    csv_path = os.path.join(DATA_DIR, "llm-scores-review.csv")
+    with open(csv_path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "bioguide", "name", "party", "state",
+            "econ_claude", "econ_gpt", "econ_avg", "econ_normalized",
+            "social_claude", "social_gpt", "social_avg", "social_normalized",
+            "econ_divergence", "social_divergence", "low_confidence",
+            "anchor", "anchor_econ_target", "anchor_social_target",
+        ])
+        for bio, s in sorted(scores_out.items(), key=lambda x: inputs.get(x[0], {}).get("displayName", "")):
+            inp = inputs.get(bio, {})
+            is_anchor = bio in ANCHORS
+            writer.writerow([
+                bio,
+                inp.get("displayName", ""),
+                inp.get("party", ""),
+                inp.get("state", ""),
+                f"{s['econ_raw_claude']:+.3f}"   if s["econ_raw_claude"]   is not None else "",
+                f"{s['econ_raw_gpt']:+.3f}"      if s["econ_raw_gpt"]      is not None else "",
+                f"{(s['econ_raw_claude'] + s['econ_raw_gpt']) / 2:+.3f}"
+                    if s["econ_raw_claude"] is not None and s["econ_raw_gpt"] is not None else "",
+                f"{s['econ_normalized']:+.3f}",
+                f"{s['social_raw_claude']:+.3f}" if s["social_raw_claude"] is not None else "",
+                f"{s['social_raw_gpt']:+.3f}"    if s["social_raw_gpt"]    is not None else "",
+                f"{(s['social_raw_claude'] + s['social_raw_gpt']) / 2:+.3f}"
+                    if s["social_raw_claude"] is not None and s["social_raw_gpt"] is not None else "",
+                f"{s['social_normalized']:+.3f}",
+                f"{s['econ_divergence']:.3f}"    if s["econ_divergence"]   is not None else "",
+                f"{s['social_divergence']:.3f}"  if s["social_divergence"] is not None else "",
+                "YES" if s["low_confidence"] else "",
+                "ANCHOR" if is_anchor else "",
+                f"{ANCHORS[bio]['econ']:+.2f}"   if is_anchor else "",
+                f"{ANCHORS[bio]['social']:+.2f}" if is_anchor else "",
+            ])
+    print(f"Review CSV: {csv_path}")
 
     # Validation: correlation with NOMINATE dim1
     try:

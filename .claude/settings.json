@@ -50,7 +50,8 @@
       "Bash(open http://localhost:5173)",
       "Bash(open http://localhost:3000)",
       "Bash(open http://localhost:4173)",
-      "Bash(open http://localhost:8080)"
+      "Bash(open http://localhost:8080)",
+      "Bash(CONGRESS_API_KEY=\"SaE2is72peVUEN1dvkJVMNofrE9FvnxeeaaQa2st\" python3 scripts/collect_scoring_data.py --members S000033)"
     ]
   }
 }
