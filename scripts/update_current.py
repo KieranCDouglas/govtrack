@@ -443,8 +443,15 @@ def populate_govtrack_ids(members_current):
         objects = data.get("objects", [])
         for role in objects:
             person = role.get("person") or {}
-            bio = role.get("bioguideid") or person.get("bioguideid") or ""
-            pid = person.get("id")
+            bio = person.get("bioguideid") or ""
+            # Numeric person ID is not directly in the response but is
+            # in the link URL: /congress/members/name/300025
+            link = person.get("link") or ""
+            pid = None
+            if link:
+                parts = [p for p in link.rstrip("/").split("/") if p.isdigit()]
+                if parts:
+                    pid = int(parts[-1])
             if bio and pid:
                 bio_to_gtid[bio] = pid
 
