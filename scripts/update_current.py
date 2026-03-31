@@ -409,6 +409,64 @@ def update_members_current(congress, index):
     return members_out
 
 
+def populate_govtrack_ids(members_current):
+    """Fetch GovTrack person IDs for all current members via the role API.
+
+    Uses /api/v2/role?current=true to get all current roles in bulk, then
+    maps bioguide_id -> person.id and patches members_current in place.
+    Only fetches for members that are still missing govtrackId.
+    """
+    missing = [m for m in members_current if not m.get("govtrackId")]
+    if not missing:
+        print("=== GovTrack IDs: all members already have IDs, skipping ===")
+        return
+
+    print(f"=== Fetching GovTrack person IDs for {len(missing)} members ===")
+
+    bio_to_gtid = {}
+    offset = 0
+    page_size = 100
+
+    while True:
+        url = (
+            f"https://www.govtrack.us/api/v2/role"
+            f"?current=true&limit={page_size}&offset={offset}"
+        )
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, context=ctx, timeout=30) as r:
+                data = json.loads(r.read())
+        except Exception as e:
+            print(f"  WARNING: GovTrack role API failed at offset {offset}: {e}")
+            break
+
+        objects = data.get("objects", [])
+        for role in objects:
+            person = role.get("person") or {}
+            bio = role.get("bioguideid") or person.get("bioguideid") or ""
+            pid = person.get("id")
+            if bio and pid:
+                bio_to_gtid[bio] = pid
+
+        total = data.get("meta", {}).get("total_count", 0)
+        offset += len(objects)
+        if offset >= total or not objects:
+            break
+
+    patched = 0
+    for m in members_current:
+        if not m.get("govtrackId"):
+            gid = bio_to_gtid.get(m["bioguideId"])
+            if gid:
+                m["govtrackId"] = gid
+                patched += 1
+
+    print(f"  Patched {patched}/{len(missing)} members with GovTrack person IDs")
+    if patched < len(missing):
+        still_missing = [m["bioguideId"] for m in members_current if not m.get("govtrackId")]
+        print(f"  Still missing: {still_missing[:10]}{'...' if len(still_missing) > 10 else ''}")
+
+
 def update_stats(members_current, index):
     """Regenerate stats.json using GovTrack API for current member counts.
     
@@ -557,6 +615,11 @@ def main():
 
     index = update_members_index(congress)
     current = update_members_current(congress, index)
+    populate_govtrack_ids(current)
+    # Re-write members-current.json now that govtrackIds are populated
+    current_path = os.path.join(DATA_DIR, "members-current.json")
+    with open(current_path, "w") as f:
+        json.dump(current, f, separators=(",", ":"))
     update_stats(current, index)
     update_vote_data(congress)
 
