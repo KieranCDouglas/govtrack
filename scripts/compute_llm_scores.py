@@ -315,6 +315,49 @@ def normalize_scores(raw_scores, anchor_raw):
     return normalized
 
 
+def equalize_scores(normalized, anchor_bios, strength=0.6):
+    """
+    Rank-based histogram equalization to spread compressed scores.
+
+    Maps each score to a blend of its original value and its percentile-based
+    position across the full [-1, +1] range. Anchors are excluded from the
+    rank distribution so their calibrated positions are preserved exactly.
+
+    strength=0.0 → pure anchor normalization (no equalization)
+    strength=1.0 → pure percentile spread (ignores raw score magnitudes)
+    strength=0.6 → 60% percentile, 40% original (default — visible spread,
+                   anchors still honored, relative distances preserved)
+    """
+    if len(normalized) < 4:
+        return normalized   # not enough members to equalize
+
+    non_anchor_bios = [b for b in normalized if b not in anchor_bios]
+
+    for axis in ("econ", "social"):
+        # Build sorted rank list from non-anchor members only
+        vals = sorted(non_anchor_bios, key=lambda b: normalized[b][axis])
+        n = len(vals)
+        if n < 2:
+            continue
+
+        # Map each non-anchor to its percentile position in [-1, +1]
+        percentile_map = {}
+        for rank, bio in enumerate(vals):
+            # Spread evenly: rank 0 → -1.0, rank n-1 → +1.0
+            percentile_pos = -1.0 + 2.0 * rank / (n - 1)
+            percentile_map[bio] = percentile_pos
+
+        # Blend original normalized score with percentile position
+        for bio in non_anchor_bios:
+            orig = normalized[bio][axis]
+            perc = percentile_map[bio]
+            blended = round((1 - strength) * orig + strength * perc, 4)
+            blended = max(-1.0, min(1.0, blended))
+            normalized[bio][axis] = blended
+
+    return normalized
+
+
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 def main():
@@ -485,6 +528,12 @@ def main():
     else:
         print(f"WARNING: only {len(anchor_raw)} anchor(s) scored — skipping normalization")
         normalized = {bio: s.copy() for bio, s in raw_scores.items()}
+
+    # Histogram equalization — spreads compressed scores across full range
+    # Only applied when scoring the full membership (not anchor-only or small batches)
+    if len(normalized) >= 50:
+        normalized = equalize_scores(normalized, set(ANCHORS.keys()), strength=0.6)
+        print(f"  Histogram equalization applied (strength=0.6, anchors preserved)")
 
     # Build output
     scores_out = {}
