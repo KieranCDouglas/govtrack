@@ -45,3 +45,7 @@ build/
 
 # Local Claude Code config (may contain API keys)
 .claude/
+
+# Source zip and extracted source (local only — used for redesign reference)
+*.zip
+source/
