@@ -6,9 +6,19 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+
+# Data directory (large files, local only — never commit)
 data/
 node_modules/
 node_modules
+
+# Large raw data file types (safety net in case files land outside data/)
+*.csv
+*.txt
+*.tsv
+*.xls
+*.xlsx
+
 dist
 dist-ssr
 *.local
@@ -32,3 +42,6 @@ dist-ssr
 # Build outputs
 build/
 *.tsbuildinfo
+
+# Local Claude Code config (may contain API keys)
+.claude/
