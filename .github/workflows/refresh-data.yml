@@ -31,9 +31,6 @@ jobs:
       - name: Refresh data from Voteview and GovTrack
         run: python3 scripts/update_current.py
 
-      - name: Compute social axis scores
-        run: python3 scripts/compute_social_axis.py
-
       - name: Update manifest timestamp
         run: |
           python3 -c "
