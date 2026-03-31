@@ -206,11 +206,9 @@ def call_claude(prompt, model="claude-sonnet-4-6"):
         messages=[{"role": "user", "content": prompt}],
     )
     text = msg.content[0].text.strip()
-    # Strip markdown code fences if present (```json ... ``` or ``` ... ```)
     text = re.sub(r"^```(?:json)?\s*", "", text)
     text = re.sub(r"\s*```$", "", text)
     text = text.strip()
-    # Fix Claude's habit of using +0.20 (invalid JSON — + prefix not allowed)
     text = re.sub(r':\s*\+(\d)', r': \1', text)
     return json.loads(text)
 
@@ -227,8 +225,8 @@ def call_gpt(prompt, model="gpt-4o"):
     return json.loads(resp.choices[0].message.content.strip())
 
 
-def score_member(bio, inp, dry_run=False):
-    """Score one member. Returns (claude_result, gpt_result) or (None, None) on error."""
+def score_member(bio, inp, dry_run=False, claude_model="claude-sonnet-4-6", gpt_model=None):
+    """Score one member. Returns (claude_result, gpt_result)."""
     prompt = build_prompt(inp)
 
     if dry_run:
@@ -241,16 +239,17 @@ def score_member(bio, inp, dry_run=False):
     claude_result = gpt_result = None
 
     try:
-        claude_result = call_claude(prompt)
+        claude_result = call_claude(prompt, model=claude_model)
         time.sleep(0.5)
     except Exception as e:
-        print(f"    Claude error: {e}")
+        print(f"    Claude ({claude_model}) error: {e}")
 
-    try:
-        gpt_result = call_gpt(prompt)
-        time.sleep(0.5)
-    except Exception as e:
-        print(f"    GPT error: {e}")
+    if gpt_model:
+        try:
+            gpt_result = call_gpt(prompt, model=gpt_model)
+            time.sleep(0.5)
+        except Exception as e:
+            print(f"    GPT ({gpt_model}) error: {e}")
 
     return claude_result, gpt_result
 
@@ -324,17 +323,36 @@ def main():
     parser.add_argument("--dry-run",      action="store_true")
     parser.add_argument("--anchors-only", action="store_true")
     parser.add_argument("--congress",     type=int,  default=119)
+    parser.add_argument("--claude-model", type=str,  default="claude-sonnet-4-6",
+                        help="Claude model ID (e.g. claude-haiku-4-5-20251001)")
+    parser.add_argument("--gpt-model",    type=str,  default="gpt-4o",
+                        help="GPT model ID, or 'none' to skip GPT entirely")
+    parser.add_argument("--run-label",    type=str,  default=None,
+                        help="Label for comparison runs (e.g. 'sonnet-gpt4o'). "
+                             "Saves to data/llm-scores-{label}.json and review CSV.")
     args = parser.parse_args()
 
     dry_run     = args.dry_run
     congress    = args.congress
+    claude_model = args.claude_model
+    gpt_model    = None if args.gpt_model.lower() == "none" else args.gpt_model
+    run_label    = args.run_label
+
+    # Adjust output paths if run-label given
+    global OUTPUT_PATH
+    csv_filename = "llm-scores-review.csv"
+    if run_label:
+        OUTPUT_PATH  = os.path.join(DATA_DIR, f"llm-scores-{run_label}.json")
+        csv_filename = f"llm-scores-review-{run_label}.csv"
+
+    print(f"Models: Claude={claude_model}  GPT={gpt_model or 'none (Claude only)'}")
 
     if not dry_run:
         if "ANTHROPIC_API_KEY" not in os.environ:
             print("ERROR: ANTHROPIC_API_KEY not set")
             sys.exit(1)
-        if "OPENAI_API_KEY" not in os.environ:
-            print("ERROR: OPENAI_API_KEY not set")
+        if gpt_model and "OPENAI_API_KEY" not in os.environ:
+            print("ERROR: OPENAI_API_KEY not set (required for GPT model)")
             sys.exit(1)
 
     # Determine which members to score
@@ -379,7 +397,8 @@ def main():
         name = inp["displayName"]
         print(f"\n[{i}/{total}] {name} ({inp['party']}, {inp['state']})")
 
-        claude_r, gpt_r = score_member(bio, inp, dry_run=dry_run)
+        claude_r, gpt_r = score_member(bio, inp, dry_run=dry_run,
+                                       claude_model=claude_model, gpt_model=gpt_model)
 
         if dry_run:
             continue
@@ -502,7 +521,7 @@ def main():
         "meta": {
             "congress":          congress,
             "generated":         date.today().isoformat(),
-            "models":            ["claude-sonnet-4-6", "gpt-4o"],
+            "models":            [m for m in [claude_model, gpt_model] if m],
             "anchors":           ANCHORS,
             "members_scored":    len(scores_out),
             "low_confidence_count": low_conf_count,
@@ -547,7 +566,7 @@ def main():
                   f" {target['social']:>+9.2f} {norm['social_normalized']:>+10.3f}")
 
     # Write CSV for sanity-checking
-    csv_path = os.path.join(DATA_DIR, "llm-scores-review.csv")
+    csv_path = os.path.join(DATA_DIR, csv_filename)
     with open(csv_path, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([

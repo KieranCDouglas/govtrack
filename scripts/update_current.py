@@ -360,8 +360,9 @@ def update_members_current(congress, index):
 
         # ── Policy fingerprint (replaces policyHeterodoxy) ───────────────────
         metrics = metrics_lookup.get(bio, {})
-        policy_fingerprint = metrics.get("policy_fingerprint") or old.get("policyHeterodoxy", {})
-        party_alignment    = metrics.get("party_alignment_overall")
+        policy_fingerprint         = metrics.get("policy_fingerprint") or old.get("policyHeterodoxy", {})
+        party_alignment            = metrics.get("party_alignment_overall")
+        party_alignment_by_category = metrics.get("party_alignment_by_category", {})
 
         members_out.append({
             "bioguideId":       bio,
@@ -394,8 +395,9 @@ def update_members_current(congress, index):
             "socialVotes":      ss.get("socialVotes", 0) if ss else 0,
             "socialFallback":   not bool(social_score),
             # Metrics
-            "policyFingerprint":  policy_fingerprint,
-            "partyAlignmentRate": party_alignment,
+            "policyFingerprint":          policy_fingerprint,
+            "partyAlignmentRate":         party_alignment,
+            "partyAlignmentByCategory":   party_alignment_by_category,
             "govtrackId":         old.get("govtrackId") or m.get("g"),
             "isCurrent":          True,
         })

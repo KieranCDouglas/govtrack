@@ -668,6 +668,23 @@
 
   /* ---- 2c  Full compass page: fixed view + polished overlays ---- */
 
+  // Issue categories shown in the dropdown (label → partyAlignmentByCategory key)
+  var ISSUE_CATEGORIES = [
+    { label: "Immigration",       key: "immigration" },
+    { label: "Environment",       key: "environment" },
+    { label: "Abortion / Social Rights", key: "social_rights" },
+    { label: "Gun Rights",        key: "guns" },
+    { label: "Healthcare",        key: "healthcare" },
+    { label: "Economy / Taxes",   key: "fiscal_tax" },
+    { label: "Military & Defense",key: "military_defense" },
+    { label: "Criminal Justice",  key: "criminal_justice" },
+    { label: "Elections",         key: "elections" },
+    { label: "Trade",             key: "trade" },
+  ];
+
+  // Active issue filter — shared across calls (persists while page is open)
+  var _issueFilter = null;   // null = off, else category key string
+
   function enhanceCompassPage() {
     // Only target the large full-page compass canvas (900×700)
     var canvas = null;
@@ -699,7 +716,140 @@
       "0 8px 40px rgba(0,0,0,0.45), 0 2px 10px rgba(0,0,0,0.25), " +
       "inset 0 1px 0 rgba(94,177,191,0.15)";
 
-    // --- Overlay: quadrant corner labels + axis direction labels ---
+    // --- Issue alignment overlay canvas ---
+    var overlay = document.createElement("canvas");
+    overlay.style.cssText =
+      "position:absolute;top:0;left:0;width:100%;height:100%;" +
+      "pointer-events:none;border-radius:16px;";
+    overlay.width  = canvas.width;
+    overlay.height = canvas.height;
+    container.appendChild(overlay);
+
+    // Coordinate transform — matches bundle constants (k=62, no pan/zoom)
+    function dotPosition(compassX, compassY, W, H) {
+      var k = 62, O = W / 2, z = H / 2;
+      var U = W / 2 - k, Z = H / 2 - k;
+      return { x: O + compassX * U, y: z - compassY * Z };
+    }
+
+    // Draw issue-alignment dots on the overlay canvas
+    function drawOverlay() {
+      var ctx = overlay.getContext("2d");
+      var W = overlay.width, H = overlay.height;
+      ctx.clearRect(0, 0, W, H);
+
+      if (!_issueFilter) return;
+
+      var members = window.__cwMembersData;
+      if (!members) return;
+
+      // The bundle scales the canvas by devicePixelRatio and draws at logical coords.
+      // Our overlay matches canvas.width (physical pixels), so we must scale ctx
+      // by dpr to draw in the same logical coordinate space.
+      var dpr = window.devicePixelRatio || 1;
+      var logicalW = W / dpr, logicalH = H / dpr;
+      ctx.save();
+      ctx.scale(dpr, dpr);
+
+      Object.values(members).forEach(function (m) {
+        if (m.compassX == null || m.compassY == null) return;
+        var byCategory = m.partyAlignmentByCategory;
+        if (!byCategory) return;
+        var alignment = byCategory[_issueFilter];
+        if (alignment == null) return;   // member has no votes in this category
+
+        var pos = dotPosition(m.compassX, m.compassY, logicalW, logicalH);
+
+        // Color: high alignment → dim (member toes party line)
+        //        low alignment  → vivid gold (member breaks with party)
+        // alignment is 0.0–1.0; heterodoxy = 1 - alignment
+        var heterodoxy = 1 - alignment;
+        var alpha = 0.15 + heterodoxy * 0.80;   // 0.15 (aligned) → 0.95 (divergent)
+        var radius = 3 + heterodoxy * 5;         // 3 (aligned) → 8 (divergent)
+
+        // Party-tinted ring: dim for aligned, gold glow for divergent
+        var r = Math.round(255 - heterodoxy * 60);
+        var g = Math.round(200 - heterodoxy * 80);
+        var b = Math.round(50 + heterodoxy * 30);
+
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+        ctx.fill();
+
+        // Bright ring on highly heterodox members (>40% cross-party)
+        if (heterodoxy > 0.4) {
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, radius + 2, 0, Math.PI * 2);
+          ctx.strokeStyle = "rgba(255,210,60," + (alpha * 0.8) + ")";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      });
+
+      ctx.restore();
+    }
+
+    // Re-draw overlay whenever React redraws the main canvas
+    // (React updates canvas dimensions on each render cycle)
+    var _overlayOb = new MutationObserver(function () {
+      overlay.width  = canvas.width;
+      overlay.height = canvas.height;
+      drawOverlay();
+    });
+    _overlayOb.observe(canvas, { attributes: true, attributeFilter: ["width", "height"] });
+
+    // Expose draw function so the dropdown can trigger it
+    canvas._cwDrawOverlay = drawOverlay;
+
+    // --- Issue filter dropdown ---
+    _buildIssueDropdown(container, canvas);
+  }
+
+  function _buildIssueDropdown(container, canvas) {
+    if (container.querySelector(".cw-issue-dropdown")) return;
+
+    var wrap = document.createElement("div");
+    wrap.className = "cw-issue-dropdown";
+    wrap.style.cssText =
+      "position:absolute;top:10px;right:12px;z-index:10;" +
+      "display:flex;align-items:center;gap:8px;";
+
+    var label = document.createElement("span");
+    label.textContent = "Color by issue:";
+    label.style.cssText =
+      "font-size:11px;color:rgba(205,237,246,0.70);white-space:nowrap;";
+
+    var select = document.createElement("select");
+    select.style.cssText =
+      "font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid rgba(94,177,191,0.40);" +
+      "background:rgba(9,72,74,0.85);color:rgba(205,237,246,0.90);cursor:pointer;" +
+      "appearance:auto;";
+
+    var defaultOpt = document.createElement("option");
+    defaultOpt.value = "";
+    defaultOpt.textContent = "— Off —";
+    select.appendChild(defaultOpt);
+
+    ISSUE_CATEGORIES.forEach(function (cat) {
+      var opt = document.createElement("option");
+      opt.value = cat.key;
+      opt.textContent = cat.label;
+      if (_issueFilter === cat.key) opt.selected = true;
+      select.appendChild(opt);
+    });
+
+    select.addEventListener("change", function () {
+      _issueFilter = select.value || null;
+      if (canvas._cwDrawOverlay) canvas._cwDrawOverlay();
+    });
+
+    wrap.appendChild(label);
+    wrap.appendChild(select);
+    container.appendChild(wrap);
+
+    // Draw immediately if a filter was already active
+    if (_issueFilter && canvas._cwDrawOverlay) canvas._cwDrawOverlay();
   }
 
   /* ---- 2b  Expandable vote items with party-line detection & filtering ---- */
