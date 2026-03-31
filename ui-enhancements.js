@@ -356,7 +356,7 @@
       var _nonDefault = _saved.current && _saved.current !== "current";
       if (_nonDefault) {
         _filterVeil = document.createElement("style");
-        _filterVeil.textContent = "#root { visibility: hidden !important; }";
+        _filterVeil.textContent = '[data-testid="input-member-search"], .divide-y { visibility: hidden !important; }';
         document.head.appendChild(_filterVeil);
       }
     } catch (e) { /* ignore */ }
