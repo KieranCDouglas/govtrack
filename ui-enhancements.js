@@ -1239,64 +1239,6 @@
   }
 
   /* -- Inject career-total yea/nay/NV stats into the Voting Record header -- */
-  function injectCareerVoteStats() {
-    // Find the Voting Record heading row
-    var h2 = null;
-    document.querySelectorAll("h2").forEach(function (el) {
-      if (el.textContent.trim() === "Voting Record") h2 = el;
-    });
-    if (!h2) return;
-
-    var headerRow = h2.closest(".flex.items-center.justify-between");
-    if (!headerRow || headerRow.dataset.cwCareer) return;
-
-    // Get career stats from member data
-    var hash = window.location.hash || "";
-    var match = hash.match(/^#\/members\/([A-Z]\d{5,6})$/);
-    if (!match) return;
-    var bio = match[1];
-    var member = window.__cwMembersData && window.__cwMembersData[bio];
-    if (!member) {
-      // Data not yet loaded — retry once it arrives
-      window.addEventListener("cwMembersLoaded", function onLoaded() {
-        window.removeEventListener("cwMembersLoaded", onLoaded);
-        injectCareerVoteStats();
-      });
-      return;
-    }
-
-    var yea   = member.careerYea  || 0;
-    var nay   = member.careerNay  || 0;
-    var nv    = member.careerNV   || 0;
-    var total = (member.numVotes  || 0) || (yea + nay + nv);
-    // Only inject if we have real career breakdown data (not just numVotes)
-    if (!member.careerYea && !member.careerNay) return;
-
-    // Participation = (yea+nay) / total — "present" and NV lower this rate
-    var participation = total > 0
-      ? Math.round((yea + nay) / total * 100)
-      : null;
-
-    // Replace the React-rendered stats div
-    var existingStats = headerRow.querySelector(".flex.gap-3");
-    if (existingStats) existingStats.remove();
-
-    var statsDiv = document.createElement("div");
-    statsDiv.className = "flex gap-3 text-xs text-muted-foreground";
-    statsDiv.innerHTML =
-      '<span style="color:hsl(var(--muted-foreground));font-size:10px;text-transform:uppercase;letter-spacing:0.05em;">Career:</span>' +
-      '<span style="color:hsl(var(--foreground));font-weight:600;">' + total.toLocaleString() + ' votes</span>' +
-      '<span style="color:#5eb1bf;font-weight:600;">' + yea.toLocaleString() + ' Yea</span>' +
-      '<span style="color:rgb(248 113 113);font-weight:600;">' + nay.toLocaleString() + ' Nay</span>' +
-      '<span style="color:rgb(148 163 184);">' + nv.toLocaleString() + ' NV</span>' +
-      (participation !== null
-        ? '<span style="color:#ef7b45;">' + participation + '% participation</span>'
-        : '');
-
-    headerRow.appendChild(statsDiv);
-    headerRow.dataset.cwCareer = "1";
-  }
-
   /* -- Main vote enhancement entry point -- */
   function enhanceVotes() {
     var voteSection = document.querySelector(".divide-y.divide-border\\/40");
