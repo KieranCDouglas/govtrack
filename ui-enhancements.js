@@ -1238,7 +1238,6 @@
     }, 0);
   }
 
-  /* -- Inject career-total yea/nay/NV stats into the Voting Record header -- */
   /* -- Main vote enhancement entry point -- */
   function enhanceVotes() {
     var voteSection = document.querySelector(".divide-y.divide-border\\/40");
@@ -1248,7 +1247,6 @@
 
     var memberParty = detectMemberParty();
     addVoteFilters(container, voteSection, memberParty);
-    injectCareerVoteStats();
 
     // enhance individual vote items
     voteSection.querySelectorAll(":scope > div").forEach(function (item) {
