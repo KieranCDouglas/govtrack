@@ -375,10 +375,13 @@ def update_members_current(congress, index):
             "lastCongress":     congress,
             "dim1":             round(dim1, 3) if dim1 is not None else None,
             "dim2":             round(dim2, 3) if dim2 is not None else None,
-            "numVotes":         career_stats.get(bio, {}).get("total", old.get("numVotes", 0)),
-            "careerYea":        career_stats.get(bio, {}).get("yea", 0),
-            "careerNay":        career_stats.get(bio, {}).get("nay", 0),
-            "careerNV":         career_stats.get(bio, {}).get("nv", 0),
+            # Preserve career stats from old file if CI only has partial vote history.
+            # max() ensures a fresh CI run (with only 1-2 congress vote files) never
+            # overwrites the full career totals computed locally from all 238 files.
+            "numVotes":         max(career_stats.get(bio, {}).get("total", 0), old.get("numVotes", 0)),
+            "careerYea":        max(career_stats.get(bio, {}).get("yea", 0),   old.get("careerYea", 0)),
+            "careerNay":        max(career_stats.get(bio, {}).get("nay", 0),   old.get("careerNay", 0)),
+            "careerNV":         max(career_stats.get(bio, {}).get("nv", 0),    old.get("careerNV", 0)),
             "compassX":         compass_x,
             "compassY":         compass_y,
             # LLM score fields
