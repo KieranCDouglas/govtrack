@@ -348,13 +348,15 @@
 
     // If a non-default filter is saved, hide the member grid immediately to
     // prevent the flash of default (current-only) results before restore runs.
+    // The veil is created synchronously here (not inside the polling interval)
+    // so it is in the DOM before React renders any member rows.
     var _filterVeil = null;
     try {
       var _saved = JSON.parse(sessionStorage.getItem(FILTER_KEY) || "{}");
       var _nonDefault = _saved.current && _saved.current !== "current";
       if (_nonDefault) {
         _filterVeil = document.createElement("style");
-        _filterVeil.textContent = ".divide-y.divide-border\\/50 { visibility: hidden !important; }";
+        _filterVeil.textContent = "#root { visibility: hidden !important; }";
         document.head.appendChild(_filterVeil);
       }
     } catch (e) { /* ignore */ }
@@ -369,14 +371,14 @@
         if (input) {
           _restoreFilters();
           _startFilterTracking();
-          // Lift the veil after a short delay — enough for React to re-query
-          // with the restored filter before the grid becomes visible.
-          if (_filterVeil) {
-            setTimeout(function () {
-              if (_filterVeil.parentNode) _filterVeil.parentNode.removeChild(_filterVeil);
-              _filterVeil = null;
-            }, 350);
-          }
+        }
+        // Lift the veil after a short delay — enough for React to re-query
+        // with the restored filter before the grid becomes visible.
+        if (_filterVeil) {
+          setTimeout(function () {
+            if (_filterVeil.parentNode) _filterVeil.parentNode.removeChild(_filterVeil);
+            _filterVeil = null;
+          }, 400);
         }
       }
     }, 100);
