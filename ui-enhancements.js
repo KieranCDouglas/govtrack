@@ -264,9 +264,20 @@
       _lastCurrentFilter = filters.current;
       var switchingFormer = (filters.current === "former" || prev === "former");
       if (switchingFormer && prev !== null) {
-        // Save the intended filter state before reloading so it restores correctly
-        sessionStorage.setItem(FILTER_KEY, JSON.stringify(filters));
         window.__cwFormerMode = (filters.current === "former");
+        // If returning to default (current), clear sessionStorage so the restore
+        // step after reload finds nothing and leaves the select at its default.
+        var isNowDefault =
+          !filters.search &&
+          filters.chamber === "all" &&
+          filters.party === "all" &&
+          filters.state === "all" &&
+          filters.current === "current";
+        if (isNowDefault) {
+          sessionStorage.removeItem(FILTER_KEY);
+        } else {
+          sessionStorage.setItem(FILTER_KEY, JSON.stringify(filters));
+        }
         window.location.reload();
         return;
       }
