@@ -205,6 +205,68 @@ EXCLUDE_CURRENT = {
 }
 
 
+def compute_career_vote_stats(members, index):
+    """Compute career-total yea/nay/NV/total for each current member from local Voteview files.
+
+    Voteview cast codes:
+      1 = Yea (also 2=Paired Yea, 3=Announced Yea — counted as Yea)
+      4 = Announced Nay, 5 = Paired Nay, 6 = Nay — counted as Nay
+      7 = Present
+      8 = Not Voting
+      9 = Not Voting / absent
+      0 = Not a member that congress (excluded)
+
+    Reads every H*.json and S*.json in data/votes/ to cover the full career.
+    Uses the ICPSR in members-index to match vote strings to members.
+    """
+    print("=== Computing career vote stats from Voteview files ===")
+
+    # Build ICPSR -> bioguide map from full index
+    icpsr_to_bio = {str(m["i"]): m["b"] for m in index if m.get("i")}
+
+    # Also build set of current member bioguides for quick lookup
+    current_bios = {m["b"] for m in members}
+
+    # Accumulators: bio -> [yea, nay, nv, present]
+    stats = {bio: [0, 0, 0, 0] for bio in current_bios}
+
+    files = sorted(
+        f for f in os.listdir(VOTES_DIR)
+        if f.endswith(".json") and (f.startswith("H") or f.startswith("S"))
+    )
+
+    for fname in files:
+        try:
+            with open(os.path.join(VOTES_DIR, fname)) as f:
+                data = json.load(f)
+        except Exception:
+            continue
+
+        for icpsr, vote_str in data.get("v", {}).items():
+            bio = icpsr_to_bio.get(icpsr)
+            if not bio or bio not in stats:
+                continue
+            s = stats[bio]
+            for code in vote_str:
+                if code in ("1", "2", "3"):
+                    s[0] += 1  # yea
+                elif code in ("4", "5", "6"):
+                    s[1] += 1  # nay
+                elif code in ("8", "9"):
+                    s[2] += 1  # nv
+                elif code == "7":
+                    s[3] += 1  # present
+
+    result = {}
+    for bio, (yea, nay, nv, present) in stats.items():
+        total = yea + nay + nv + present
+        result[bio] = {"yea": yea, "nay": nay, "nv": nv, "present": present, "total": total}
+
+    matched = sum(1 for v in result.values() if v["total"] > 0)
+    print(f"  Done: {matched}/{len(current_bios)} current members have vote data across {len(files)} files")
+    return result
+
+
 def update_members_current(congress, index):
     """Generate members-current.json for app's compass/detail pages."""
     print("=== Updating members-current.json ===")
@@ -255,6 +317,9 @@ def update_members_current(congress, index):
         print("  WARNING: member-metrics.json not found, policyFingerprint will be empty")
 
     party_names = {"D": "Democrat", "R": "Republican", "O": "Independent"}
+
+    # Compute career vote stats from local Voteview files
+    career_stats = compute_career_vote_stats(current, index)
 
     members_out = []
     score_source_counts = {"llm": 0, "social_votes": 0, "nominate": 0}
@@ -310,7 +375,10 @@ def update_members_current(congress, index):
             "lastCongress":     congress,
             "dim1":             round(dim1, 3) if dim1 is not None else None,
             "dim2":             round(dim2, 3) if dim2 is not None else None,
-            "numVotes":         old.get("numVotes", 0),
+            "numVotes":         career_stats.get(bio, {}).get("total", old.get("numVotes", 0)),
+            "careerYea":        career_stats.get(bio, {}).get("yea", 0),
+            "careerNay":        career_stats.get(bio, {}).get("nay", 0),
+            "careerNV":         career_stats.get(bio, {}).get("nv", 0),
             "compassX":         compass_x,
             "compassY":         compass_y,
             # LLM score fields

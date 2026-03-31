@@ -17,6 +17,15 @@
 
   var CONGRESS = 119;
 
+  // Set __cwFormerMode from sessionStorage before any fetches fire, so the
+  // members-index.json interceptor can filter correctly on page load.
+  try {
+    var _sf = JSON.parse(sessionStorage.getItem("cw-member-filters") || "{}");
+    window.__cwFormerMode = (_sf.current === "former");
+  } catch (e) {
+    window.__cwFormerMode = false;
+  }
+
   var originalFetch = window.fetch;
 
   function _exposeLastNames(members) {
@@ -31,6 +40,24 @@
       }
     });
     window.dispatchEvent(new CustomEvent("cwMembersLoaded"));
+  }
+
+  /**
+   * Build a sorted, optionally filtered Response for members-index.json.
+   * Strips congress-119 members when window.__cwFormerMode is true.
+   */
+  function _buildIndexResponse(data) {
+    var output = window.__cwFormerMode
+      ? data.filter(function (m) { return m.l !== CONGRESS; })
+      : data;
+    var sorted = output.slice().sort(function (a, b) {
+      var la = ((a.n || "").trim().split(/\s+/)[0] || "").toLowerCase();
+      var lb = ((b.n || "").trim().split(/\s+/)[0] || "").toLowerCase();
+      return la.localeCompare(lb);
+    });
+    return new Response(JSON.stringify(sorted), {
+      status: 200, headers: { "Content-Type": "application/json" }
+    });
   }
 
   /**
@@ -105,7 +132,10 @@
       });
     }
 
-    // Cache members-index.json, sort by last name, then return sorted response to React
+    // Cache members-index.json, sort by first name, then return sorted response to React.
+    // When "Former only" mode is active (window.__cwFormerMode), strip current-congress
+    // members. __cwFormerMode is set from sessionStorage before any fetches fire, and a
+    // page reload is triggered whenever the filter switches to/from "former".
     if (url.indexOf("members-index.json") !== -1) {
       return originalFetch.apply(window, arguments).then(function (resp) {
         return resp.json().then(function (data) {
@@ -125,16 +155,8 @@
               }
             });
             window.dispatchEvent(new CustomEvent("cwMembersLoaded"));
-            // Sort by first name before handing data to React
-            data.sort(function (a, b) {
-              var la = ((a.n || "").trim().split(/\s+/)[0] || "").toLowerCase();
-              var lb = ((b.n || "").trim().split(/\s+/)[0] || "").toLowerCase();
-              return la.localeCompare(lb);
-            });
           }
-          return new Response(JSON.stringify(data), {
-            status: 200, headers: { "Content-Type": "application/json" }
-          });
+          return _buildIndexResponse(data);
         });
       });
     }

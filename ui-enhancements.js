@@ -238,6 +238,8 @@
     return h === "#/members" || h === "#/members/";
   }
 
+  var _lastCurrentFilter = null;
+
   function _saveFilters() {
     if (!_isOnMembersList()) return;
 
@@ -253,6 +255,23 @@
       state: _readSelect("select-state") || "all",
       current: _readSelect("select-current") || "current",
     };
+
+    // When switching to/from "former", a full reload is needed because the bundle
+    // caches the members-index in memory (Pe) after the first fetch. A reload lets
+    // data-loader.js intercept the fresh fetch with __cwFormerMode already set.
+    if (filters.current !== _lastCurrentFilter) {
+      var prev = _lastCurrentFilter;
+      _lastCurrentFilter = filters.current;
+      var switchingFormer = (filters.current === "former" || prev === "former");
+      if (switchingFormer && prev !== null) {
+        // Save the intended filter state before reloading so it restores correctly
+        sessionStorage.setItem(FILTER_KEY, JSON.stringify(filters));
+        window.__cwFormerMode = (filters.current === "former");
+        window.location.reload();
+        return;
+      }
+      window.__cwFormerMode = (filters.current === "former");
+    }
 
     var isDefault =
       !filters.search &&
@@ -326,18 +345,38 @@
       _stopFilterTracking();
       return;
     }
+
+    // If a non-default filter is saved, hide the member grid immediately to
+    // prevent the flash of default (current-only) results before restore runs.
+    var _filterVeil = null;
+    try {
+      var _saved = JSON.parse(sessionStorage.getItem(FILTER_KEY) || "{}");
+      var _nonDefault = _saved.current && _saved.current !== "current";
+      if (_nonDefault) {
+        _filterVeil = document.createElement("style");
+        _filterVeil.textContent = ".divide-y.divide-border\\/50 { visibility: hidden !important; }";
+        document.head.appendChild(_filterVeil);
+      }
+    } catch (e) { /* ignore */ }
+
     // Wait for React to mount the filter controls
     var attempts = 0;
     var waitId = setInterval(function () {
       attempts++;
-      var input = document.querySelector(
-        '[data-testid="input-member-search"]'
-      );
+      var input = document.querySelector('[data-testid="input-member-search"]');
       if (input || attempts > 20) {
         clearInterval(waitId);
         if (input) {
           _restoreFilters();
           _startFilterTracking();
+          // Lift the veil after a short delay — enough for React to re-query
+          // with the restored filter before the grid becomes visible.
+          if (_filterVeil) {
+            setTimeout(function () {
+              if (_filterVeil.parentNode) _filterVeil.parentNode.removeChild(_filterVeil);
+              _filterVeil = null;
+            }, 350);
+          }
         }
       }
     }, 100);
@@ -992,7 +1031,7 @@
       });
 
       var showingEnd = Math.min(end, totalMatching);
-      countEl.textContent = totalMatching + " votes";
+      countEl.textContent = "";
 
       // Update pagination bar
       pageInfo.textContent = "Page " + (currentPage + 1) + " of " + totalPages;
@@ -1036,6 +1075,62 @@
     }, 0);
   }
 
+  /* -- Inject career-total yea/nay/NV stats into the Voting Record header -- */
+  function injectCareerVoteStats() {
+    // Find the Voting Record heading row
+    var h2 = null;
+    document.querySelectorAll("h2").forEach(function (el) {
+      if (el.textContent.trim() === "Voting Record") h2 = el;
+    });
+    if (!h2) return;
+
+    var headerRow = h2.closest(".flex.items-center.justify-between");
+    if (!headerRow || headerRow.dataset.cwCareer) return;
+
+    // Get career stats from member data
+    var hash = window.location.hash || "";
+    var match = hash.match(/^#\/members\/([A-Z]\d{5,6})$/);
+    if (!match) return;
+    var bio = match[1];
+    var member = window.__cwMembersData && window.__cwMembersData[bio];
+    if (!member) {
+      // Data not yet loaded — retry once it arrives
+      window.addEventListener("cwMembersLoaded", function onLoaded() {
+        window.removeEventListener("cwMembersLoaded", onLoaded);
+        injectCareerVoteStats();
+      });
+      return;
+    }
+
+    var yea   = member.careerYea  || 0;
+    var nay   = member.careerNay  || 0;
+    var nv    = member.careerNV   || 0;
+    var total = (member.numVotes  || 0) || (yea + nay + nv);
+    // Only inject if we have real career breakdown data (not just numVotes)
+    if (!member.careerYea && !member.careerNay) return;
+
+    var participation = total > 0
+      ? Math.round((yea + nay) / total * 100)
+      : null;
+
+    // Replace the React-rendered stats div
+    var existingStats = headerRow.querySelector(".flex.gap-3");
+    if (existingStats) existingStats.remove();
+
+    var statsDiv = document.createElement("div");
+    statsDiv.className = "flex gap-3 text-xs text-muted-foreground";
+    statsDiv.innerHTML =
+      '<span style="color:#5eb1bf;font-weight:600;">' + yea.toLocaleString() + ' Yea</span>' +
+      '<span style="color:rgb(248 113 113);font-weight:600;">' + nay.toLocaleString() + ' Nay</span>' +
+      '<span style="color:rgb(148 163 184);">' + nv.toLocaleString() + ' NV</span>' +
+      (participation !== null
+        ? '<span style="color:#ef7b45;">' + participation + '% participation</span>'
+        : '');
+
+    headerRow.appendChild(statsDiv);
+    headerRow.dataset.cwCareer = "1";
+  }
+
   /* -- Main vote enhancement entry point -- */
   function enhanceVotes() {
     var voteSection = document.querySelector(".divide-y.divide-border\\/40");
@@ -1045,6 +1140,7 @@
 
     var memberParty = detectMemberParty();
     addVoteFilters(container, voteSection, memberParty);
+    injectCareerVoteStats();
 
     // enhance individual vote items
     voteSection.querySelectorAll(":scope > div").forEach(function (item) {
