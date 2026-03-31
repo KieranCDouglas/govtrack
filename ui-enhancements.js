@@ -1272,6 +1272,7 @@
     // Only inject if we have real career breakdown data (not just numVotes)
     if (!member.careerYea && !member.careerNay) return;
 
+    // Participation = (yea+nay) / total — "present" and NV lower this rate
     var participation = total > 0
       ? Math.round((yea + nay) / total * 100)
       : null;
@@ -1284,6 +1285,7 @@
     statsDiv.className = "flex gap-3 text-xs text-muted-foreground";
     statsDiv.innerHTML =
       '<span style="color:hsl(var(--muted-foreground));font-size:10px;text-transform:uppercase;letter-spacing:0.05em;">Career:</span>' +
+      '<span style="color:hsl(var(--foreground));font-weight:600;">' + total.toLocaleString() + ' votes</span>' +
       '<span style="color:#5eb1bf;font-weight:600;">' + yea.toLocaleString() + ' Yea</span>' +
       '<span style="color:rgb(248 113 113);font-weight:600;">' + nay.toLocaleString() + ' Nay</span>' +
       '<span style="color:rgb(148 163 184);">' + nv.toLocaleString() + ' NV</span>' +
