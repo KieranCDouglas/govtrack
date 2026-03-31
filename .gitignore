@@ -58,7 +58,7 @@ assets/index-*.css
 assets/ui-vendor-*.js
 assets/query-vendor-*.js
 # Allow the specific deployed files
-!assets/index-C3q1xJnh.js
-!assets/index-htUumT3l.css
-!assets/ui-vendor-b_2lAFDP.js
+!assets/index-DafP_ezV.js
+!assets/index-CLavar-I.css
+!assets/ui-vendor-CwtEd5It.js
 !assets/query-vendor-4pY_VIt9.js
