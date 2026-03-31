@@ -512,7 +512,8 @@
       for (var i = 0; i < results.length; i++) {
         var data = results[i];
         if (!data) continue;
-        var voteStr = (data.v || {})[icpsr];
+        // Keys may be stored as "15039.0" (float-stringified) or "15039" — try both
+        var voteStr = (data.v || {})[icpsr] || (data.v || {})[icpsr + ".0"];
         if (!voteStr) continue;
         var rollcalls = data.r || [];
         // Determine chamber and congress from fetch index
