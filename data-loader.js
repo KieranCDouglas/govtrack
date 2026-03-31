@@ -373,6 +373,120 @@
   }
 
   /**
+   * Curated landmark votes for congresses 114–118.
+   * Key: "<chamber initial><congress>_<rollnum>"  e.g. "H118_242"
+   * Value: human-readable title shown in the voting record.
+   *
+   * For members whose lastCongress is in 114–118 we show only these votes.
+   * For members whose lastCongress < 114 we show nothing (bio + scores only).
+   */
+  var LANDMARK_VOTES = {
+    // ── 114th Congress ────────────────────────────────────────────────────────
+    // House
+    "H114_707": "ACA Reconciliation Repeal (H.R. 3762)",
+    "H114_74":  "Keystone XL Pipeline Approval (S. 1)",
+    "H114_223": "USA FREEDOM Act — End NSA Bulk Collection (H.R. 2048)",
+    "H114_662": "Every Student Succeeds Act — Replace No Child Left Behind (S. 1177)",
+    "H114_670": "FAST Act — 5-Year Highway & Transit Reauthorization (H.R. 22)",
+    "H114_360": "Trade Promotion Authority — Fast-Track for TPP (H.R. 1314)",
+    "H114_577": "Bipartisan Budget Act of 2015 — Debt Ceiling & Spending Caps (H.R. 1314)",
+    "H114_1292":"21st Century Cures Act (H.R. 34)",
+    "H114_1264":"JASTA — Allow 9/11 Families to Sue Saudi Arabia (S. 2040)",
+    "H114_225": "Iran Nuclear Agreement Review Act (H.R. 1191)",
+    // Senate
+    "S114_312": "ACA Reconciliation Repeal — Senate Passage (H.R. 3762)",
+    "S114_98":  "Iran Nuclear Agreement Review Act — Senate Passage (H.R. 1191)",
+    "S114_193": "Trade Promotion Authority — Senate Passage (H.R. 1314)",
+    "S114_436": "Every Student Succeeds Act — Senate Passage (S. 1177)",
+    "S114_49":  "Keystone XL Pipeline — Senate Passage (S. 1)",
+    "S114_220": "JASTA Veto Override — Senate (S. 2040)",
+    "S114_120": "USA FREEDOM Act — Senate Passage (H.R. 2048)",
+    "S114_264": "Bipartisan Budget Act of 2015 — Senate Passage",
+    "S114_382": "21st Century Cures Act — Senate Passage (H.R. 34)",
+    "S114_468": "CARA — Comprehensive Addiction & Recovery Act (S. 524)",
+
+    // ── 115th Congress ────────────────────────────────────────────────────────
+    // House
+    "H115_636": "Tax Cuts and Jobs Act — House Initial Passage (H.R. 1)",
+    "H115_691": "Tax Cuts and Jobs Act — Conference Report (H.R. 1)",
+    "H115_255": "American Health Care Act — ACA Replacement (H.R. 1628)",
+    "H115_412": "CAATSA — Russia/Iran/North Korea Sanctions (H.R. 3364)",
+    "H115_1155":"First Step Act — Criminal Justice Reform (S. 756)",
+    "H115_991": "Farm Bill — Agriculture Improvement Act of 2018 (H.R. 2)",
+    "H115_265": "Bipartisan Budget Act of 2018 — Raise Spending Caps (H.R. 1892)",
+    // Senate
+    "S115_303": "Tax Cuts and Jobs Act — Senate Passage (H.R. 1)",
+    "S115_261": "ACA 'Skinny Repeal' — Health Care Freedom Act",
+    "S115_111": "Gorsuch Supreme Court Confirmation (PN55)",
+    "S115_548": "Kavanaugh Supreme Court Confirmation (PN2259)",
+    "S115_175": "CAATSA — Russia/Iran/NK Sanctions — Senate Passage (H.R. 3364)",
+    "S115_356": "Bipartisan Budget Act of 2018 — Senate Passage (H.R. 1892)",
+    "S115_596": "First Step Act — Criminal Justice Reform — Senate Passage (S. 756)",
+
+    // ── 116th Congress ────────────────────────────────────────────────────────
+    // House
+    "H116_694": "First Impeachment of Trump — Abuse of Power (H.Res. 755)",
+    "H116_695": "First Impeachment of Trump — Obstruction of Congress (H.Res. 755)",
+    "H116_492": "CARES Act — $2.2T COVID Relief (H.R. 748)",
+    "H116_808": "HEROES Act — $3T Follow-On COVID Relief (H.R. 6800)",
+    "H116_700": "USMCA — Replace NAFTA (H.R. 5430)",
+    "H116_510": "Bipartisan Budget Act of 2019 — Suspend Debt Ceiling (H.R. 3877)",
+    // Senate
+    "S116_461": "First Impeachment Trial — Acquittal on Abuse of Power (H.Res. 755)",
+    "S116_508": "CARES Act — $2.2T COVID Relief — Senate Passage (H.R. 748)",
+    "S116_442": "USMCA — Replace NAFTA — Senate Passage (H.R. 5430)",
+    "S116_652": "Barrett Supreme Court Confirmation (PN2252)",
+    "S116_504": "COVID-19 Families First Emergency Paid Leave Act (H.R. 6201)",
+    "S116_473": "Bipartisan Budget Act of 2019 — Senate Passage (H.R. 3877)",
+
+    // ── 117th Congress ────────────────────────────────────────────────────────
+    // House
+    "H117_16":  "Second Impeachment of Trump — Incitement of Insurrection (H.Res. 24)",
+    "H117_48":  "American Rescue Plan Act — $1.9T COVID Relief (H.R. 1319)",
+    "H117_368": "Infrastructure Investment & Jobs Act — Bipartisan Infrastructure Law (H.R. 3684)",
+    "H117_867": "Inflation Reduction Act — Climate, Health, Deficit (H.R. 5376)",
+    "H117_384": "Build Back Better Act — Social Policy Spending (H.R. 5376)",
+    "H117_746": "Bipartisan Safer Communities Act — First Federal Gun Safety Law in 30 Years (S. 2938)",
+    "H117_851": "CHIPS and Science Act — Semiconductor Manufacturing (H.R. 4346)",
+    "H117_996": "Consolidated Appropriations Act 2023 / Electoral Count Reform (H.R. 2617)",
+    "H117_820": "Respect for Marriage Act — Codify Same-Sex Marriage (H.R. 8404)",
+    // Senate
+    "S117_59":  "Second Impeachment Trial — Acquittal on Incitement of Insurrection (H.Res. 24)",
+    "S117_853": "Inflation Reduction Act — Senate Passage (H.R. 5376)",
+    "S117_110": "American Rescue Plan Act — Senate Passage (H.R. 1319)",
+    "S117_314": "Infrastructure Investment & Jobs Act — Senate Passage (H.R. 3684)",
+    "S117_768": "Bipartisan Safer Communities Act — Senate Passage (S. 2938)",
+    "S117_799": "CHIPS and Science Act — Senate Passage (H.R. 4346)",
+    "S117_936": "Consolidated Appropriations Act 2023 / Electoral Count Reform (H.R. 2617)",
+    "S117_890": "Respect for Marriage Act — Senate Passage (H.R. 8404)",
+
+    // ── 118th Congress ────────────────────────────────────────────────────────
+    // House
+    "H118_216": "Election of Kevin McCarthy as Speaker (15th Ballot)",
+    "H118_242": "Fiscal Responsibility Act — Avert U.S. Default (H.R. 3746)",
+    "H118_518": "Ouster of Speaker Kevin McCarthy (H.Res. 757)",
+    "H118_761": "Impeachment of DHS Secretary Mayorkas (H.Res. 863)",
+    "H118_686": "Expulsion of Rep. George Santos (H.Res. 878)",
+    "H118_804": "TikTok Forced Divestiture Act (H.R. 7521)",
+    "H118_837": "FISA Section 702 Reauthorization (H.R. 7888)",
+    "H118_1174":"Social Security Fairness Act — Repeal WEP/GPO (H.R. 82)",
+    "H118_750": "FY2024 Full-Year Appropriations (H.R. 2882)",
+    "H118_718": "FY2024 National Defense Authorization Act (H.R. 2670)",
+    // Senate
+    "S118_146": "Fiscal Responsibility Act — Senate Passage (H.R. 3746)",
+    "S118_400": "Ukraine-Israel-Taiwan Aid Package — Senate Passage (H.R. 815)",
+    "S118_502": "FISA Section 702 Reauthorization — Senate Passage (H.R. 7888)",
+    "S118_690": "Social Security Fairness Act — Senate Passage (H.R. 82)",
+    "S118_343": "FY2024 NDAA Conference Report (H.R. 2670)",
+    "S118_534": "Bipartisan Border Bill — Cloture Failed (S. 4361)",
+    "S118_289": "FY2024 NDAA — Senate Passage (H.R. 2670)",
+  };
+
+  /** Congresses covered by landmark curation */
+  var LANDMARK_MIN_CONGRESS = 114;
+  var LANDMARK_MAX_CONGRESS = 118;
+
+  /**
    * Fetch votes for a member from static Voteview files (data/votes/H*.json, S*.json).
    * Used for former members who have no GovTrack presence.
    * icpsr: string ICPSR number; firstCongress/lastCongress: range to fetch.
@@ -450,9 +564,30 @@
       var fc = memberInfo.fc || memberInfo.l;
       var lc = memberInfo.l || fc;
       console.log("[Civicism] Loading Voteview votes for", bioguideId, "ICPSR:", icpsr, "congresses:", fc, "-", lc);
-      return fetchVoteviewVotes(icpsr, fc, lc).then(function(votes) {
-        console.log("[Civicism] Loaded", votes.length, "Voteview votes for", bioguideId);
-        return { votes: votes, source: "voteview.com", totalCount: votes.length };
+
+      // Members who left before the curated era get no vote list
+      if (lc < LANDMARK_MIN_CONGRESS) {
+        return Promise.resolve({ votes: [], source: "none", totalCount: 0 });
+      }
+
+      // Only fetch congresses within the curated range
+      var fetchFrom = Math.max(fc, LANDMARK_MIN_CONGRESS);
+      var fetchTo   = Math.min(lc, LANDMARK_MAX_CONGRESS);
+
+      return fetchVoteviewVotes(icpsr, fetchFrom, fetchTo).then(function(votes) {
+        // Filter to curated landmark votes only, and replace billTitle with the
+        // human-readable name from the lookup table.
+        var landmark = votes.filter(function(v) {
+          var chamberCode = (v.chamber === "Senate") ? "S" : "H";
+          var key = chamberCode + v.congress + "_" + v.voteId;
+          return LANDMARK_VOTES.hasOwnProperty(key);
+        }).map(function(v) {
+          var chamberCode = (v.chamber === "Senate") ? "S" : "H";
+          var key = chamberCode + v.congress + "_" + v.voteId;
+          return Object.assign({}, v, { billTitle: LANDMARK_VOTES[key] });
+        });
+        console.log("[Civicism] Loaded", landmark.length, "landmark votes for", bioguideId);
+        return { votes: landmark, source: "voteview.com", totalCount: landmark.length };
       });
     }
 
