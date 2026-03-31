@@ -379,10 +379,14 @@
    */
   window.__cwLoadVotes = function (bioguideId, govtrackId) {
     console.log("[Civicism] __cwLoadVotes called:", bioguideId, "govtrackId:", govtrackId);
-    // Resolve govtrackId if not provided
-    var idPromise = govtrackId
-      ? Promise.resolve(govtrackId)
-      : lookupGovTrackId(bioguideId);
+    // Former members without a govtrackId cannot be resolved via the GovTrack
+    // person API (CORS blocks cross-origin requests from GitHub Pages). Return
+    // empty votes rather than throwing a CORS error.
+    if (!govtrackId) {
+      console.log("[Civicism] No govtrackId for", bioguideId, "— skipping GovTrack lookup");
+      return Promise.resolve({ votes: [], source: "none", totalCount: 0 });
+    }
+    var idPromise = Promise.resolve(govtrackId);
 
     return idPromise.then(function (resolvedId) {
       console.log("[Civicism] Fetching votes from GovTrack API for person", resolvedId);
