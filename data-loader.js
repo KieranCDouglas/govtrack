@@ -13,7 +13,7 @@
  */
 (function () {
   "use strict";
-  console.log("[Civicism] data-loader.js v20260330a loaded");
+  console.log("[Civicism] data-loader.js v20260330b loaded");
 
   var CONGRESS = 119;
 
@@ -373,19 +373,89 @@
   }
 
   /**
+   * Fetch votes for a member from static Voteview files (data/votes/H*.json, S*.json).
+   * Used for former members who have no GovTrack presence.
+   * icpsr: string ICPSR number; firstCongress/lastCongress: range to fetch.
+   */
+  function fetchVoteviewVotes(icpsr, firstCongress, lastCongress) {
+    var CAST = { "1":"Yes","2":"Yes","3":"Yes","4":"No","5":"No","6":"No","7":"Present","8":"Not Voting","9":"Not Voting" };
+    var chambers = ["H", "S"];
+    var fetches = [];
+
+    for (var cong = firstCongress; cong <= lastCongress; cong++) {
+      for (var ci = 0; ci < chambers.length; ci++) {
+        fetches.push((function(chamber, congress) {
+          var url = "./data/votes/" + chamber + congress + ".json";
+          return originalFetch.call(window, url)
+            .then(function(r) { return r.ok ? r.json() : null; })
+            .catch(function() { return null; });
+        })(chambers[ci], cong));
+      }
+    }
+
+    return Promise.all(fetches).then(function(results) {
+      var votes = [];
+      for (var i = 0; i < results.length; i++) {
+        var data = results[i];
+        if (!data) continue;
+        var voteStr = (data.v || {})[icpsr];
+        if (!voteStr) continue;
+        var rollcalls = data.r || [];
+        // Determine chamber and congress from fetch index
+        var fileIdx = i;
+        var congress = firstCongress + Math.floor(fileIdx / 2);
+        var chamber = (fileIdx % 2 === 0) ? "House" : "Senate";
+        for (var j = 0; j < rollcalls.length && j < voteStr.length; j++) {
+          var code = voteStr[j];
+          if (code === "0") continue; // not a member that congress
+          var rc = rollcalls[j];
+          // rc: [rollnum, date, bill_number, question, result, yea, nay, desc]
+          votes.push({
+            question:   rc[3] || "Roll Call Vote",
+            position:   CAST[code] || "Not Voting",
+            voteDate:   rc[1] || "",
+            result:     rc[4] || undefined,
+            billId:     rc[2] || undefined,
+            billTitle:  rc[7] || undefined,
+            chamber:    chamber,
+            congress:   congress,
+            voteId:     rc[0],
+            totalPlus:  rc[5] || 0,
+            totalMinus: rc[6] || 0,
+            _source:    "voteview"
+          });
+        }
+      }
+      // Sort newest first
+      votes.sort(function(a, b) { return (b.voteDate || "").localeCompare(a.voteDate || ""); });
+      return votes;
+    });
+  }
+
+  /**
    * Global hook called by the bundle's ra() function.
-   * Uses GovTrack API as the sole vote data source.
-   * If govtrackId is missing, resolves it via person lookup first.
+   * Uses GovTrack API for current members, Voteview static files for former members.
    */
   window.__cwLoadVotes = function (bioguideId, govtrackId) {
     console.log("[Civicism] __cwLoadVotes called:", bioguideId, "govtrackId:", govtrackId);
-    // Former members without a govtrackId cannot be resolved via the GovTrack
-    // person API (CORS blocks cross-origin requests from GitHub Pages). Return
-    // empty votes rather than throwing a CORS error.
+
+    // Former members: serve votes from static Voteview files
     if (!govtrackId) {
-      console.log("[Civicism] No govtrackId for", bioguideId, "— skipping GovTrack lookup");
-      return Promise.resolve({ votes: [], source: "none", totalCount: 0 });
+      var memberInfo = _membersIndex && _membersIndex.find(function(m) { return m.b === bioguideId; });
+      if (!memberInfo) {
+        console.log("[Civicism] No index entry for", bioguideId);
+        return Promise.resolve({ votes: [], source: "none", totalCount: 0 });
+      }
+      var icpsr = String(memberInfo.i);
+      var fc = memberInfo.fc || memberInfo.l;
+      var lc = memberInfo.l || fc;
+      console.log("[Civicism] Loading Voteview votes for", bioguideId, "ICPSR:", icpsr, "congresses:", fc, "-", lc);
+      return fetchVoteviewVotes(icpsr, fc, lc).then(function(votes) {
+        console.log("[Civicism] Loaded", votes.length, "Voteview votes for", bioguideId);
+        return { votes: votes, source: "voteview.com", totalCount: votes.length };
+      });
     }
+
     var idPromise = Promise.resolve(govtrackId);
 
     return idPromise.then(function (resolvedId) {
