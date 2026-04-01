@@ -91,7 +91,6 @@
     setTimeout(run, 600);
 
     function run() {
-      addCompassLegends();
       enhanceVotes();
       enhanceRecentVotes();
       injectMemberSummary();
@@ -622,50 +621,6 @@
     });
   }
 
-  /* ---- 2a  Compass axis-explanation boxes ---- */
-
-  function addCompassLegends() {
-    document.querySelectorAll("canvas").forEach(function (cv) {
-      var par = cv.parentElement;
-      if (!par) return;
-      if (par.querySelector(".cw-legend")) return;
-
-      // only target compass canvases
-      var isCompass =
-        (cv.width >= 200 && cv.height >= 180) ||
-        (par.closest && par.closest(".bg-card") &&
-         par.textContent.indexOf("Ideological") !== -1);
-      // also match the full compass page canvas (large canvas, often > 500px)
-      if (!isCompass && cv.width >= 500) isCompass = true;
-      if (!isCompass) return;
-
-      var box = document.createElement("div");
-      box.className = "cw-legend";
-      box.style.cssText =
-        "display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;font-size:11px;" +
-        "margin-top:10px;padding:10px 14px;border-radius:8px;" +
-        "background:hsl(var(--card));border:1px solid hsl(var(--border));";
-
-      box.innerHTML =
-        '<div style="display:flex;align-items:center;gap:5px;">' +
-          '<span style="color:hsl(var(--primary));font-weight:600;">\u25c2 \u25b8</span>' +
-          '<span style="color:hsl(var(--muted-foreground));">Economic: Progressive (\u22121) \u2013 Conservative (+1)</span>' +
-        '</div>' +
-        '<div style="display:flex;align-items:center;gap:5px;">' +
-          '<span style="color:hsl(var(--primary));font-weight:600;">\u25b4 \u25be</span>' +
-          '<span style="color:hsl(var(--muted-foreground));">Social: Progressive (\u22121) \u2013 Conservative (+1)</span>' +
-        '</div>';
-
-      // insert after the existing description <p>, or after canvas
-      var desc = par.querySelector("p.text-xs");
-      if (desc && desc.parentElement === par) {
-        desc.replaceWith(box);
-      } else {
-        par.appendChild(box);
-      }
-    });
-  }
-
   /* ---- 2c  Full compass page: block pan/zoom, polish container ---- */
 
   function enhanceCompassPage() {
@@ -693,11 +648,6 @@
     if (!container || container._cwCompassStyled) return;
     container._cwCompassStyled = true;
     container.style.position = "relative";
-    container.style.borderRadius = "16px";
-    container.style.border = "1px solid rgba(94,177,191,0.35)";
-    container.style.boxShadow =
-      "0 8px 40px rgba(0,0,0,0.45), 0 2px 10px rgba(0,0,0,0.25), " +
-      "inset 0 1px 0 rgba(94,177,191,0.15)";
 
   }
 
