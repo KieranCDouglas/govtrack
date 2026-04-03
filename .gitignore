@@ -51,7 +51,7 @@ build/
 source/
 
 # Build outputs that don't match deployed assets
-# The deployed bundle is index-C3q1xJnh.js / ui-vendor-b_2lAFDP.js
+# The deployed bundle is index-CPaTjA_I.js / ui-vendor-DmHqwhdX.js
 # Any rebuild generates new hashes — ignore those to prevent accidental overwrites
 assets/index-*.js
 assets/index-*.css
@@ -59,6 +59,6 @@ assets/ui-vendor-*.js
 assets/query-vendor-*.js
 # Allow the specific deployed files
 !assets/index-CPaTjA_I.js
-!assets/index-BdJsWI8j.css
-!assets/ui-vendor-CwtEd5It.js
+!assets/index-DE4EkDz7.css
+!assets/ui-vendor-DmHqwhdX.js
 !assets/query-vendor-4pY_VIt9.js
