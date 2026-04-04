@@ -611,11 +611,6 @@
         block.appendChild(ul);
       }
 
-      var label = document.createElement("div");
-      label.style.cssText = "font-size:10px;color:hsl(var(--muted-foreground));margin-top:6px;font-style:italic;";
-      label.textContent = "AI-generated summary based on voting record and ideology scores.";
-      block.appendChild(label);
-
       // Insert after the h2
       h2.insertAdjacentElement("afterend", block);
     });
