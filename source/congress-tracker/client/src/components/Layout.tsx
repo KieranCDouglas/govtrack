@@ -26,10 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
-            <img src="./logo.png" alt="CongressWatch logo" className="h-10 flex-shrink-0" style={{height:"40px",width:"auto"}} />
-            <span className="font-bold text-lg tracking-tight hidden sm:inline text-foreground">
-              CongressWatch
-            </span>
+            <img src="./logo.png" alt="Civicism logo" className="h-10 flex-shrink-0" style={{height:"40px",width:"auto"}} />
           </Link>
 
           {/* Desktop Nav */}
@@ -38,14 +35,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
+                title={item.label}
                 className={cn(
-                  "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+                  "p-2 rounded-md transition-colors",
                   location === item.href
                     ? "bg-primary/15 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                 )}
               >
-                {item.label}
+                <item.icon className="w-5 h-5" />
               </Link>
             ))}
           </nav>
@@ -62,11 +60,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
-            <Link href="/quiz">
-              <Button size="sm" className="hidden md:flex h-8 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-xs">
-                Take the Quiz
-              </Button>
-            </Link>
             <Button
               variant="ghost"
               size="icon"
