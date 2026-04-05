@@ -67,6 +67,38 @@ jobs:
         with:
           ref: main
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: source/congress-tracker/package-lock.json
+
+      - name: Install dependencies
+        working-directory: source/congress-tracker
+        run: npm ci
+
+      - name: Build React app
+        working-directory: source/congress-tracker
+        run: npm run build:static
+        env:
+          VITE_BASE_PATH: /
+
+      - name: Copy built assets to root
+        run: cp -r source/congress-tracker/dist/public/assets ./assets
+
+      - name: Update asset references in root index.html
+        run: |
+          BUILT_INDEX=source/congress-tracker/dist/public/index.html
+          NEW_JS=$(grep -o 'assets/index-[^"]*\.js' "$BUILT_INDEX" | head -1)
+          NEW_CSS=$(grep -o 'assets/index-[^"]*\.css' "$BUILT_INDEX" | head -1)
+          NEW_QUERY=$(grep -o 'assets/query-vendor-[^"]*\.js' "$BUILT_INDEX" | head -1)
+          NEW_UI=$(grep -o 'assets/ui-vendor-[^"]*\.js' "$BUILT_INDEX" | head -1)
+          sed -i "s|assets/index-[^\"]*\.js|$NEW_JS|g" index.html
+          sed -i "s|assets/index-[^\"]*\.css|$NEW_CSS|g" index.html
+          sed -i "s|assets/query-vendor-[^\"]*\.js|$NEW_QUERY|g" index.html
+          sed -i "s|assets/ui-vendor-[^\"]*\.js|$NEW_UI|g" index.html
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 

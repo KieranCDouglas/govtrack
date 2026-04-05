@@ -50,16 +50,5 @@ build/
 *.zip
 source/
 
-# Build outputs that don't match deployed assets
-# Any rebuild generates new hashes — ignore those to prevent accidental overwrites
-assets/index-*.js
-assets/index-*.css
-assets/ui-vendor-*.js
-assets/query-vendor-*.js
-assets/react-vendor-*.js
-# Allow the specific deployed files
-!assets/index-q8nVQFp9.js
-!assets/index-CNL4cn0a.css
-!assets/ui-vendor-D5RCtF6n.js
-!assets/query-vendor-4pY_VIt9.js
-!assets/react-vendor-l0sNRNKZ.js
+# Built assets — generated fresh by CI on every deploy
+assets/
