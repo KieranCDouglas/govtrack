@@ -69,7 +69,7 @@ const QUESTIONS: Question[] = [
   },
   {
     id: "f03",
-    text: "Tax cuts for businesses and high earners are an effective way to stimulate broad economic growth.",
+    text: "Tax cuts for businesses and high earners are an effective way to stimulate lasting economic growth.",
     topic: "Tax Policy",
     category: "fiscal_tax",
     conservativeDirection: true,
@@ -328,9 +328,9 @@ function computeScores(answers: Record<string, number>): QuizResult {
 }
 
 function getQuadrantLabel(x: number, y: number): string {
-  if (x < -0.15 && y >  0.15) return "Populist Left";
-  if (x >  0.15 && y >  0.15) return "Traditional Conservative";
-  if (x < -0.15 && y < -0.15) return "Progressive Left";
+  if (x < -0.15 && y >  0.15) return "Populist";
+  if (x >  0.15 && y >  0.15) return "American Right";
+  if (x < -0.15 && y < -0.15) return "American Left";
   if (x >  0.15 && y < -0.15) return "Libertarian";
   if (Math.abs(x) < 0.15 && Math.abs(y) < 0.15) return "Centrist";
   if (x < -0.15) return "Economic Left";
@@ -341,11 +341,11 @@ function getQuadrantLabel(x: number, y: number): string {
 
 function getQuadrantDescription(x: number, y: number): string {
   if (x < -0.15 && y >  0.15)
-    return "You sit in the populist-left quadrant: state-directed economics combined with socially conservative or nationalist values. This maps to economic nationalism — tariffs, industrial policy, strict immigration controls — alongside traditional or majoritarian social views.";
+    return "You sit in the Populist quadrant: state-directed economics combined with socially conservative or nationalist values. This maps to economic nationalism — tariffs, industrial policy, strict immigration controls — alongside traditional or majoritarian social views.";
   if (x >  0.15 && y >  0.15)
-    return "You sit in the traditional-right quadrant: free market economics alongside socially conservative values. This is the classic conservative position — lower taxes, less regulation, free trade, and traditional social norms including religion in public life.";
+    return "You sit in the American Right quadrant: free market economics alongside socially conservative values. This is the classic conservative position — lower taxes, less regulation, free trade, and traditional social norms including religion in public life.";
   if (x < -0.15 && y < -0.15)
-    return "You sit in the progressive-left quadrant: state-directed economics alongside progressive social values. This maps to social democratic or democratic socialist politics — universal public services, redistribution, and a strongly open, inclusive society.";
+    return "You sit in the American Left quadrant: state-directed economics alongside progressive social values. This maps to social democratic or democratic socialist politics — universal public services, redistribution, and a strongly open, inclusive society.";
   if (x >  0.15 && y < -0.15)
     return "You sit in the libertarian quadrant: free market economics alongside progressive social views. You see government's role as protecting individual rights from both state overreach and private coercion — open markets, open society, minimal state interference in personal life.";
   return "Your views span multiple dimensions — you may be a pragmatic centrist, or your positions cut across the standard left-right divides in ways that don't fit neatly into any quadrant.";
@@ -503,9 +503,9 @@ export default function QuizPage() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
             {[
-              { q: "Top-Left",  label: "Populist Left",       c: "rgba(239,123,69,0.15)",                   lc: "rgba(239,123,69,0.15)",  b: "rgba(239,123,69,0.4)",  lb: "rgba(239,123,69,0.4)" },
-              { q: "Top-Right", label: "Trad. Conservative",  c: "rgba(205,237,246,0.08)",                  lc: "#eff0f9",                b: "rgba(205,237,246,0.3)", lb: "#d7d1ea" },
-              { q: "Bot-Left",  label: "Progressive Left",    c: "rgba(94,177,191,0.12)",                   lc: "#d9eef2",                b: "rgba(94,177,191,0.5)",  lb: "#b3d7df" },
+              { q: "Top-Left",  label: "Populist",            c: "rgba(239,123,69,0.15)",                   lc: "rgba(239,123,69,0.15)",  b: "rgba(239,123,69,0.4)",  lb: "rgba(239,123,69,0.4)" },
+              { q: "Top-Right", label: "American Right",       c: "rgba(205,237,246,0.08)",                  lc: "#eff0f9",                b: "rgba(205,237,246,0.3)", lb: "#d7d1ea" },
+              { q: "Bot-Left",  label: "American Left",        c: "rgba(94,177,191,0.12)",                   lc: "#d9eef2",                b: "rgba(94,177,191,0.5)",  lb: "#b3d7df" },
               { q: "Bot-Right", label: "Libertarian",         c: "rgba(94,177,191,0.18)",                   lc: "#dce6f4",                b: "rgba(94,177,191,0.6)",  lb: "#bbcce4" },
             ].map(({ q: pos, label, c, lc, b, lb }) => (
               <div key={pos} className="rounded-md p-2" style={{ background: isLight ? lc : c, border: `1px solid ${isLight ? lb : b}` }}>
