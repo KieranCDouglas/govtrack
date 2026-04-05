@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useTheme } from "@/components/ThemeProvider";
 import PerplexityAttribution from "@/components/PerplexityAttribution";
-import { Sun, Moon, Menu, X, Vote, Map, HelpCircle, Users, Home, ScrollText } from "lucide-react";
+import { Sun, Moon, Menu, X, Vote, Map, HelpCircle, Users, Home, ScrollText, Info } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: "/compass", label: "Compass", icon: Map },
   { href: "/ballot", label: "Ballot Measures", icon: ScrollText },
   { href: "/quiz", label: "Take the Quiz", icon: HelpCircle },
+  { href: "/about", label: "About", icon: Info },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
