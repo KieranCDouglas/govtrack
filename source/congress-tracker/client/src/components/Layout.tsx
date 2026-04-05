@@ -23,15 +23,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border/60 backdrop-blur-md bg-background/80 overflow-hidden">
+      <header className="sticky top-0 z-50 border-b border-border/60 backdrop-blur-md bg-background/80">
 
         {/* ── Mobile / narrow header (hamburger) ── */}
         <div className="lg:hidden">
           {/* Logo row */}
-          <div className="flex items-center justify-between px-3" style={{height:"120px"}}>
+          <div className="flex items-center justify-between px-3 py-2">
             <div className="w-16" />
-            <Link href="/">
-              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"450px",width:"auto",objectFit:"contain",marginTop:"-165px",marginBottom:"-165px"}} />
+            <Link href="/" className="flex-1 flex justify-center">
+              <img src="./civicism-logo.png" alt="Civicism logo" style={{width:"clamp(160px, 55vw, 340px)",height:"auto",objectFit:"contain"}} />
             </Link>
             <div className="w-16 flex justify-end items-center gap-1">
               <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
@@ -45,9 +45,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* ── Desktop header (wide enough to fit all nav items) ── */}
-        <div className="hidden lg:flex max-w-7xl mx-auto px-4 items-center justify-between gap-4" style={{height:"130px"}}>
+        <div className="hidden lg:flex max-w-7xl mx-auto px-4 py-3 items-center justify-between gap-4">
           <Link href="/">
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(220px, 22vw, 340px)",width:"auto",objectFit:"contain",marginTop:"-105px",marginBottom:"-105px"}} />
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{width:"clamp(200px, 18vw, 320px)",height:"auto",objectFit:"contain"}} />
           </Link>
           <nav className="flex items-center gap-1 flex-nowrap">
             {NAV_ITEMS.map((item) => (
