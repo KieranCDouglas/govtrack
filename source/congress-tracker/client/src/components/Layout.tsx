@@ -28,9 +28,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {/* ── Mobile / narrow header (hamburger) ── */}
         <div className="lg:hidden">
           {/* Logo row */}
-          <div className="flex items-center justify-between px-3" style={{height:"152px"}}>
+          <div className="flex items-center justify-between px-3" style={{height:"296px"}}>
             <Link href="/" className="flex items-center overflow-hidden">
-              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"144px",width:"auto",maxWidth:"calc(100vw - 6rem)",objectFit:"contain"}} />
+              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"288px",width:"auto",maxWidth:"calc(100vw - 6rem)",objectFit:"contain"}} />
             </Link>
             <div className="shrink-0 flex justify-end items-center gap-1">
               <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
@@ -44,10 +44,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* ── Desktop header (wide enough to fit all nav items) ── */}
-        <div className="hidden lg:grid max-w-7xl mx-auto px-6 items-center" style={{height:"155px", gridTemplateColumns:"1fr auto 1fr"}}>
+        <div className="hidden lg:grid max-w-7xl mx-auto px-6 items-center" style={{height:"200px", gridTemplateColumns:"1fr auto 1fr"}}>
           {/* Left: logo */}
           <Link href="/" className="flex items-center">
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(260px, 26vw, 400px)",width:"auto",objectFit:"contain",marginTop:"calc((clamp(260px, 26vw, 400px) - 155px) / -2)",marginBottom:"calc((clamp(260px, 26vw, 400px) - 155px) / -2)"}} />
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(160px, 18vw, 300px)",width:"auto",objectFit:"contain"}} />
           </Link>
           {/* Center: nav */}
           <nav className="flex items-center gap-1 flex-nowrap">
