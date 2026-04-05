@@ -27,10 +27,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {/* ── Mobile / narrow header (hamburger) ── */}
         <div className="lg:hidden">
           {/* Logo row */}
-          <div className="flex items-center justify-between px-3" style={{height:"82px"}}>
+          <div className="flex items-center justify-between px-3" style={{height:"120px"}}>
             <div className="w-16" />
             <Link href="/">
-              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"300px",width:"auto",objectFit:"contain",marginTop:"-109px",marginBottom:"-109px"}} />
+              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"450px",width:"auto",objectFit:"contain",marginTop:"-165px",marginBottom:"-165px"}} />
             </Link>
             <div className="w-16 flex justify-end items-center gap-1">
               <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
@@ -44,9 +44,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* ── Desktop header (wide enough to fit all nav items) ── */}
-        <div className="hidden lg:flex max-w-7xl mx-auto px-4 items-center justify-between gap-4" style={{height:"100px"}}>
+        <div className="hidden lg:flex max-w-7xl mx-auto px-4 items-center justify-between gap-4" style={{height:"130px"}}>
           <Link href="/">
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(220px, 22vw, 340px)",width:"auto",objectFit:"contain",marginTop:"-80px",marginBottom:"-80px"}} />
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(220px, 22vw, 340px)",width:"auto",objectFit:"contain",marginTop:"-105px",marginBottom:"-105px"}} />
           </Link>
           <nav className="flex items-center gap-1 flex-nowrap">
             {NAV_ITEMS.map((item) => (
