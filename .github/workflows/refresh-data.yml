@@ -31,6 +31,9 @@ jobs:
       - name: Refresh data from Voteview and GovTrack
         run: python3 scripts/update_current.py
 
+      - name: Refresh ballot measures from Ballotpedia
+        run: python3 scripts/fetch_ballot_measures.py
+
       - name: Update manifest timestamp
         run: |
           python3 -c "
