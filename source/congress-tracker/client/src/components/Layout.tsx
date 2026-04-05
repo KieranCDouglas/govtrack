@@ -24,13 +24,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/60 backdrop-blur-md bg-background/80 overflow-hidden">
 
-        {/* ── Mobile header ── */}
-        <div className="md:hidden">
+        {/* ── Mobile / narrow header (hamburger) ── */}
+        <div className="lg:hidden">
           {/* Logo row */}
-          <div className="flex items-center justify-between px-3" style={{height:"72px"}}>
+          <div className="flex items-center justify-between px-3" style={{height:"82px"}}>
             <div className="w-16" />
             <Link href="/">
-              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"200px",width:"auto",objectFit:"contain",marginTop:"-64px",marginBottom:"-64px"}} />
+              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"300px",width:"auto",objectFit:"contain",marginTop:"-109px",marginBottom:"-109px"}} />
             </Link>
             <div className="w-16 flex justify-end items-center gap-1">
               <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
@@ -43,18 +43,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        {/* ── Desktop header ── */}
-        <div className="hidden md:flex max-w-7xl mx-auto px-4 items-center justify-between gap-4" style={{height:"90px"}}>
+        {/* ── Desktop header (wide enough to fit all nav items) ── */}
+        <div className="hidden lg:flex max-w-7xl mx-auto px-4 items-center justify-between gap-4" style={{height:"100px"}}>
           <Link href="/">
             <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(220px, 22vw, 340px)",width:"auto",objectFit:"contain",marginTop:"-80px",marginBottom:"-80px"}} />
           </Link>
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-1 flex-nowrap">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+                  "px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap",
                   location === item.href
                     ? "bg-primary/15 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
@@ -71,9 +71,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        {/* Mobile Nav dropdown */}
+        {/* Hamburger nav dropdown (mobile + narrow desktop) */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-border/60 bg-background/95 px-4 py-3 flex flex-col gap-1">
+          <div className="lg:hidden border-t border-border/60 bg-background/95 px-4 py-3 flex flex-col gap-1">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
