@@ -25,12 +25,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/60 backdrop-blur-md bg-background/80" style={{overflow:"visible"}}>
 
-        {/* ── Single unified bar: [left] [logo] [right] ── */}
-        <div className="max-w-7xl mx-auto px-4 flex items-center" style={{height:"100px"}}>
+        {/* ── Single unified bar: [logo left] [nav/burger center] [toggle right] ── */}
+        {/* Header height tracks logo on mobile, fixed on desktop */}
+        <div className="max-w-7xl mx-auto px-4 flex items-center" style={{height:"clamp(64px, 20vw, 100px)"}}>
 
-          {/* Left: logo */}
-          <Link href="/" className="shrink-0 flex items-center" style={{marginTop:"calc((288px - 100px) / -2)", marginBottom:"calc((288px - 100px) / -2)"}}>
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"288px",width:"auto",objectFit:"contain"}} />
+          {/* Left: logo — scales with header on mobile, fixed 288px on desktop */}
+          <Link href="/" className="shrink-0 flex items-center" style={{position:"relative", left:"-4px", top:"2px"}}>
+            <img src="./civicism-logo.png" alt="Civicism logo"
+              style={{
+                height:"clamp(60px, 19vw, 288px)",
+                width:"auto",
+                objectFit:"contain",
+              }}
+            />
           </Link>
 
           {/* Center: hamburger (mobile) or nav links (desktop) */}
