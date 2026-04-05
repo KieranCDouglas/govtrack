@@ -58,8 +58,8 @@ assets/ui-vendor-*.js
 assets/query-vendor-*.js
 assets/react-vendor-*.js
 # Allow the specific deployed files
-!assets/index-B8RiGfKa.js
-!assets/index-DHT6B9oU.css
+!assets/index-SfkMiIbw.js
+!assets/index-BJx9fyst.css
 !assets/ui-vendor-znJkRuJi.js
 !assets/query-vendor-4pY_VIt9.js
 !assets/react-vendor-l0sNRNKZ.js
