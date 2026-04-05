@@ -23,14 +23,42 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/60 backdrop-blur-md bg-background/80">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" style={{height:"clamp(120px, 17vw, 220px)"}}>
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
-            <img src="./civicism-logo.png" alt="Civicism logo" className="flex-shrink-0" style={{height:"clamp(120px, 17vw, 220px)",width:"auto"}} />
-          </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+        {/* ── Mobile header: logo row + hamburger ── */}
+        <div className="md:hidden flex items-center justify-between px-4 py-2">
+          <div className="flex-1" />
+          <Link href="/" className="flex-1 flex justify-center">
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"80px",width:"auto"}} />
+          </Link>
+          <div className="flex-1 flex justify-end items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              data-testid="button-theme-toggle"
+              className="h-8 w-8"
+            >
+              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Menu"
+            >
+              {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </Button>
+          </div>
+        </div>
+
+        {/* ── Desktop header: single row ── */}
+        <div className="hidden md:flex max-w-7xl mx-auto px-4 items-center justify-between gap-4" style={{height:"clamp(120px, 17vw, 220px)"}}>
+          <Link href="/">
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(120px, 17vw, 220px)",width:"auto"}} />
+          </Link>
+          <nav className="flex items-center gap-1">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
@@ -46,8 +74,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
-
-          {/* Right actions */}
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -59,19 +85,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 md:hidden"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="Menu"
-            >
-              {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-            </Button>
           </div>
         </div>
 
-        {/* Mobile Nav */}
+        {/* Mobile Nav dropdown */}
         {mobileOpen && (
           <div className="md:hidden border-t border-border/60 bg-background/95 px-4 py-3 flex flex-col gap-1">
             {NAV_ITEMS.map((item) => (
