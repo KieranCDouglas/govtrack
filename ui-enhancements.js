@@ -63,8 +63,8 @@
         "  header > div > a:first-child { flex: 0 0 auto !important; overflow: hidden !important; }" +
         "  .cw-new-logo { height: 300px !important; transition: none !important; margin-top: -90px !important; margin-bottom: -110px !important; }" +
         "  header > div > a:first-child { width: 100% !important; justify-content: center !important; }" +
-        "  header nav { display: flex !important; flex-wrap: nowrap !important; justify-content: center !important; opacity: 1 !important; padding: 2px 8px 6px !important; gap: 2px !important; white-space: nowrap !important; flex: 1 !important; }" +
-        "  header nav a { padding: 4px 8px !important; font-size: 12px !important; }" +
+        "  header nav { display: flex !important; flex-wrap: wrap !important; justify-content: center !important; opacity: 1 !important; padding: 2px 8px 6px !important; gap: 2px !important; width: 100% !important; }" +
+        "  header nav a { padding: 4px 6px !important; font-size: 11px !important; }" +
         "  header > div > div:last-child { position: static !important; flex: 0 0 auto !important; display: flex !important; align-items: center !important; padding-right: 8px !important; }" +
         "  header [aria-label='Menu'] { display: none !important; }" +
         "}";
