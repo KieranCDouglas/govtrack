@@ -97,7 +97,7 @@ export default function HomePage() {
       </div>
 
       {/* Feature cards */}
-      <div className="grid md:grid-cols-4 gap-6 mb-16">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
         <Link href="/members">
           <div className="group bg-card border border-border rounded-xl p-6 cursor-pointer hover:border-primary/50 hover:bg-card/80 transition-colors h-full">
             <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center mb-4">
