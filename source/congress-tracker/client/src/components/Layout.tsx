@@ -22,15 +22,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border/60 backdrop-blur-md bg-background/80">
+      <header className="sticky top-0 z-50 border-b border-border/60 backdrop-blur-md bg-background/80 overflow-hidden">
 
         {/* ── Mobile header ── */}
         <div className="md:hidden">
           {/* Logo row */}
-          <div className="flex items-center justify-between px-3 pt-2 pb-1">
+          <div className="flex items-center justify-between px-3" style={{height:"72px"}}>
             <div className="w-16" />
             <Link href="/">
-              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"200px",width:"auto",objectFit:"contain"}} />
+              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"200px",width:"auto",objectFit:"contain",marginTop:"-64px",marginBottom:"-64px"}} />
             </Link>
             <div className="w-16 flex justify-end items-center gap-1">
               <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
@@ -44,9 +44,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* ── Desktop header ── */}
-        <div className="hidden md:flex max-w-7xl mx-auto px-4 items-center justify-between gap-4" style={{height:"clamp(220px, 22vw, 340px)"}}>
+        <div className="hidden md:flex max-w-7xl mx-auto px-4 items-center justify-between gap-4" style={{height:"90px"}}>
           <Link href="/">
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(220px, 22vw, 340px)",width:"auto",objectFit:"contain"}} />
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(220px, 22vw, 340px)",width:"auto",objectFit:"contain",marginTop:"-80px",marginBottom:"-80px"}} />
           </Link>
           <nav className="flex items-center gap-1">
             {NAV_ITEMS.map((item) => (
