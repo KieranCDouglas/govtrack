@@ -23,34 +23,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border/60 backdrop-blur-md bg-background/80 overflow-hidden">
+      <header className="sticky top-0 z-50 border-b border-border/60 backdrop-blur-md bg-background/80" style={{overflow:"visible"}}>
 
-        {/* ── Mobile / narrow header (hamburger) ── */}
-        <div className="lg:hidden">
-          {/* Logo row */}
-          <div className="flex items-center justify-between px-3" style={{height:"296px"}}>
-            <Link href="/" className="flex items-center overflow-hidden">
-              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"288px",width:"auto",maxWidth:"calc(100vw - 6rem)",objectFit:"contain"}} />
-            </Link>
-            <div className="shrink-0 flex justify-end items-center gap-1">
-              <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
-                {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu">
-                {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-              </Button>
-            </div>
-          </div>
-        </div>
+        {/* ── Single unified bar ── */}
+        <div className="max-w-7xl mx-auto px-4 flex items-center gap-4" style={{height:"100px"}}>
 
-        {/* ── Desktop header (wide enough to fit all nav items) ── */}
-        <div className="hidden lg:grid max-w-7xl mx-auto px-6 items-center" style={{height:"200px", gridTemplateColumns:"1fr auto 1fr"}}>
-          {/* Left: logo */}
-          <Link href="/" className="flex items-center">
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(160px, 18vw, 300px)",width:"auto",objectFit:"contain"}} />
+          {/* Logo — overflows header vertically via negative margin */}
+          <Link href="/" className="shrink-0 flex items-center" style={{marginTop:"calc((288px - 100px) / -2)", marginBottom:"calc((288px - 100px) / -2)"}}>
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"288px",width:"auto",objectFit:"contain"}} />
           </Link>
-          {/* Center: nav */}
-          <nav className="flex items-center gap-1 flex-nowrap">
+
+          {/* Desktop nav — hidden when not enough room */}
+          <nav className="hidden lg:flex items-center gap-1 flex-1 justify-center flex-nowrap">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
@@ -66,15 +50,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
-          {/* Right: theme toggle */}
-          <div className="flex items-center justify-end">
-            <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
-              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </Button>
-          </div>
+
+          {/* Spacer on mobile so controls go right */}
+          <div className="flex-1 lg:hidden" />
+
+          {/* Theme toggle (always visible) */}
+          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8 shrink-0">
+            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </Button>
+
+          {/* Hamburger — only on mobile/narrow */}
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 lg:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu">
+            {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </Button>
         </div>
 
-        {/* Hamburger nav dropdown (mobile + narrow desktop) */}
+        {/* Dropdown nav for mobile/narrow */}
         {mobileOpen && (
           <div className="lg:hidden border-t border-border/60 bg-background/95 px-4 py-3 flex flex-col gap-1">
             {NAV_ITEMS.map((item) => (
