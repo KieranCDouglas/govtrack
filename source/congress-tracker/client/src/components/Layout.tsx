@@ -28,10 +28,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {/* ── Mobile / narrow header (hamburger) ── */}
         <div className="lg:hidden">
           {/* Logo row */}
-          <div className="flex items-center justify-between px-3" style={{height:"160px"}}>
+          <div className="flex items-center justify-between px-3" style={{height:"100px"}}>
             <div className="w-16 shrink-0" />
             <Link href="/" className="flex-1 flex justify-center overflow-hidden">
-              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(260px, 55vw, 560px)",width:"auto",maxWidth:"calc(100vw - 8rem)",objectFit:"contain",marginTop:"clamp(-200px, calc((55vw - 160px) / -2), -50px)",marginBottom:"clamp(-200px, calc((55vw - 160px) / -2), -50px)"}} />
+              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(200px, 48vw, 420px)",width:"auto",maxWidth:"calc(100vw - 8rem)",objectFit:"contain",marginTop:"clamp(-160px, calc((48vw - 100px) / -2), -40px)",marginBottom:"clamp(-160px, calc((48vw - 100px) / -2), -40px)"}} />
             </Link>
             <div className="w-16 shrink-0 flex justify-end items-center gap-1">
               <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
