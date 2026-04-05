@@ -30,7 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center justify-between px-3 pt-2 pb-1">
             <div className="w-16" />
             <Link href="/">
-              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"120px",width:"auto",objectFit:"contain"}} />
+              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"200px",width:"auto",objectFit:"contain"}} />
             </Link>
             <div className="w-16 flex justify-end items-center gap-1">
               <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
@@ -44,9 +44,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* ── Desktop header ── */}
-        <div className="hidden md:flex max-w-7xl mx-auto px-4 items-center justify-between gap-4" style={{height:"clamp(160px, 18vw, 260px)"}}>
+        <div className="hidden md:flex max-w-7xl mx-auto px-4 items-center justify-between gap-4" style={{height:"clamp(220px, 22vw, 340px)"}}>
           <Link href="/">
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(160px, 18vw, 260px)",width:"auto",objectFit:"contain"}} />
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(220px, 22vw, 340px)",width:"auto",objectFit:"contain"}} />
           </Link>
           <nav className="flex items-center gap-1">
             {NAV_ITEMS.map((item) => (
