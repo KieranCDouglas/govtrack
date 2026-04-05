@@ -58,12 +58,6 @@
     });
     ob.observe(root, { childList: true, subtree: true });
 
-    // Rename brand text immediately on any DOM change — no debounce — so the
-    // old names never flash before being replaced.
-    var brandOb = new MutationObserver(function () {
-      renameBrand();
-    });
-    brandOb.observe(root, { childList: true, subtree: true });
 
     window.addEventListener("hashchange", function () {
       setTimeout(run, 300);
