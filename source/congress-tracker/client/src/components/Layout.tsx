@@ -25,44 +25,47 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/60 backdrop-blur-md bg-background/80" style={{overflow:"visible"}}>
 
-        {/* ── Single unified bar ── */}
-        <div className="max-w-7xl mx-auto px-4 flex items-center gap-4" style={{height:"100px"}}>
+        {/* ── Single unified bar: [left] [logo] [right] ── */}
+        <div className="max-w-7xl mx-auto px-4 flex items-center" style={{height:"100px"}}>
 
-          {/* Logo — overflows header vertically via negative margin */}
-          <Link href="/" className="shrink-0 flex items-center" style={{marginTop:"calc((288px - 100px) / -2)", marginBottom:"calc((288px - 100px) / -2)"}}>
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"288px",width:"auto",objectFit:"contain"}} />
-          </Link>
+          {/* Left: hamburger (mobile) or nav links (desktop) */}
+          <div className="flex items-center gap-1 shrink-0">
+            {/* Hamburger — mobile/narrow only */}
+            <Button variant="ghost" size="icon" className="h-8 w-8 lg:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu">
+              {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </Button>
+            {/* Desktop nav links */}
+            <nav className="hidden lg:flex items-center gap-1 flex-nowrap">
+              {NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap",
+                    location === item.href
+                      ? "bg-primary/15 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                  )}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
 
-          {/* Desktop nav — hidden when not enough room */}
-          <nav className="hidden lg:flex items-center gap-1 flex-1 justify-center flex-nowrap">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap",
-                  location === item.href
-                    ? "bg-primary/15 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+          {/* Center: logo */}
+          <div className="flex-1 flex justify-center">
+            <Link href="/" className="shrink-0 flex items-center" style={{marginTop:"calc((288px - 100px) / -2)", marginBottom:"calc((288px - 100px) / -2)"}}>
+              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"288px",width:"auto",objectFit:"contain"}} />
+            </Link>
+          </div>
 
-          {/* Spacer on mobile so controls go right */}
-          <div className="flex-1 lg:hidden" />
-
-          {/* Theme toggle (always visible) */}
-          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8 shrink-0">
-            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </Button>
-
-          {/* Hamburger — only on mobile/narrow */}
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 lg:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu">
-            {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-          </Button>
+          {/* Right: theme toggle */}
+          <div className="shrink-0">
+            <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
+              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </Button>
+          </div>
         </div>
 
         {/* Dropdown nav for mobile/narrow */}
