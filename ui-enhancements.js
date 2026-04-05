@@ -48,7 +48,7 @@
       style.textContent =
         ".cw-replaced > :not(.cw-bill-line):not(.cw-proc-line):not(.cw-vote-panel) { display: none !important; }" +
         "header { height: clamp(70px, 8vw, 120px) !important; overflow: hidden !important; padding: 0 !important; display: flex !important; align-items: center !important; position: sticky !important; top: 0 !important; z-index: 50 !important; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), height 0.15s ease !important; }" +
-        "header > div { display: grid !important; grid-template-columns: 1fr auto 1fr !important; align-items: center !important; height: clamp(70px, 8vw, 120px) !important; grid-template-rows: clamp(70px, 8vw, 120px) !important; padding-left: 0 !important; margin-left: 0 !important; width: 100% !important; max-width: 100% !important; min-width: 600px !important; transition: height 0.15s ease !important; }" +
+        "header > div { display: grid !important; grid-template-columns: 1fr auto 1fr !important; align-items: center !important; height: clamp(70px, 8vw, 120px) !important; grid-template-rows: clamp(70px, 8vw, 120px) !important; padding-left: 0 !important; margin-left: 0 !important; width: 100% !important; max-width: 100% !important; min-width: 0 !important; transition: height 0.15s ease !important; }" +
         "header > div > a:first-child { overflow: hidden !important; display: flex !important; align-items: center !important; padding-left: 0 !important; }" +
         "header nav { justify-self: center !important; display: flex !important; justify-content: center !important; align-items: center !important; white-space: nowrap !important; overflow: hidden !important; min-width: 0 !important; transition: opacity 0.2s ease !important; }" +
         "header > div > div:last-child { justify-self: end !important; overflow: hidden !important; min-width: 0 !important; }" +
@@ -63,8 +63,8 @@
         "  header > div > a:first-child { flex: 0 0 auto !important; overflow: hidden !important; }" +
         "  .cw-new-logo { height: 300px !important; transition: none !important; margin-top: -90px !important; margin-bottom: -110px !important; }" +
         "  header > div > a:first-child { width: 100% !important; justify-content: center !important; }" +
-        "  header nav { display: flex !important; flex-wrap: wrap !important; justify-content: center !important; opacity: 1 !important; padding: 2px 8px 6px !important; gap: 2px !important; width: 100% !important; }" +
-        "  header nav a { padding: 4px 6px !important; font-size: 11px !important; }" +
+        "  header nav { display: flex !important; flex-wrap: nowrap !important; justify-content: center !important; opacity: 1 !important; padding: 2px 4px 6px !important; gap: 0 !important; width: 100% !important; overflow: hidden !important; }" +
+        "  header nav a { padding: 3px 5px !important; font-size: 10.5px !important; white-space: nowrap !important; }" +
         "  header > div > div:last-child { position: static !important; flex: 0 0 auto !important; display: flex !important; align-items: center !important; padding-right: 8px !important; }" +
         "  header [aria-label='Menu'] { display: none !important; }" +
         "}";
