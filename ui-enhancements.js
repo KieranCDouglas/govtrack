@@ -20,8 +20,6 @@
     var s = document.createElement("style");
     s.id = "cw-flash-prevention";
     s.textContent =
-      "img[alt='CongressWatch logo'] { display: none !important; }" +
-      "header a[href='/'] span { display: none !important; }" +
       "header [data-testid='button-theme-toggle'] ~ a { display: none !important; }";
 
     document.head.appendChild(s);
@@ -163,42 +161,7 @@
     }, { passive: true });
 
     function renameBrand() {
-      var header = document.querySelector("header");
-      if (header) {
-        // Inject new unified logo once
-        if (!header.querySelector('.cw-new-logo')) {
-          var oldLogo = header.querySelector('img[alt="CongressWatch logo"]');
-          if (oldLogo) {
-            var newLogo = document.createElement('img');
-            newLogo.src = './civicism-logo.png';
-            newLogo.alt = 'Civicism';
-            newLogo.className = 'cw-new-logo flex-shrink-0';
-            newLogo.style.cssText = 'height:260px;width:auto;display:block;filter:contrast(5) brightness(0.75);align-self:center;margin-top:0;margin-right:0;';
-            oldLogo.parentElement.insertBefore(newLogo, oldLogo);
-          }
-        }
-        // Hide old logo img and brand text span
-        var oldImg = header.querySelector('img[alt="CongressWatch logo"]');
-        if (oldImg) oldImg.style.display = 'none';
-        var walker = document.createTreeWalker(header, NodeFilter.SHOW_TEXT);
-        var node;
-        while ((node = walker.nextNode())) {
-          var val = node.nodeValue.trim();
-          if (val === "CongressWatch" || val === "Civicism") {
-            node.parentElement.style.display = 'none';
-          }
-        }
-      }
-      var body = document.getElementById("root");
-      if (body) {
-        var walker2 = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
-        var node2;
-        while ((node2 = walker2.nextNode())) {
-          if (node2.nodeValue.includes("Track Every Vote in Congress")) {
-            node2.nodeValue = node2.nodeValue.replace(/Track Every Vote in Congress/g, "A Civic Engagement Tool");
-          }
-        }
-      }
+      // Nothing to rename — logo and brand text are correct in the React source.
     }
 
   });

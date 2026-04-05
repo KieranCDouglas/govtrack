@@ -35,15 +35,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                title={item.label}
                 className={cn(
-                  "p-2 rounded-md transition-colors",
+                  "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
                   location === item.href
                     ? "bg-primary/15 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                 )}
               >
-                <item.icon className="w-5 h-5" />
+                {item.label}
               </Link>
             ))}
           </nav>
