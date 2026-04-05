@@ -23,10 +23,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/60 backdrop-blur-md bg-background/80">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" style={{height:"clamp(80px, 12vw, 160px)"}}>
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4" style={{height:"clamp(120px, 17vw, 220px)"}}>
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
-            <img src="./civicism-logo.png" alt="Civicism logo" className="flex-shrink-0" style={{height:"clamp(80px, 12vw, 160px)",width:"auto"}} />
+            <img src="./civicism-logo.png" alt="Civicism logo" className="flex-shrink-0" style={{height:"clamp(120px, 17vw, 220px)",width:"auto"}} />
           </Link>
 
           {/* Desktop Nav */}
