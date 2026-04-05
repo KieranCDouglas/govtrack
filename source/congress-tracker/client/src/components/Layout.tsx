@@ -24,41 +24,31 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/60 backdrop-blur-md bg-background/80">
 
-        {/* ── Mobile header: logo row + hamburger ── */}
-        <div className="md:hidden flex items-center justify-between px-4 py-2">
-          <div className="flex-1" />
-          <Link href="/" className="flex-1 flex justify-center">
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"160px",width:"auto"}} />
-          </Link>
-          <div className="flex-1 flex justify-end items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-              data-testid="button-theme-toggle"
-              className="h-8 w-8"
-            >
-              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="Menu"
-            >
-              {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-            </Button>
+        {/* ── Mobile header ── */}
+        <div className="md:hidden">
+          {/* Logo row */}
+          <div className="flex items-center justify-between px-3 pt-2 pb-1">
+            <div className="w-16" />
+            <Link href="/">
+              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"60px",width:"auto",objectFit:"contain"}} />
+            </Link>
+            <div className="w-16 flex justify-end items-center gap-1">
+              <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
+                {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu">
+                {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* ── Desktop header: single row ── */}
-        <div className="hidden md:grid max-w-7xl mx-auto px-4 w-full" style={{gridTemplateColumns:"1fr auto 1fr", height:"clamp(240px, 34vw, 440px)"}}>
-          <Link href="/" className="flex items-center">
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(240px, 34vw, 440px)",width:"auto"}} />
+        {/* ── Desktop header ── */}
+        <div className="hidden md:flex max-w-7xl mx-auto px-4 items-center justify-between gap-4" style={{height:"clamp(100px, 12vw, 180px)"}}>
+          <Link href="/">
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(100px, 12vw, 180px)",width:"auto",objectFit:"contain"}} />
           </Link>
-          <nav className="flex items-center justify-center gap-1">
+          <nav className="flex items-center gap-1">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
@@ -74,15 +64,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
-          <div className="flex items-center justify-end gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-              data-testid="button-theme-toggle"
-              className="h-8 w-8"
-            >
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
           </div>
