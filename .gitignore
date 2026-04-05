@@ -60,6 +60,6 @@ assets/react-vendor-*.js
 # Allow the specific deployed files
 !assets/index-DfS_sxPB.js
 !assets/index-nbZYtVge.css
-!assets/ui-vendor-DaXYgaG8.js
+!assets/ui-vendor-Cn0IxFht.js
 !assets/query-vendor-4pY_VIt9.js
 !assets/react-vendor-l0sNRNKZ.js
