@@ -27,10 +27,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {/* ── Mobile / narrow header (hamburger) ── */}
         <div className="lg:hidden">
           {/* Logo row */}
-          <div className="flex items-center justify-between px-3" style={{height:"120px"}}>
+          <div className="flex items-center justify-between px-3" style={{height:"160px"}}>
             <div className="w-16" />
             <Link href="/">
-              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"450px",width:"auto",objectFit:"contain",marginTop:"-165px",marginBottom:"-165px"}} />
+              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"675px",width:"auto",objectFit:"contain",marginTop:"-258px",marginBottom:"-258px",imageRendering:"high-quality"}} />
             </Link>
             <div className="w-16 flex justify-end items-center gap-1">
               <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
