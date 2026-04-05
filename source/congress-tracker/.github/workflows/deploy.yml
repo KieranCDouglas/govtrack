@@ -1,0 +1,81 @@
+name: Build and Deploy to GitHub Pages
+
+on:
+  # Deploy on every push to main
+  push:
+    branches: [main]
+
+  # Weekly auto-refresh: rebuilds with fresh data from Voteview and GovTrack
+  # Runs every Sunday at 2am UTC (6pm PST Saturday)
+  schedule:
+    - cron: "0 2 * * 0"
+
+  # Allow manual trigger from GitHub Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: write  # needed to push to gh-pages branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Set up Python (for data refresh scripts) ──────────────────────────
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # ── 3. Set up Node.js ────────────────────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      # ── 4. Install Node dependencies ─────────────────────────────────────────
+      - name: Install Node dependencies
+        run: npm ci
+
+      # ── 5. Refresh data (runs weekly or on manual trigger) ───────────────────
+      - name: Refresh member data and scores
+        run: python3 scripts/refresh_data.py
+        env:
+          CONGRESS_API_KEY: ${{ secrets.CONGRESS_API_KEY }}
+
+      # ── 6. Generate static JSON data files ───────────────────────────────────
+      - name: Generate static data files
+        run: python3 scripts/generate_static_data.py
+
+      # ── 7. Build Vite frontend ────────────────────────────────────────────────
+      - name: Build frontend
+        run: npm run build:static
+        env:
+          # Set to your GitHub Pages path:
+          # - For username.github.io (user/org site): VITE_BASE_PATH=/
+          # - For username.github.io/repo-name: VITE_BASE_PATH=/repo-name
+          VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH || '/' }}
+
+      # ── 8. Copy data files into build output ─────────────────────────────────
+      - name: Copy data files to dist
+        run: |
+          cp -r client/public/data dist/public/data
+
+      # ── 9. Add .nojekyll (prevents GitHub Pages from ignoring _ folders) ─────
+      - name: Add .nojekyll
+        run: touch dist/public/.nojekyll
+
+      # ── 10. Deploy to gh-pages branch ────────────────────────────────────────
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist/public
+          # Optionally set a custom domain:
+          # cname: congresswatch.yourdomain.com

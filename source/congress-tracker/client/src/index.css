@@ -1,0 +1,149 @@
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700&f[]=cabinet-grotesk@400,500,700,800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Palette:
+  Evergreen      #042a2b  — deep teal-black, primary background
+  Pacific Blue   #5eb1bf  — mid teal, primary accent / interactive
+  Light Cyan     #cdedf6  — light teal, foreground text / highlights
+  Atomic Tangerine #ef7b45 — warm orange, secondary accent
+  Burnt Tangerine  #d84727 — burnt red-orange, destructive / warning
+*/
+
+:root {
+  /* Evergreen-based dark theme */
+  --background: 182 83% 9%;        /* #042a2b Evergreen */
+  --foreground: 193 69% 88%;       /* #cdedf6 Light Cyan */
+  --card: 182 70% 12%;             /* slightly lighter than bg */
+  --card-foreground: 193 69% 88%;
+  --popover: 182 70% 11%;
+  --popover-foreground: 193 69% 88%;
+  --primary: 189 43% 56%;          /* #5eb1bf Pacific Blue */
+  --primary-foreground: 182 83% 9%;
+  --secondary: 182 50% 17%;
+  --secondary-foreground: 193 60% 75%;
+  --muted: 182 50% 14%;
+  --muted-foreground: 189 30% 52%;
+  --accent: 19 84% 60%;            /* #ef7b45 Atomic Tangerine */
+  --accent-foreground: 182 83% 9%;
+  --destructive: 11 69% 50%;       /* #d84727 Burnt Tangerine */
+  --destructive-foreground: 193 69% 88%;
+  --border: 182 40% 20%;
+  --input: 182 45% 16%;
+  --ring: 189 43% 56%;
+  --radius: 0.4rem;
+  --sidebar-background: 182 83% 7%;
+  --sidebar-foreground: 193 60% 80%;
+  --sidebar-primary: 189 43% 56%;
+  --sidebar-primary-foreground: 182 83% 9%;
+  --sidebar-accent: 182 55% 14%;
+  --sidebar-accent-foreground: 193 60% 80%;
+  --sidebar-border: 182 40% 18%;
+  --sidebar-ring: 189 43% 56%;
+
+  /* Custom palette tokens for direct use */
+  --evergreen: 4, 42, 43;            /* rgb */
+  --pacific-blue: 94, 177, 191;
+  --light-cyan: 205, 237, 246;
+  --atomic-tangerine: 239, 123, 69;
+  --burnt-tangerine: 216, 71, 39;
+
+  /* Party colors — adjusted for new palette contrast */
+  --dem-color: 214 72% 60%;
+  --rep-color: 11 69% 55%;
+  --ind-color: 189 43% 56%;
+
+  font-family: 'Satoshi', system-ui, sans-serif;
+}
+
+/* Light mode override */
+.light {
+  --background: 193 69% 97%;
+  --foreground: 182 83% 9%;
+  --card: 0 0% 100%;
+  --card-foreground: 182 83% 9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 182 83% 9%;
+  --primary: 189 43% 42%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 193 60% 90%;
+  --secondary-foreground: 182 60% 15%;
+  --muted: 193 50% 93%;
+  --muted-foreground: 189 30% 40%;
+  --accent: 19 84% 58%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 11 69% 48%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 189 30% 82%;
+  --input: 193 50% 92%;
+  --ring: 189 43% 42%;
+  --sidebar-background: 193 60% 94%;
+  --sidebar-foreground: 182 60% 15%;
+  --sidebar-primary: 189 43% 42%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 193 55% 88%;
+  --sidebar-accent-foreground: 182 60% 15%;
+  --sidebar-border: 189 30% 82%;
+  --sidebar-ring: 189 43% 42%;
+
+  --dem-color: 214 72% 48%;
+  --rep-color: 11 69% 44%;
+  --ind-color: 189 43% 38%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: 'Satoshi', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Cabinet Grotesk', 'Satoshi', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Party color utilities */
+.party-dem { color: hsl(var(--dem-color)); }
+.party-rep { color: hsl(var(--rep-color)); }
+.party-ind { color: hsl(var(--ind-color)); }
+.bg-party-dem { background-color: hsl(var(--dem-color)); }
+.bg-party-rep { background-color: hsl(var(--rep-color)); }
+.bg-party-ind { background-color: hsl(var(--ind-color)); }
+.border-party-dem { border-color: hsl(var(--dem-color)); }
+.border-party-rep { border-color: hsl(var(--rep-color)); }
+.border-party-ind { border-color: hsl(var(--ind-color)); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: hsl(var(--background)); }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+
+/* Vote badge */
+.vote-yes { @apply text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded text-xs font-semibold; }
+.vote-no { @apply text-red-400 bg-red-400/10 px-2 py-0.5 rounded text-xs font-semibold; }
+.vote-not-voting { @apply text-slate-400 bg-slate-400/10 px-2 py-0.5 rounded text-xs font-semibold; }
+.vote-present { @apply text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded text-xs font-semibold; }
+
+/* Shimmer loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--border)) 50%, hsl(var(--muted)) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius);
+}
