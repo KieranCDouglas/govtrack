@@ -59,13 +59,12 @@
         "@media (max-width:640px) { .cw-recent-grid { grid-template-columns:1fr !important; } }" +
         "@media (max-width:767px) {" +
         "  header { height: auto !important; overflow: visible !important; padding: 0 !important; }" +
-        "  header > div { display: flex !important; flex-wrap: wrap !important; align-items: center !important; position: relative !important; width: 100% !important; min-width: 0 !important; height: auto !important; padding: 8px 0 !important; }" +
-        "  header > div > a:first-child { flex: 0 0 auto !important; overflow: hidden !important; }" +
+        "  header > div { display: grid !important; grid-template-columns: 1fr auto !important; grid-template-rows: auto auto !important; align-items: center !important; width: 100% !important; min-width: 0 !important; height: auto !important; padding: 6px 8px !important; gap: 4px 0 !important; }" +
+        "  header > div > a:first-child { grid-column: 1 / -1 !important; display: flex !important; justify-content: center !important; width: 100% !important; overflow: hidden !important; }" +
         "  .cw-new-logo { height: 300px !important; transition: none !important; margin-top: -90px !important; margin-bottom: -110px !important; }" +
-        "  header > div > a:first-child { width: 100% !important; justify-content: center !important; }" +
-        "  header nav { display: flex !important; flex-wrap: nowrap !important; justify-content: center !important; opacity: 1 !important; padding: 2px 4px 6px !important; gap: 0 !important; width: 100% !important; overflow: hidden !important; }" +
-        "  header nav a { padding: 3px 5px !important; font-size: 10.5px !important; white-space: nowrap !important; }" +
-        "  header > div > div:last-child { position: static !important; flex: 0 0 auto !important; display: flex !important; align-items: center !important; padding-right: 8px !important; }" +
+        "  header nav { grid-column: 1 !important; grid-row: 2 !important; display: flex !important; flex-direction: column !important; align-items: center !important; opacity: 1 !important; padding: 0 !important; gap: 2px !important; min-width: 0 !important; }" +
+        "  header nav a { padding: 4px 7px !important; font-size: 12px !important; white-space: nowrap !important; }" +
+        "  header > div > div:last-child { grid-column: 2 !important; grid-row: 2 !important; display: flex !important; align-items: center !important; justify-content: flex-end !important; flex-shrink: 0 !important; padding-left: 6px !important; }" +
         "  header [aria-label='Menu'] { display: none !important; }" +
         "}";
       document.head.appendChild(style);
@@ -112,6 +111,27 @@
           el.style.display = 'none';
         }
       });
+
+      // On mobile: split nav into two centered rows (3 + 2)
+      if (window.innerWidth > 767) return;
+      var nav = header.querySelector('nav');
+      if (!nav || nav.querySelector('.cw-nav-row')) return; // already split
+      var links = Array.from(nav.querySelectorAll('a'));
+      if (links.length < 4) return;
+
+      var row1 = document.createElement('div');
+      row1.className = 'cw-nav-row';
+      row1.style.cssText = 'display:flex;justify-content:center;gap:2px;width:100%;';
+      var row2 = document.createElement('div');
+      row2.className = 'cw-nav-row';
+      row2.style.cssText = 'display:flex;justify-content:center;gap:2px;width:100%;';
+
+      links.slice(0, 3).forEach(function(el) { row1.appendChild(el); });
+      links.slice(3).forEach(function(el) { row2.appendChild(el); });
+
+      nav.innerHTML = '';
+      nav.appendChild(row1);
+      nav.appendChild(row2);
     }
 
     function updateNavFade() {
