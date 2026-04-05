@@ -26,7 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
-            <img src="./logo.png" alt="Civicism logo" className="h-10 flex-shrink-0" style={{height:"40px",width:"auto"}} />
+            <img src="./civicism-logo.png" alt="Civicism logo" className="h-10 flex-shrink-0" style={{height:"40px",width:"auto"}} />
           </Link>
 
           {/* Desktop Nav */}
