@@ -46,8 +46,9 @@ build/
 # Local Claude Code config (may contain API keys)
 .claude/
 
-# Source zip archives
+# Source zip and extracted source (local only — used for redesign reference)
 *.zip
+source/
 
 # Built assets — generated fresh by CI on every deploy
 assets/
