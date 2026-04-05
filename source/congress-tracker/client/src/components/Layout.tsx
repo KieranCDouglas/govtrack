@@ -28,7 +28,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="md:hidden flex items-center justify-between px-4 py-2">
           <div className="flex-1" />
           <Link href="/" className="flex-1 flex justify-center">
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"80px",width:"auto"}} />
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"160px",width:"auto"}} />
           </Link>
           <div className="flex-1 flex justify-end items-center gap-1">
             <Button
@@ -54,11 +54,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* ── Desktop header: single row ── */}
-        <div className="hidden md:flex max-w-7xl mx-auto px-4 items-center justify-between gap-4" style={{height:"clamp(120px, 17vw, 220px)"}}>
-          <Link href="/">
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(120px, 17vw, 220px)",width:"auto"}} />
+        <div className="hidden md:grid max-w-7xl mx-auto px-4 w-full" style={{gridTemplateColumns:"1fr auto 1fr", height:"clamp(240px, 34vw, 440px)"}}>
+          <Link href="/" className="flex items-center">
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(240px, 34vw, 440px)",width:"auto"}} />
           </Link>
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center justify-center gap-1">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
@@ -74,7 +74,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-end gap-2">
             <Button
               variant="ghost"
               size="icon"
