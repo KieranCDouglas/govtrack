@@ -45,26 +45,9 @@
       style.id = "cw-vote-styles";
       style.textContent =
         ".cw-replaced > :not(.cw-bill-line):not(.cw-proc-line):not(.cw-vote-panel) { display: none !important; }" +
-        "header { height: clamp(70px, 8vw, 120px) !important; overflow: hidden !important; padding: 0 !important; display: flex !important; align-items: center !important; position: sticky !important; top: 0 !important; z-index: 50 !important; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), height 0.15s ease !important; }" +
-        "header > div { display: grid !important; grid-template-columns: 1fr auto 1fr !important; align-items: center !important; height: clamp(70px, 8vw, 120px) !important; grid-template-rows: clamp(70px, 8vw, 120px) !important; padding-left: 0 !important; margin-left: 0 !important; width: 100% !important; max-width: 100% !important; min-width: 0 !important; transition: height 0.15s ease !important; }" +
-        "header > div > a:first-child { overflow: hidden !important; display: flex !important; align-items: center !important; padding-left: 0 !important; }" +
-        "header nav { justify-self: center !important; display: flex !important; justify-content: center !important; align-items: center !important; white-space: nowrap !important; overflow: hidden !important; min-width: 0 !important; transition: opacity 0.2s ease !important; }" +
-        "header > div > div:last-child { justify-self: end !important; overflow: hidden !important; min-width: 0 !important; }" +
-        ".cw-new-logo { height: clamp(120px, 17vw, 260px) !important; width: auto !important; max-width: none !important; flex-shrink: 0 !important; transition: height 0.15s ease !important; }" +
-        "html:not(.light) .cw-new-logo { filter: invert(1) contrast(5) brightness(0.75) sepia(1) hue-rotate(155deg) saturate(0.7) !important; }" +
         "@keyframes cw-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }" +
         "@keyframes cw-shimmer { 0% { opacity:0.5; } 50% { opacity:1; } 100% { opacity:0.5; } }" +
-        "@media (max-width:640px) { .cw-recent-grid { grid-template-columns:1fr !important; } }" +
-        "@media (max-width:767px) {" +
-        "  header { height: auto !important; overflow: visible !important; padding: 0 !important; }" +
-        "  header > div { display: grid !important; grid-template-columns: 1fr auto !important; grid-template-rows: auto auto !important; align-items: center !important; width: 100% !important; min-width: 0 !important; height: auto !important; padding: 6px 8px !important; gap: 4px 0 !important; }" +
-        "  header > div > a:first-child { grid-column: 1 / -1 !important; display: flex !important; justify-content: center !important; width: 100% !important; overflow: hidden !important; }" +
-        "  .cw-new-logo { height: 300px !important; transition: none !important; margin-top: -90px !important; margin-bottom: -110px !important; }" +
-        "  header nav { grid-column: 1 !important; grid-row: 2 !important; display: flex !important; flex-direction: column !important; align-items: center !important; opacity: 1 !important; padding: 0 !important; gap: 2px !important; min-width: 0 !important; }" +
-        "  header nav a { padding: 4px 7px !important; font-size: 12px !important; white-space: nowrap !important; }" +
-        "  header > div > div:last-child { grid-column: 2 !important; grid-row: 2 !important; display: flex !important; align-items: center !important; justify-content: flex-end !important; flex-shrink: 0 !important; padding-left: 6px !important; }" +
-        "  header [aria-label='Menu'] { display: none !important; }" +
-        "}";
+        "@media (max-width:640px) { .cw-recent-grid { grid-template-columns:1fr !important; } }";
       document.head.appendChild(style);
     }
 
@@ -91,77 +74,7 @@
       enhanceVotes();
       enhanceRecentVotes();
       injectMemberSummary();
-      renameBrand();
       enhanceCompassPage();
-      enhanceHeaderLayout();
-    }
-
-    function enhanceHeaderLayout() {
-      var header = document.querySelector('header');
-      if (!header) return;
-      var themeToggle = header.querySelector('[data-testid="button-theme-toggle"]');
-      if (!themeToggle) return;
-      var rightDiv = themeToggle.parentElement;
-      if (!rightDiv) return;
-      // Only hide the quiz link, not the mobile menu button
-      Array.from(rightDiv.querySelectorAll('a')).forEach(function (el) {
-        if (el.textContent.trim().toLowerCase().includes('take the quiz')) {
-          el.style.display = 'none';
-        }
-      });
-
-      // On mobile: split nav into two centered rows (3 + 2)
-      if (window.innerWidth > 767) return;
-      var nav = header.querySelector('nav');
-      if (!nav || nav.querySelector('.cw-nav-row')) return; // already split
-      var links = Array.from(nav.querySelectorAll('a'));
-      if (links.length < 4) return;
-
-      var row1 = document.createElement('div');
-      row1.className = 'cw-nav-row';
-      row1.style.cssText = 'display:flex;justify-content:center;gap:2px;width:100%;';
-      var row2 = document.createElement('div');
-      row2.className = 'cw-nav-row';
-      row2.style.cssText = 'display:flex;justify-content:center;gap:2px;width:100%;';
-
-      links.slice(0, 3).forEach(function(el) { row1.appendChild(el); });
-      links.slice(3).forEach(function(el) { row2.appendChild(el); });
-
-      nav.innerHTML = '';
-      nav.appendChild(row1);
-      nav.appendChild(row2);
-    }
-
-    function updateNavFade() {
-      var nav = document.querySelector('header nav');
-      if (!nav) return;
-      var w = window.innerWidth;
-      if (w <= 767) return;
-      // Fade nav out between 1000px and 800px viewport width
-      var opacity = Math.max(0, Math.min(1, (w - 800) / 200));
-      nav.style.opacity = opacity;
-      nav.style.pointerEvents = opacity < 0.05 ? 'none' : 'auto';
-    }
-
-    updateNavFade();
-    window.addEventListener('resize', updateNavFade);
-
-    // Hide header on scroll down, reveal on scroll up
-    var lastScrollY = window.scrollY;
-    window.addEventListener('scroll', function () {
-      var header = document.querySelector('header');
-      if (!header) return;
-      var currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 80) {
-        header.style.transform = 'translateY(-100%)';
-      } else {
-        header.style.transform = 'translateY(0)';
-      }
-      lastScrollY = currentScrollY;
-    }, { passive: true });
-
-    function renameBrand() {
-      // Nothing to rename — logo and brand text are correct in the React source.
     }
 
   });
