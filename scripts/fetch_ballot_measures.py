@@ -166,14 +166,43 @@ def classify_subject(subject_text: str) -> str:
     return "fiscal_tax"  # default
 
 
+# Measure types that are inherently procedural/nonpartisan regardless of content
+NONPARTISAN_TYPES = {"BI", "LRAQ", "ACCQ", "ABR", "VR"}
+
+def infer_partisan(title: str, description: str, mtype_raw: str) -> bool:
+    """
+    Returns False (nonpartisan) when the measure is procedural by type
+    or when title/description contain no partisan signal words at all.
+    Returns True (partisan) otherwise.
+    """
+    # Bond issues, advisory questions, budget renewals are inherently nonpartisan
+    if mtype_raw.strip() in NONPARTISAN_TYPES:
+        return False
+
+    text = (title + " " + description).lower()
+
+    # Nonpartisan keyword signals — measures about process, not policy
+    nonpartisan_signals = [
+        "redistrict", "independent commission", "election administration",
+        "term limit", "legislative process", "ballot access", "campaign finance disclosure",
+        "open primary", "ranked.choice", "ranked choice", "judicial selection",
+        "infrastructure bond", "school bond", "general obligation",
+        "constitutional convention",
+    ]
+    if any(re.search(s, text) for s in nonpartisan_signals):
+        return False
+
+    return True  # default: assume partisan unless positively identified as nonpartisan
+
+
 def infer_conservative_direction(title: str, description: str, category: str) -> bool:
     """
     Infer whether passing = conservative outcome from title/description keywords.
     Returns True if passing the measure = more conservative, False if more progressive.
+    Only called when infer_partisan() returns True.
     """
     text = (title + " " + description).lower()
 
-    # Explicit conservative signals
     conservative_signals = [
         "restrict", "ban", "prohibit", "limit", "reduce", "cut", "eliminate",
         "require citizenship", "enforce", "mandatory", "tougher", "stricter",
@@ -182,7 +211,6 @@ def infer_conservative_direction(title: str, description: str, category: str) ->
         "cut.*tax", "tax.*exempt", "reduce.*tax", "lower.*tax",
         "budget.*stabiliz", "spending.*limit", "repeal.*carbon",
     ]
-    # Explicit progressive signals
     progressive_signals = [
         "expand", "guarantee", "universal", "protect", "equal rights",
         "non-discrimination", "allow.*public financ", "public.*fund",
@@ -376,11 +404,12 @@ def scrape_measures() -> list:
                 if any(k in title.lower() for k in skip_kw):
                     continue
 
-                category     = classify_subject(subject)
-                conservative = infer_conservative_direction(title, desc, category)
-                mtype        = expand_type(mtype_raw)
-                code         = STATE_CODES.get(state, state[:2].upper())
-                summary      = desc if desc else title
+                category  = classify_subject(subject)
+                partisan  = infer_partisan(title, desc, mtype_raw)
+                conservative = infer_conservative_direction(title, desc, category) if partisan else True
+                mtype     = expand_type(mtype_raw)
+                code      = STATE_CODES.get(state, state[:2].upper())
+                summary   = desc if desc else title
 
                 n = state_counts.get(state, 0) + 1
                 state_counts[state] = n
@@ -394,6 +423,7 @@ def scrape_measures() -> list:
                     "title":                 title,
                     "summary":               summary,
                     "category":              category,
+                    "partisan":              partisan,
                     "conservativeDirection": conservative,
                     "type":                  mtype,
                     "status":                "Qualified",
