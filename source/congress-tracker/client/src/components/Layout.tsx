@@ -28,12 +28,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {/* ── Mobile / narrow header (hamburger) ── */}
         <div className="lg:hidden">
           {/* Logo row */}
-          <div className="flex items-center justify-between px-3" style={{height:"128px"}}>
-            <div className="w-16 shrink-0" />
-            <Link href="/" className="flex-1 flex justify-center items-center overflow-hidden">
-              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"120px",width:"auto",maxWidth:"calc(100vw - 8rem)",objectFit:"contain"}} />
+          <div className="flex items-center justify-between px-3" style={{height:"152px"}}>
+            <Link href="/" className="flex items-center overflow-hidden">
+              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"144px",width:"auto",maxWidth:"calc(100vw - 6rem)",objectFit:"contain"}} />
             </Link>
-            <div className="w-16 shrink-0 flex justify-end items-center gap-1">
+            <div className="shrink-0 flex justify-end items-center gap-1">
               <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </Button>
@@ -45,10 +44,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* ── Desktop header (wide enough to fit all nav items) ── */}
-        <div className="hidden lg:grid max-w-7xl mx-auto px-6 items-center" style={{height:"130px", gridTemplateColumns:"1fr auto 1fr"}}>
+        <div className="hidden lg:grid max-w-7xl mx-auto px-6 items-center" style={{height:"155px", gridTemplateColumns:"1fr auto 1fr"}}>
           {/* Left: logo */}
           <Link href="/" className="flex items-center">
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(220px, 22vw, 340px)",width:"auto",objectFit:"contain",marginTop:"calc((clamp(220px, 22vw, 340px) - 130px) / -2)",marginBottom:"calc((clamp(220px, 22vw, 340px) - 130px) / -2)"}} />
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(260px, 26vw, 400px)",width:"auto",objectFit:"contain",marginTop:"calc((clamp(260px, 26vw, 400px) - 155px) / -2)",marginBottom:"calc((clamp(260px, 26vw, 400px) - 155px) / -2)"}} />
           </Link>
           {/* Center: nav */}
           <nav className="flex items-center gap-1 flex-nowrap">
