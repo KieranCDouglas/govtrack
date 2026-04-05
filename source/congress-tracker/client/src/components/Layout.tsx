@@ -28,8 +28,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {/* ── Single unified bar: [left] [logo] [right] ── */}
         <div className="max-w-7xl mx-auto px-4 flex items-center" style={{height:"100px"}}>
 
-          {/* Left: hamburger (mobile) or nav links (desktop) */}
-          <div className="flex items-center gap-1 shrink-0">
+          {/* Left: logo */}
+          <Link href="/" className="shrink-0 flex items-center" style={{marginTop:"calc((288px - 100px) / -2)", marginBottom:"calc((288px - 100px) / -2)"}}>
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"288px",width:"auto",objectFit:"contain"}} />
+          </Link>
+
+          {/* Center: hamburger (mobile) or nav links (desktop) */}
+          <div className="flex-1 flex items-center justify-center gap-1">
             {/* Hamburger — mobile/narrow only */}
             <Button variant="ghost" size="icon" className="h-8 w-8 lg:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu">
               {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -51,13 +56,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </Link>
               ))}
             </nav>
-          </div>
-
-          {/* Center: logo */}
-          <div className="flex-1 flex justify-center">
-            <Link href="/" className="shrink-0 flex items-center" style={{marginTop:"calc((288px - 100px) / -2)", marginBottom:"calc((288px - 100px) / -2)"}}>
-              <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"288px",width:"auto",objectFit:"contain"}} />
-            </Link>
           </div>
 
           {/* Right: theme toggle */}
