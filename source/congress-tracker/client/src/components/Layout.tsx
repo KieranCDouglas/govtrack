@@ -25,7 +25,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <header className="z-50 border-b border-border/60 backdrop-blur-md bg-background/80" style={{overflow:"visible"}}>
 
         {/* ── Mobile header: compact bar, logo overflows, controls in bar ── */}
-        <div className="min-[1100px]:hidden relative flex flex-col items-center" style={{height:"140px"}}>
+        <div className="min-[1100px]:hidden relative flex flex-col items-center" style={{height:"160px"}}>
           {/* Logo centered, overflows bar above and below */}
           <Link href="/" className="absolute" style={{top:"40%", transform:"translateY(-50%)", display:"block", width:"300px", zIndex:10}}>
             <img src="./civicism-logo.png" alt="Civicism logo" style={{width:"300px",height:"auto", display:"block", filter: theme === "dark" ? "brightness(0) saturate(100%) invert(90%) sepia(18%) saturate(400%) hue-rotate(163deg) brightness(103%) contrast(92%)" : "none"}} />

@@ -50,7 +50,6 @@ build/
 
 # Source zip and extracted source (local only — used for redesign reference)
 *.zip
-source/
 
 # Built assets — ignore by default, allow only the deployed files
 assets/index-*.js

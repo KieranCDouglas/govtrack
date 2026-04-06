@@ -62,6 +62,21 @@ function getLeanLabel(measure: BallotMeasure): { label: string; conservative: bo
   if (!measure.partisan) {
     return { label: "Nonpartisan", conservative: false, nonpartisan: true };
   }
+
+  // Use actual scores when available — pick the axis with the stronger signal
+  if (measure.econScore != null && measure.socialScore != null) {
+    const econAbs   = Math.abs(measure.econScore);
+    const socialAbs = Math.abs(measure.socialScore);
+    if (socialAbs >= econAbs) {
+      const conservative = measure.socialScore > 0;
+      return { label: conservative ? "Socially Conservative" : "Socially Progressive", conservative, nonpartisan: false };
+    } else {
+      const conservative = measure.econScore > 0;
+      return { label: conservative ? "Fiscally Conservative" : "Fiscally Progressive", conservative, nonpartisan: false };
+    }
+  }
+
+  // Fallback: original category-axis + conservativeDirection logic
   const axis = CATEGORY_AXIS[measure.category] ?? "social";
   const conservative = measure.conservativeDirection;
   if (axis === "economic") {
@@ -108,8 +123,8 @@ function getAlignment(
       return { label: "Outside your core priorities", match: null };
     }
 
-    if (distance < 0.35) return { label: "Based on your views: YES", match: true };
-    if (distance > 0.65) return { label: "Based on your views: NO",  match: false };
+    if (distance < 0.15) return { label: "Based on your views: YES", match: true };
+    if (distance > 0.35) return { label: "Based on your views: NO",  match: false };
     return { label: "You may be split on this", match: null };
   }
 

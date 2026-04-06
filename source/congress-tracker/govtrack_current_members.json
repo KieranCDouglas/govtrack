@@ -1,0 +1,3775 @@
+{
+  "C001035": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "ME",
+    "district": null,
+    "gt_id": 300025
+  },
+  "C001056": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "TX",
+    "district": null,
+    "gt_id": 300027
+  },
+  "D000563": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "IL",
+    "district": null,
+    "gt_id": 300038
+  },
+  "G000359": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "SC",
+    "district": null,
+    "gt_id": 300047
+  },
+  "M000355": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "KY",
+    "district": null,
+    "gt_id": 300072
+  },
+  "M001176": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "OR",
+    "district": null,
+    "gt_id": 412325
+  },
+  "R000122": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "RI",
+    "district": null,
+    "gt_id": 300081
+  },
+  "R000584": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "ID",
+    "district": null,
+    "gt_id": 412322
+  },
+  "S001181": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "NH",
+    "district": null,
+    "gt_id": 412323
+  },
+  "W000805": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "VA",
+    "district": null,
+    "gt_id": 412321
+  },
+  "C001088": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "DE",
+    "district": null,
+    "gt_id": 412390
+  },
+  "C001047": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "WV",
+    "district": null,
+    "gt_id": 400061
+  },
+  "C001075": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "LA",
+    "district": null,
+    "gt_id": 412269
+  },
+  "L000570": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "NM",
+    "district": null,
+    "gt_id": 412293
+  },
+  "M000133": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "MA",
+    "district": null,
+    "gt_id": 400253
+  },
+  "P000595": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "MI",
+    "district": null,
+    "gt_id": 412305
+  },
+  "C001095": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "AR",
+    "district": null,
+    "gt_id": 412508
+  },
+  "D000618": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "MT",
+    "district": null,
+    "gt_id": 412549
+  },
+  "B001288": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "NJ",
+    "district": null,
+    "gt_id": 412598
+  },
+  "S001198": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "AK",
+    "district": null,
+    "gt_id": 412665
+  },
+  "E000295": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "IA",
+    "district": null,
+    "gt_id": 412667
+  },
+  "T000476": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "NC",
+    "district": null,
+    "gt_id": 412668
+  },
+  "R000605": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "SD",
+    "district": null,
+    "gt_id": 412669
+  },
+  "M001198": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "KS",
+    "district": null,
+    "gt_id": 412704
+  },
+  "S001203": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "MN",
+    "district": null,
+    "gt_id": 412742
+  },
+  "H001079": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "MS",
+    "district": null,
+    "gt_id": 412743
+  },
+  "L000571": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "WY",
+    "district": null,
+    "gt_id": 412294
+  },
+  "T000278": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "AL",
+    "district": null,
+    "gt_id": 456796
+  },
+  "H000273": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "CO",
+    "district": null,
+    "gt_id": 456797
+  },
+  "H000601": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "TN",
+    "district": null,
+    "gt_id": 456798
+  },
+  "O000174": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "GA",
+    "district": null,
+    "gt_id": 456857
+  },
+  "B001267": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "CO",
+    "district": null,
+    "gt_id": 412330
+  },
+  "B001277": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "CT",
+    "district": null,
+    "gt_id": 412490
+  },
+  "B001236": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "AR",
+    "district": null,
+    "gt_id": 400040
+  },
+  "C000880": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "ID",
+    "district": null,
+    "gt_id": 300030
+  },
+  "G000386": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "IA",
+    "district": null,
+    "gt_id": 300048
+  },
+  "H001061": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "ND",
+    "district": null,
+    "gt_id": 412494
+  },
+  "J000293": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "WI",
+    "district": null,
+    "gt_id": 412496
+  },
+  "L000575": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "OK",
+    "district": null,
+    "gt_id": 412464
+  },
+  "L000577": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "UT",
+    "district": null,
+    "gt_id": 412495
+  },
+  "M000934": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "KS",
+    "district": null,
+    "gt_id": 400284
+  },
+  "M001153": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "AK",
+    "district": null,
+    "gt_id": 300075
+  },
+  "M001111": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "WA",
+    "district": null,
+    "gt_id": 300076
+  },
+  "P000603": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "KY",
+    "district": null,
+    "gt_id": 412492
+  },
+  "S000148": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "NY",
+    "district": null,
+    "gt_id": 300087
+  },
+  "S001184": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "SC",
+    "district": null,
+    "gt_id": 412471
+  },
+  "T000250": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "SD",
+    "district": null,
+    "gt_id": 400546
+  },
+  "V000128": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "MD",
+    "district": null,
+    "gt_id": 400415
+  },
+  "W000800": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "VT",
+    "district": null,
+    "gt_id": 412239
+  },
+  "W000779": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "OR",
+    "district": null,
+    "gt_id": 300100
+  },
+  "Y000064": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "IN",
+    "district": null,
+    "gt_id": 412428
+  },
+  "S001194": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "HI",
+    "district": null,
+    "gt_id": 412507
+  },
+  "D000622": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "IL",
+    "district": null,
+    "gt_id": 412533
+  },
+  "M001190": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "OK",
+    "district": null,
+    "gt_id": 412568
+  },
+  "K000393": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "LA",
+    "district": null,
+    "gt_id": 412679
+  },
+  "H001076": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "NH",
+    "district": null,
+    "gt_id": 412680
+  },
+  "C001113": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "NV",
+    "district": null,
+    "gt_id": 412681
+  },
+  "B001305": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "NC",
+    "district": null,
+    "gt_id": 412712
+  },
+  "K000377": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "AZ",
+    "district": null,
+    "gt_id": 456794
+  },
+  "P000145": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "CA",
+    "district": null,
+    "gt_id": 456856
+  },
+  "W000790": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "GA",
+    "district": null,
+    "gt_id": 456858
+  },
+  "B001319": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "AL",
+    "district": null,
+    "gt_id": 456874
+  },
+  "S001227": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "MO",
+    "district": null,
+    "gt_id": 456875
+  },
+  "F000479": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "PA",
+    "district": null,
+    "gt_id": 456877
+  },
+  "R000618": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "NE",
+    "district": null,
+    "gt_id": 456952
+  },
+  "C000127": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "WA",
+    "district": null,
+    "gt_id": 300018
+  },
+  "K000367": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "MN",
+    "district": null,
+    "gt_id": 412242
+  },
+  "S000033": {
+    "chamber": "Senate",
+    "party": "Independent",
+    "state": "VT",
+    "district": null,
+    "gt_id": 400357
+  },
+  "W000802": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "RI",
+    "district": null,
+    "gt_id": 412247
+  },
+  "B001261": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "WY",
+    "district": null,
+    "gt_id": 412251
+  },
+  "W000437": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "MS",
+    "district": null,
+    "gt_id": 400432
+  },
+  "G000555": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "NY",
+    "district": null,
+    "gt_id": 412223
+  },
+  "A000055": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AL",
+    "district": 4,
+    "gt_id": 400004
+  },
+  "B001230": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "WI",
+    "district": null,
+    "gt_id": 400013
+  },
+  "B001257": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 12,
+    "gt_id": 412250
+  },
+  "B000490": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "GA",
+    "district": 2,
+    "gt_id": 400030
+  },
+  "B001243": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "TN",
+    "district": null,
+    "gt_id": 400032
+  },
+  "B001260": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 16,
+    "gt_id": 412196
+  },
+  "C000059": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "CA",
+    "district": 41,
+    "gt_id": 400057
+  },
+  "C001072": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IN",
+    "district": 7,
+    "gt_id": 412258
+  },
+  "C001051": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 31,
+    "gt_id": 400068
+  },
+  "C001066": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "FL",
+    "district": 14,
+    "gt_id": 412195
+  },
+  "C001080": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 28,
+    "gt_id": 412379
+  },
+  "C001067": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 9,
+    "gt_id": 412221
+  },
+  "C001061": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MO",
+    "district": 5,
+    "gt_id": 400639
+  },
+  "C000537": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "SC",
+    "district": 6,
+    "gt_id": 400075
+  },
+  "C001068": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "TN",
+    "district": 9,
+    "gt_id": 412236
+  },
+  "C001053": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OK",
+    "district": 4,
+    "gt_id": 400077
+  },
+  "C001059": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 21,
+    "gt_id": 400618
+  },
+  "C001069": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CT",
+    "district": 2,
+    "gt_id": 412193
+  },
+  "C001087": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AR",
+    "district": 1,
+    "gt_id": 412400
+  },
+  "C001063": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "TX",
+    "district": 28,
+    "gt_id": 400657
+  },
+  "D000096": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IL",
+    "district": 7,
+    "gt_id": 400093
+  },
+  "D000197": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CO",
+    "district": 1,
+    "gt_id": 400101
+  },
+  "D000216": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CT",
+    "district": 3,
+    "gt_id": 400103
+  },
+  "D000616": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TN",
+    "district": 4,
+    "gt_id": 412477
+  },
+  "D000600": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 26,
+    "gt_id": 400108
+  },
+  "D000399": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "TX",
+    "district": 37,
+    "gt_id": 400111
+  },
+  "F000459": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TN",
+    "district": 3,
+    "gt_id": 412476
+  },
+  "F000450": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NC",
+    "district": 5,
+    "gt_id": 400643
+  },
+  "G000559": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 8,
+    "gt_id": 412382
+  },
+  "G000565": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AZ",
+    "district": 9,
+    "gt_id": 412397
+  },
+  "G000546": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MO",
+    "district": 6,
+    "gt_id": 400158
+  },
+  "G000553": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "TX",
+    "district": 9,
+    "gt_id": 400653
+  },
+  "G000568": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "VA",
+    "district": 9,
+    "gt_id": 412485
+  },
+  "G000558": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "KY",
+    "district": 2,
+    "gt_id": 412278
+  },
+  "H001052": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MD",
+    "district": 1,
+    "gt_id": 412434
+  },
+  "H001046": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "NM",
+    "district": null,
+    "gt_id": 412281
+  },
+  "H001047": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CT",
+    "district": 4,
+    "gt_id": 412282
+  },
+  "H001042": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "HI",
+    "district": null,
+    "gt_id": 412200
+  },
+  "H000874": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MD",
+    "district": 5,
+    "gt_id": 400189
+  },
+  "H001058": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MI",
+    "district": 4,
+    "gt_id": 412437
+  },
+  "J000288": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "GA",
+    "district": 4,
+    "gt_id": 412199
+  },
+  "J000289": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OH",
+    "district": 4,
+    "gt_id": 412226
+  },
+  "K000009": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "OH",
+    "district": 9,
+    "gt_id": 400211
+  },
+  "K000375": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MA",
+    "district": 9,
+    "gt_id": 412435
+  },
+  "K000376": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "PA",
+    "district": 16,
+    "gt_id": 412465
+  },
+  "L000560": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "WA",
+    "district": 2,
+    "gt_id": 400232
+  },
+  "L000557": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CT",
+    "district": 1,
+    "gt_id": 400233
+  },
+  "L000566": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OH",
+    "district": 5,
+    "gt_id": 412256
+  },
+  "L000397": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 18,
+    "gt_id": 400245
+  },
+  "L000491": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OK",
+    "district": 3,
+    "gt_id": 400247
+  },
+  "L000562": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MA",
+    "district": 8,
+    "gt_id": 400249
+  },
+  "M001163": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 7,
+    "gt_id": 400663
+  },
+  "M001157": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 10,
+    "gt_id": 400654
+  },
+  "M001177": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "CA",
+    "district": 5,
+    "gt_id": 412295
+  },
+  "M001143": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MN",
+    "district": 4,
+    "gt_id": 400259
+  },
+  "M000312": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MA",
+    "district": 2,
+    "gt_id": 400263
+  },
+  "M001137": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 5,
+    "gt_id": 400271
+  },
+  "M001160": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "WI",
+    "district": 4,
+    "gt_id": 400661
+  },
+  "M001169": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "CT",
+    "district": null,
+    "gt_id": 412194
+  },
+  "N000002": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 12,
+    "gt_id": 400289
+  },
+  "N000015": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MA",
+    "district": 1,
+    "gt_id": 400291
+  },
+  "N000147": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "DC",
+    "district": 0,
+    "gt_id": 400295
+  },
+  "P000034": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NJ",
+    "district": 6,
+    "gt_id": 400308
+  },
+  "P000197": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 11,
+    "gt_id": 400314
+  },
+  "P000597": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "ME",
+    "district": 1,
+    "gt_id": 412307
+  },
+  "Q000023": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IL",
+    "district": 5,
+    "gt_id": 412331
+  },
+  "R000395": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "KY",
+    "district": 5,
+    "gt_id": 400340
+  },
+  "R000575": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AL",
+    "district": 3,
+    "gt_id": 400341
+  },
+  "S001176": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "LA",
+    "district": 1,
+    "gt_id": 412261
+  },
+  "S001145": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IL",
+    "district": 9,
+    "gt_id": 400360
+  },
+  "S001150": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "CA",
+    "district": null,
+    "gt_id": 400361
+  },
+  "S001183": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AZ",
+    "district": 1,
+    "gt_id": 412399
+  },
+  "S001189": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "GA",
+    "district": 8,
+    "gt_id": 412417
+  },
+  "S001157": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "GA",
+    "district": 13,
+    "gt_id": 400363
+  },
+  "S000185": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "VA",
+    "district": 3,
+    "gt_id": 400364
+  },
+  "S001185": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "AL",
+    "district": 7,
+    "gt_id": 412396
+  },
+  "S000344": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 32,
+    "gt_id": 400371
+  },
+  "S001148": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "ID",
+    "district": 2,
+    "gt_id": 400376
+  },
+  "S000510": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "WA",
+    "district": 9,
+    "gt_id": 400379
+  },
+  "S001172": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NE",
+    "district": 3,
+    "gt_id": 412217
+  },
+  "S000522": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NJ",
+    "district": 4,
+    "gt_id": 400380
+  },
+  "S001156": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 38,
+    "gt_id": 400355
+  },
+  "T000193": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MS",
+    "district": 2,
+    "gt_id": 400402
+  },
+  "T000460": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 4,
+    "gt_id": 400403
+  },
+  "T000467": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "PA",
+    "district": 15,
+    "gt_id": 412317
+  },
+  "T000469": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 20,
+    "gt_id": 412319
+  },
+  "T000463": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OH",
+    "district": 10,
+    "gt_id": 400411
+  },
+  "V000081": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 7,
+    "gt_id": 400416
+  },
+  "W000798": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MI",
+    "district": 5,
+    "gt_id": 412213
+  },
+  "W000797": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "FL",
+    "district": 25,
+    "gt_id": 400623
+  },
+  "W000187": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 43,
+    "gt_id": 400422
+  },
+  "W000806": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 11,
+    "gt_id": 412410
+  },
+  "W000795": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "SC",
+    "district": 2,
+    "gt_id": 400433
+  },
+  "W000808": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "FL",
+    "district": 24,
+    "gt_id": 412412
+  },
+  "W000804": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "VA",
+    "district": 1,
+    "gt_id": 412255
+  },
+  "W000809": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AR",
+    "district": 3,
+    "gt_id": 412402
+  },
+  "A000369": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NV",
+    "district": 2,
+    "gt_id": 412500
+  },
+  "B001278": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "OR",
+    "district": 1,
+    "gt_id": 412501
+  },
+  "D000617": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "WA",
+    "district": 1,
+    "gt_id": 412505
+  },
+  "M001184": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "KY",
+    "district": 4,
+    "gt_id": 412503
+  },
+  "F000454": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IL",
+    "district": 11,
+    "gt_id": 412257
+  },
+  "T000468": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NV",
+    "district": 1,
+    "gt_id": 412318
+  },
+  "H001068": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 2,
+    "gt_id": 412511
+  },
+  "B001287": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 6,
+    "gt_id": 412512
+  },
+  "S001193": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 14,
+    "gt_id": 412514
+  },
+  "B001285": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 26,
+    "gt_id": 412516
+  },
+  "R000599": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 25,
+    "gt_id": 412519
+  },
+  "T000472": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 39,
+    "gt_id": 412520
+  },
+  "V000130": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 52,
+    "gt_id": 412522
+  },
+  "P000608": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 50,
+    "gt_id": 412523
+  },
+  "F000462": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "FL",
+    "district": 22,
+    "gt_id": 412529
+  },
+  "B001282": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "KY",
+    "district": 6,
+    "gt_id": 412541
+  },
+  "W000817": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "MA",
+    "district": null,
+    "gt_id": 412542
+  },
+  "K000383": {
+    "chamber": "Senate",
+    "party": "Independent",
+    "state": "ME",
+    "district": null,
+    "gt_id": 412545
+  },
+  "W000812": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MO",
+    "district": 2,
+    "gt_id": 412548
+  },
+  "H001067": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NC",
+    "district": 9,
+    "gt_id": 412550
+  },
+  "C001096": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "ND",
+    "district": null,
+    "gt_id": 412555
+  },
+  "F000463": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "NE",
+    "district": null,
+    "gt_id": 412556
+  },
+  "M001188": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 6,
+    "gt_id": 412560
+  },
+  "J000294": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 8,
+    "gt_id": 412561
+  },
+  "B001281": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "OH",
+    "district": 3,
+    "gt_id": 412565
+  },
+  "J000295": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OH",
+    "district": 14,
+    "gt_id": 412566
+  },
+  "P000605": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "PA",
+    "district": 10,
+    "gt_id": 412569
+  },
+  "C001098": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "TX",
+    "district": null,
+    "gt_id": 412573
+  },
+  "W000814": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 14,
+    "gt_id": 412574
+  },
+  "C001091": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "TX",
+    "district": 20,
+    "gt_id": 412576
+  },
+  "W000816": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 25,
+    "gt_id": 412578
+  },
+  "V000131": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "TX",
+    "district": 33,
+    "gt_id": 412579
+  },
+  "K000384": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "VA",
+    "district": null,
+    "gt_id": 412582
+  },
+  "P000607": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "WI",
+    "district": 2,
+    "gt_id": 412585
+  },
+  "K000385": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IL",
+    "district": 2,
+    "gt_id": 412595
+  },
+  "S001195": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MO",
+    "district": 8,
+    "gt_id": 412596
+  },
+  "C001101": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MA",
+    "district": 5,
+    "gt_id": 412600
+  },
+  "N000188": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NJ",
+    "district": 1,
+    "gt_id": 412606
+  },
+  "A000370": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NC",
+    "district": 12,
+    "gt_id": 412607
+  },
+  "P000609": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AL",
+    "district": 6,
+    "gt_id": 412608
+  },
+  "H001072": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AR",
+    "district": 2,
+    "gt_id": 412609
+  },
+  "W000821": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AR",
+    "district": 4,
+    "gt_id": 412610
+  },
+  "G000574": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "AZ",
+    "district": null,
+    "gt_id": 412612
+  },
+  "D000623": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 10,
+    "gt_id": 412613
+  },
+  "A000371": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 33,
+    "gt_id": 412615
+  },
+  "L000582": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 36,
+    "gt_id": 412616
+  },
+  "T000474": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 35,
+    "gt_id": 412617
+  },
+  "C001103": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "GA",
+    "district": 1,
+    "gt_id": 412622
+  },
+  "L000583": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "GA",
+    "district": 11,
+    "gt_id": 412624
+  },
+  "A000372": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "GA",
+    "district": 12,
+    "gt_id": 412625
+  },
+  "B001295": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "IL",
+    "district": 12,
+    "gt_id": 412629
+  },
+  "M001196": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MA",
+    "district": 6,
+    "gt_id": 412632
+  },
+  "M001194": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MI",
+    "district": 2,
+    "gt_id": 412634
+  },
+  "D000624": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MI",
+    "district": 6,
+    "gt_id": 412637
+  },
+  "E000294": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MN",
+    "district": 6,
+    "gt_id": 412639
+  },
+  "R000603": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NC",
+    "district": 7,
+    "gt_id": 412641
+  },
+  "W000822": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NJ",
+    "district": 12,
+    "gt_id": 412644
+  },
+  "S001196": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NY",
+    "district": 21,
+    "gt_id": 412648
+  },
+  "B001296": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "PA",
+    "district": 2,
+    "gt_id": 412652
+  },
+  "B001291": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 36,
+    "gt_id": 412655
+  },
+  "B001292": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "VA",
+    "district": 8,
+    "gt_id": 412657
+  },
+  "P000610": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "VI",
+    "district": 0,
+    "gt_id": 412659
+  },
+  "N000189": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "WA",
+    "district": 4,
+    "gt_id": 412660
+  },
+  "G000576": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "WI",
+    "district": 6,
+    "gt_id": 412661
+  },
+  "R000600": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AS",
+    "district": 0,
+    "gt_id": 412664
+  },
+  "K000388": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MS",
+    "district": 1,
+    "gt_id": 412673
+  },
+  "L000585": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "IL",
+    "district": 16,
+    "gt_id": 412674
+  },
+  "D000626": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OH",
+    "district": 8,
+    "gt_id": 412675
+  },
+  "C001108": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "KY",
+    "district": 1,
+    "gt_id": 412676
+  },
+  "E000296": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "PA",
+    "district": 3,
+    "gt_id": 412677
+  },
+  "S001190": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IL",
+    "district": 10,
+    "gt_id": 412534
+  },
+  "B001302": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AZ",
+    "district": 5,
+    "gt_id": 412683
+  },
+  "K000389": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 17,
+    "gt_id": 412684
+  },
+  "P000613": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 19,
+    "gt_id": 412685
+  },
+  "C001112": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 24,
+    "gt_id": 412686
+  },
+  "B001300": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 44,
+    "gt_id": 412687
+  },
+  "C001110": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 46,
+    "gt_id": 412688
+  },
+  "B001303": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "DE",
+    "district": null,
+    "gt_id": 412689
+  },
+  "D000628": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 2,
+    "gt_id": 412691
+  },
+  "R000609": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 5,
+    "gt_id": 412692
+  },
+  "S001200": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "FL",
+    "district": 9,
+    "gt_id": 412695
+  },
+  "M001199": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 21,
+    "gt_id": 412698
+  },
+  "K000391": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IL",
+    "district": 8,
+    "gt_id": 412701
+  },
+  "B001299": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "IN",
+    "district": null,
+    "gt_id": 412702
+  },
+  "H001077": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "LA",
+    "district": 3,
+    "gt_id": 412705
+  },
+  "J000299": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "LA",
+    "district": 4,
+    "gt_id": 412706
+  },
+  "R000606": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MD",
+    "district": 8,
+    "gt_id": 412708
+  },
+  "B001301": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MI",
+    "district": 1,
+    "gt_id": 412709
+  },
+  "B001298": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NE",
+    "district": 2,
+    "gt_id": 412713
+  },
+  "G000583": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NJ",
+    "district": 5,
+    "gt_id": 412714
+  },
+  "R000608": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "NV",
+    "district": null,
+    "gt_id": 412715
+  },
+  "E000297": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 13,
+    "gt_id": 412718
+  },
+  "F000466": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "PA",
+    "district": 1,
+    "gt_id": 412721
+  },
+  "S001199": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "PA",
+    "district": 11,
+    "gt_id": 412722
+  },
+  "K000392": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TN",
+    "district": 8,
+    "gt_id": 412724
+  },
+  "G000581": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "TX",
+    "district": 34,
+    "gt_id": 412725
+  },
+  "A000375": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 19,
+    "gt_id": 412726
+  },
+  "J000298": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "WA",
+    "district": 7,
+    "gt_id": 412730
+  },
+  "E000298": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "KS",
+    "district": 4,
+    "gt_id": 412735
+  },
+  "N000190": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "SC",
+    "district": 5,
+    "gt_id": 412738
+  },
+  "G000585": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 34,
+    "gt_id": 412739
+  },
+  "C001114": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "UT",
+    "district": null,
+    "gt_id": 412740
+  },
+  "C001115": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 27,
+    "gt_id": 412746
+  },
+  "B001306": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OH",
+    "district": 12,
+    "gt_id": 412747
+  },
+  "H001082": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OK",
+    "district": 1,
+    "gt_id": 412748
+  },
+  "M001206": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 25,
+    "gt_id": 412749
+  },
+  "S001205": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "PA",
+    "district": 5,
+    "gt_id": 412750
+  },
+  "C001055": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "HI",
+    "district": 1,
+    "gt_id": 400069
+  },
+  "H001066": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NV",
+    "district": 4,
+    "gt_id": 412559
+  },
+  "S001211": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "AZ",
+    "district": 4,
+    "gt_id": 412753
+  },
+  "H001090": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 9,
+    "gt_id": 412754
+  },
+  "L000593": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 49,
+    "gt_id": 412760
+  },
+  "N000191": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CO",
+    "district": 2,
+    "gt_id": 412761
+  },
+  "C001121": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CO",
+    "district": 6,
+    "gt_id": 412762
+  },
+  "H001081": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CT",
+    "district": 5,
+    "gt_id": 412763
+  },
+  "S001214": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 17,
+    "gt_id": 412766
+  },
+  "M001208": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "GA",
+    "district": 6,
+    "gt_id": 412769
+  },
+  "F000469": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "ID",
+    "district": 1,
+    "gt_id": 412773
+  },
+  "G000586": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IL",
+    "district": 4,
+    "gt_id": 412774
+  },
+  "C001117": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IL",
+    "district": 6,
+    "gt_id": 412775
+  },
+  "U000040": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IL",
+    "district": 14,
+    "gt_id": 412776
+  },
+  "B001307": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "IN",
+    "district": 4,
+    "gt_id": 412777
+  },
+  "D000629": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "KS",
+    "district": 3,
+    "gt_id": 412780
+  },
+  "T000482": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MA",
+    "district": 3,
+    "gt_id": 412781
+  },
+  "P000617": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MA",
+    "district": 7,
+    "gt_id": 412782
+  },
+  "S001208": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "MI",
+    "district": null,
+    "gt_id": 412784
+  },
+  "S001215": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MI",
+    "district": 11,
+    "gt_id": 412786
+  },
+  "T000481": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MI",
+    "district": 12,
+    "gt_id": 412787
+  },
+  "C001119": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MN",
+    "district": 2,
+    "gt_id": 412789
+  },
+  "O000173": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MN",
+    "district": 5,
+    "gt_id": 412791
+  },
+  "S001212": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MN",
+    "district": 8,
+    "gt_id": 412792
+  },
+  "G000591": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MS",
+    "district": 3,
+    "gt_id": 412793
+  },
+  "P000614": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NH",
+    "district": 1,
+    "gt_id": 412795
+  },
+  "V000133": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NJ",
+    "district": 2,
+    "gt_id": 412796
+  },
+  "K000394": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "NJ",
+    "district": null,
+    "gt_id": 412797
+  },
+  "L000590": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NV",
+    "district": 3,
+    "gt_id": 412802
+  },
+  "O000172": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 14,
+    "gt_id": 412804
+  },
+  "D000631": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "PA",
+    "district": 4,
+    "gt_id": 412809
+  },
+  "H001085": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "PA",
+    "district": 6,
+    "gt_id": 412810
+  },
+  "M001204": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "PA",
+    "district": 9,
+    "gt_id": 412811
+  },
+  "J000302": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "PA",
+    "district": 13,
+    "gt_id": 412812
+  },
+  "R000610": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "PA",
+    "district": 14,
+    "gt_id": 412813
+  },
+  "T000480": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "SC",
+    "district": 4,
+    "gt_id": 412815
+  },
+  "J000301": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "SD",
+    "district": 0,
+    "gt_id": 412816
+  },
+  "B001309": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TN",
+    "district": 2,
+    "gt_id": 412817
+  },
+  "R000612": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TN",
+    "district": 6,
+    "gt_id": 412818
+  },
+  "C001120": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 2,
+    "gt_id": 412820
+  },
+  "G000589": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 5,
+    "gt_id": 412822
+  },
+  "F000468": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "TX",
+    "district": 7,
+    "gt_id": 412824
+  },
+  "E000299": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "TX",
+    "district": 16,
+    "gt_id": 412825
+  },
+  "R000614": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 21,
+    "gt_id": 412826
+  },
+  "G000587": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "TX",
+    "district": 29,
+    "gt_id": 412827
+  },
+  "C001118": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "VA",
+    "district": 6,
+    "gt_id": 412832
+  },
+  "S001216": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "WA",
+    "district": 8,
+    "gt_id": 412835
+  },
+  "S001213": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "WI",
+    "district": 1,
+    "gt_id": 412836
+  },
+  "M001205": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "WV",
+    "district": 1,
+    "gt_id": 412837
+  },
+  "S001217": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "FL",
+    "district": null,
+    "gt_id": 412838
+  },
+  "H001089": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "MO",
+    "district": null,
+    "gt_id": 412840
+  },
+  "G000592": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "ME",
+    "district": 2,
+    "gt_id": 412842
+  },
+  "M001210": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NC",
+    "district": 3,
+    "gt_id": 412845
+  },
+  "M000687": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MD",
+    "district": 7,
+    "gt_id": 407672
+  },
+  "T000165": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "WI",
+    "district": 7,
+    "gt_id": 456791
+  },
+  "I000056": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "CA",
+    "district": 48,
+    "gt_id": 400196
+  },
+  "S000250": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 17,
+    "gt_id": 400367
+  },
+  "V000129": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "CA",
+    "district": 22,
+    "gt_id": 412515
+  },
+  "M001212": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AL",
+    "district": 1,
+    "gt_id": 456800
+  },
+  "O000019": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "CA",
+    "district": 23,
+    "gt_id": 456801
+  },
+  "K000397": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "CA",
+    "district": 40,
+    "gt_id": 456802
+  },
+  "J000305": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 51,
+    "gt_id": 456804
+  },
+  "B000825": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "CO",
+    "district": 4,
+    "gt_id": 456805
+  },
+  "C001039": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 3,
+    "gt_id": 456806
+  },
+  "F000472": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 18,
+    "gt_id": 456807
+  },
+  "D000032": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 19,
+    "gt_id": 456808
+  },
+  "G000593": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 28,
+    "gt_id": 456809
+  },
+  "S000168": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 27,
+    "gt_id": 456810
+  },
+  "W000788": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "GA",
+    "district": 5,
+    "gt_id": 456811
+  },
+  "C001116": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "GA",
+    "district": 9,
+    "gt_id": 456813
+  },
+  "H001091": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "IA",
+    "district": 2,
+    "gt_id": 456816
+  },
+  "M001215": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "IA",
+    "district": 1,
+    "gt_id": 456817
+  },
+  "F000446": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "IA",
+    "district": 4,
+    "gt_id": 456818
+  },
+  "M001211": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "IL",
+    "district": 15,
+    "gt_id": 456820
+  },
+  "M001214": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IN",
+    "district": 1,
+    "gt_id": 456821
+  },
+  "S000929": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "IN",
+    "district": 5,
+    "gt_id": 456822
+  },
+  "M000871": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "KS",
+    "district": 1,
+    "gt_id": 456823
+  },
+  "A000148": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MA",
+    "district": 4,
+    "gt_id": 456825
+  },
+  "M001136": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MI",
+    "district": 9,
+    "gt_id": 456827
+  },
+  "F000470": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MN",
+    "district": 7,
+    "gt_id": 456828
+  },
+  "R000305": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NC",
+    "district": 2,
+    "gt_id": 456831
+  },
+  "L000273": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NM",
+    "district": 3,
+    "gt_id": 456835
+  },
+  "G000597": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NY",
+    "district": 2,
+    "gt_id": 456836
+  },
+  "M000317": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NY",
+    "district": 11,
+    "gt_id": 456837
+  },
+  "T000486": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 15,
+    "gt_id": 456838
+  },
+  "B000740": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OK",
+    "district": 5,
+    "gt_id": 456841
+  },
+  "B000668": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OR",
+    "district": 2,
+    "gt_id": 456842
+  },
+  "M000194": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "SC",
+    "district": 1,
+    "gt_id": 456843
+  },
+  "H001086": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TN",
+    "district": 1,
+    "gt_id": 456844
+  },
+  "F000246": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 4,
+    "gt_id": 456845
+  },
+  "P000048": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 11,
+    "gt_id": 456846
+  },
+  "J000304": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 13,
+    "gt_id": 456847
+  },
+  "N000026": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 22,
+    "gt_id": 456848
+  },
+  "G000594": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 23,
+    "gt_id": 456849
+  },
+  "V000134": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 24,
+    "gt_id": 456850
+  },
+  "M001213": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "UT",
+    "district": 1,
+    "gt_id": 456851
+  },
+  "O000086": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "UT",
+    "district": 4,
+    "gt_id": 456852
+  },
+  "S001159": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "WA",
+    "district": 10,
+    "gt_id": 456854
+  },
+  "F000471": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "WI",
+    "district": 5,
+    "gt_id": 456855
+  },
+  "T000478": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NY",
+    "district": 24,
+    "gt_id": 412720
+  },
+  "L000595": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "LA",
+    "district": 5,
+    "gt_id": 456859
+  },
+  "C001125": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "LA",
+    "district": 2,
+    "gt_id": 456860
+  },
+  "S001218": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NM",
+    "district": 1,
+    "gt_id": 456861
+  },
+  "E000071": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 6,
+    "gt_id": 456862
+  },
+  "B001313": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "OH",
+    "district": 11,
+    "gt_id": 456863
+  },
+  "C001126": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OH",
+    "district": 15,
+    "gt_id": 456864
+  },
+  "C001127": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "FL",
+    "district": 20,
+    "gt_id": 456865
+  },
+  "F000474": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NE",
+    "district": 1,
+    "gt_id": 456868
+  },
+  "F000475": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MN",
+    "district": 1,
+    "gt_id": 456869
+  },
+  "R000579": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 18,
+    "gt_id": 456871
+  },
+  "Y000067": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "IN",
+    "district": 2,
+    "gt_id": 456873
+  },
+  "Z000018": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MT",
+    "district": 1,
+    "gt_id": 412640
+  },
+  "S001220": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AL",
+    "district": 5,
+    "gt_id": 456878
+  },
+  "C001132": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AZ",
+    "district": 2,
+    "gt_id": 456879
+  },
+  "C001133": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AZ",
+    "district": 6,
+    "gt_id": 456880
+  },
+  "K000401": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "CA",
+    "district": 3,
+    "gt_id": 456881
+  },
+  "M001225": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 15,
+    "gt_id": 456883
+  },
+  "K000400": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 37,
+    "gt_id": 456884
+  },
+  "G000598": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 42,
+    "gt_id": 456885
+  },
+  "P000620": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CO",
+    "district": 7,
+    "gt_id": 456886
+  },
+  "B001314": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 4,
+    "gt_id": 456888
+  },
+  "M001216": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 7,
+    "gt_id": 456889
+  },
+  "F000476": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "FL",
+    "district": 10,
+    "gt_id": 456890
+  },
+  "L000596": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 13,
+    "gt_id": 456891
+  },
+  "L000597": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 15,
+    "gt_id": 456892
+  },
+  "M001217": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "FL",
+    "district": 23,
+    "gt_id": 456893
+  },
+  "M001218": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "GA",
+    "district": 7,
+    "gt_id": 456894
+  },
+  "C001129": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "GA",
+    "district": 10,
+    "gt_id": 456895
+  },
+  "M001219": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "GU",
+    "district": 0,
+    "gt_id": 456896
+  },
+  "T000487": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "HI",
+    "district": 2,
+    "gt_id": 456897
+  },
+  "N000193": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "IA",
+    "district": 3,
+    "gt_id": 456898
+  },
+  "J000309": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IL",
+    "district": 1,
+    "gt_id": 456899
+  },
+  "R000617": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IL",
+    "district": 3,
+    "gt_id": 456900
+  },
+  "B001315": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IL",
+    "district": 13,
+    "gt_id": 456901
+  },
+  "S001225": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "IL",
+    "district": 17,
+    "gt_id": 456902
+  },
+  "H001093": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "IN",
+    "district": 9,
+    "gt_id": 456903
+  },
+  "M001220": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "KY",
+    "district": 3,
+    "gt_id": 456904
+  },
+  "I000058": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MD",
+    "district": 4,
+    "gt_id": 456905
+  },
+  "S001221": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MI",
+    "district": 3,
+    "gt_id": 456906
+  },
+  "J000307": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MI",
+    "district": 10,
+    "gt_id": 456907
+  },
+  "T000488": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MI",
+    "district": 13,
+    "gt_id": 456908
+  },
+  "A000379": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MO",
+    "district": 4,
+    "gt_id": 456909
+  },
+  "B001316": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MO",
+    "district": 7,
+    "gt_id": 456910
+  },
+  "E000235": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MS",
+    "district": 4,
+    "gt_id": 456911
+  },
+  "D000230": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NC",
+    "district": 1,
+    "gt_id": 456912
+  },
+  "F000477": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NC",
+    "district": 4,
+    "gt_id": 456913
+  },
+  "E000246": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NC",
+    "district": 11,
+    "gt_id": 456914
+  },
+  "K000398": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NJ",
+    "district": 7,
+    "gt_id": 456917
+  },
+  "M001226": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NJ",
+    "district": 8,
+    "gt_id": 456918
+  },
+  "V000136": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NM",
+    "district": 2,
+    "gt_id": 456919
+  },
+  "L000598": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NY",
+    "district": 1,
+    "gt_id": 456920
+  },
+  "G000599": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 10,
+    "gt_id": 456923
+  },
+  "L000599": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NY",
+    "district": 17,
+    "gt_id": 456924
+  },
+  "L000600": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NY",
+    "district": 23,
+    "gt_id": 456927
+  },
+  "L000601": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "OH",
+    "district": 1,
+    "gt_id": 456928
+  },
+  "M001222": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OH",
+    "district": 7,
+    "gt_id": 456929
+  },
+  "S001223": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "OH",
+    "district": 13,
+    "gt_id": 456930
+  },
+  "B001317": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OK",
+    "district": 2,
+    "gt_id": 456931
+  },
+  "H001094": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "OR",
+    "district": 4,
+    "gt_id": 456932
+  },
+  "S001226": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "OR",
+    "district": 6,
+    "gt_id": 456934
+  },
+  "L000602": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "PA",
+    "district": 12,
+    "gt_id": 456935
+  },
+  "D000530": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "PA",
+    "district": 17,
+    "gt_id": 456936
+  },
+  "M001223": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "RI",
+    "district": 2,
+    "gt_id": 456937
+  },
+  "F000478": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "SC",
+    "district": 7,
+    "gt_id": 456938
+  },
+  "O000175": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TN",
+    "district": 5,
+    "gt_id": 456939
+  },
+  "M001224": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 1,
+    "gt_id": 456940
+  },
+  "S001224": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 3,
+    "gt_id": 456941
+  },
+  "L000603": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 8,
+    "gt_id": 456942
+  },
+  "D000594": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 15,
+    "gt_id": 456943
+  },
+  "C001130": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "TX",
+    "district": 30,
+    "gt_id": 456944
+  },
+  "C001131": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "TX",
+    "district": 35,
+    "gt_id": 456945
+  },
+  "H001095": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 38,
+    "gt_id": 456946
+  },
+  "K000399": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "VA",
+    "district": 2,
+    "gt_id": 456947
+  },
+  "B001318": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "VT",
+    "district": 0,
+    "gt_id": 456948
+  },
+  "G000600": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "WA",
+    "district": 3,
+    "gt_id": 456949
+  },
+  "V000135": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "WI",
+    "district": 3,
+    "gt_id": 456950
+  },
+  "H001096": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "WY",
+    "district": 0,
+    "gt_id": 456951
+  },
+  "M001227": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "VA",
+    "district": 4,
+    "gt_id": 456953
+  },
+  "A000380": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "RI",
+    "district": 1,
+    "gt_id": 456955
+  },
+  "M001228": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "UT",
+    "district": 2,
+    "gt_id": 456956
+  },
+  "S001201": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 3,
+    "gt_id": 412717
+  },
+  "K000402": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 26,
+    "gt_id": 456957
+  },
+  "F000480": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "CA",
+    "district": 20,
+    "gt_id": 456958
+  },
+  "R000619": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OH",
+    "district": 6,
+    "gt_id": 456959
+  },
+  "M001229": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NJ",
+    "district": 10,
+    "gt_id": 456962
+  },
+  "W000829": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "WI",
+    "district": 8,
+    "gt_id": 456963
+  },
+  "F000110": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "LA",
+    "district": 6,
+    "gt_id": 404067
+  },
+  "S001188": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "IN",
+    "district": 3,
+    "gt_id": 412392
+  },
+  "C001123": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 31,
+    "gt_id": 412757
+  },
+  "A000382": {
+    "chamber": "Senate",
+    "party": "Democrat",
+    "state": "MD",
+    "district": null,
+    "gt_id": 456965
+  },
+  "S001232": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "MT",
+    "district": null,
+    "gt_id": 456966
+  },
+  "M001242": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "OH",
+    "district": null,
+    "gt_id": 456967
+  },
+  "M001243": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "PA",
+    "district": null,
+    "gt_id": 456968
+  },
+  "B001323": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AK",
+    "district": 0,
+    "gt_id": 456970
+  },
+  "F000481": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "AL",
+    "district": 2,
+    "gt_id": 456971
+  },
+  "A000381": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "AZ",
+    "district": 3,
+    "gt_id": 456972
+  },
+  "H001098": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "AZ",
+    "district": 8,
+    "gt_id": 456973
+  },
+  "S001231": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 12,
+    "gt_id": 456974
+  },
+  "G000605": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 13,
+    "gt_id": 456975
+  },
+  "L000607": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 16,
+    "gt_id": 456976
+  },
+  "W000830": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 27,
+    "gt_id": 456977
+  },
+  "R000620": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 29,
+    "gt_id": 456978
+  },
+  "F000483": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 30,
+    "gt_id": 456979
+  },
+  "T000491": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 45,
+    "gt_id": 456980
+  },
+  "M001241": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "CA",
+    "district": 47,
+    "gt_id": 456981
+  },
+  "H001100": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "CO",
+    "district": 3,
+    "gt_id": 456982
+  },
+  "C001137": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "CO",
+    "district": 5,
+    "gt_id": 456983
+  },
+  "E000300": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "CO",
+    "district": 8,
+    "gt_id": 456984
+  },
+  "M001238": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "DE",
+    "district": 0,
+    "gt_id": 456985
+  },
+  "H001099": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 8,
+    "gt_id": 456986
+  },
+  "J000311": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "GA",
+    "district": 3,
+    "gt_id": 456987
+  },
+  "S001229": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "IN",
+    "district": 6,
+    "gt_id": 456988
+  },
+  "M001233": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "IN",
+    "district": 8,
+    "gt_id": 456989
+  },
+  "S001228": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "KS",
+    "district": 2,
+    "gt_id": 456990
+  },
+  "O000176": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MD",
+    "district": 2,
+    "gt_id": 456991
+  },
+  "E000301": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MD",
+    "district": 3,
+    "gt_id": 456992
+  },
+  "M001232": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MD",
+    "district": 6,
+    "gt_id": 456993
+  },
+  "B001321": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MI",
+    "district": 7,
+    "gt_id": 456994
+  },
+  "M001237": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MI",
+    "district": 8,
+    "gt_id": 456995
+  },
+  "M001234": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MN",
+    "district": 3,
+    "gt_id": 456996
+  },
+  "B001324": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "MO",
+    "district": 1,
+    "gt_id": 456997
+  },
+  "O000177": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MO",
+    "district": 3,
+    "gt_id": 456998
+  },
+  "K000404": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MP",
+    "district": 0,
+    "gt_id": 456999
+  },
+  "D000634": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "MT",
+    "district": 2,
+    "gt_id": 457000
+  },
+  "M001240": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NC",
+    "district": 6,
+    "gt_id": 457001
+  },
+  "H001102": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NC",
+    "district": 8,
+    "gt_id": 457002
+  },
+  "H001101": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NC",
+    "district": 10,
+    "gt_id": 457003
+  },
+  "K000405": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NC",
+    "district": 13,
+    "gt_id": 457004
+  },
+  "M001236": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "NC",
+    "district": 14,
+    "gt_id": 457005
+  },
+  "F000482": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "ND",
+    "district": 0,
+    "gt_id": 457006
+  },
+  "G000604": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NH",
+    "district": 2,
+    "gt_id": 457007
+  },
+  "C001136": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NJ",
+    "district": 3,
+    "gt_id": 457008
+  },
+  "P000621": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NJ",
+    "district": 9,
+    "gt_id": 457009
+  },
+  "G000602": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 4,
+    "gt_id": 457010
+  },
+  "L000606": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 16,
+    "gt_id": 457011
+  },
+  "R000622": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 19,
+    "gt_id": 457012
+  },
+  "M001231": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "NY",
+    "district": 22,
+    "gt_id": 457013
+  },
+  "T000490": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "OH",
+    "district": 2,
+    "gt_id": 457014
+  },
+  "D000635": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "OR",
+    "district": 3,
+    "gt_id": 457015
+  },
+  "B001326": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "OR",
+    "district": 5,
+    "gt_id": 457016
+  },
+  "M001230": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "PA",
+    "district": 7,
+    "gt_id": 457017
+  },
+  "B001327": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "PA",
+    "district": 8,
+    "gt_id": 457018
+  },
+  "H001103": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "PR",
+    "district": 0,
+    "gt_id": 457019
+  },
+  "B001325": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "SC",
+    "district": 3,
+    "gt_id": 457020
+  },
+  "G000601": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 12,
+    "gt_id": 457021
+  },
+  "G000603": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TX",
+    "district": 26,
+    "gt_id": 457023
+  },
+  "J000310": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "TX",
+    "district": 32,
+    "gt_id": 457024
+  },
+  "K000403": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "UT",
+    "district": 3,
+    "gt_id": 457025
+  },
+  "M001239": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "VA",
+    "district": 5,
+    "gt_id": 457026
+  },
+  "V000138": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "VA",
+    "district": 7,
+    "gt_id": 457027
+  },
+  "S001230": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "VA",
+    "district": 10,
+    "gt_id": 457028
+  },
+  "B001322": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "WA",
+    "district": 5,
+    "gt_id": 457029
+  },
+  "R000621": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "WA",
+    "district": 6,
+    "gt_id": 457030
+  },
+  "M001235": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "WV",
+    "district": 2,
+    "gt_id": 457031
+  },
+  "J000312": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "WV",
+    "district": null,
+    "gt_id": 456969
+  },
+  "V000137": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "",
+    "district": null,
+    "gt_id": 456876
+  },
+  "H001104": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "OH",
+    "district": null,
+    "gt_id": 457032
+  },
+  "M001244": {
+    "chamber": "Senate",
+    "party": "Republican",
+    "state": "FL",
+    "district": null,
+    "gt_id": 457033
+  },
+  "P000622": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 1,
+    "gt_id": 457034
+  },
+  "F000484": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "FL",
+    "district": 6,
+    "gt_id": 457035
+  },
+  "W000831": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "VA",
+    "district": 11,
+    "gt_id": 457036
+  },
+  "G000606": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "AZ",
+    "district": 7,
+    "gt_id": 457037
+  },
+  "V000139": {
+    "chamber": "House",
+    "party": "Republican",
+    "state": "TN",
+    "district": 7,
+    "gt_id": 457038
+  },
+  "M001245": {
+    "chamber": "House",
+    "party": "Democrat",
+    "state": "TX",
+    "district": 18,
+    "gt_id": 457039
+  }
+}
