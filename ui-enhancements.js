@@ -20,7 +20,7 @@
     var s = document.createElement("style");
     s.id = "cw-flash-prevention";
     s.textContent =
-      "header [data-testid='button-theme-toggle'] ~ a { display: none !important; }";
+      "";
 
     document.head.appendChild(s);
   })();
