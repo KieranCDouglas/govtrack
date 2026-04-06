@@ -34,6 +34,15 @@ jobs:
       - name: Refresh ballot measures from Ballotpedia
         run: python3 scripts/fetch_ballot_measures.py
 
+      - name: Install enrichment dependencies
+        run: pip install anthropic
+
+      - name: Enrich ballot measures with ideology scoring
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python3 scripts/enrich_ballot_measures.py
+        continue-on-error: true
+
       - name: Update manifest timestamp
         run: |
           python3 -c "

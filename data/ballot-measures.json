@@ -11,7 +11,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.0,
+    "econReasoning": "This measure addresses procedural rules for filling a vacant lieutenant governor position and has no direct economic content regarding taxation, spending, regulation, or market mechanisms.",
+    "socialReasoning": "The measure concerns electoral procedures for filling executive vacancies and does not substantively address personal freedoms, civil liberties, criminal justice, or conservative/progressive social values.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a neutral election procedure reform, but it structurally shifts power from gubernatorial appointment authority to electoral processes, potentially constraining executive power in succession scenarios."
   },
   {
     "id": "al-2026-2",
@@ -25,7 +31,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-05-19"
+    "electionDate": "2026-05-19",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "This measure has no significant economic dimension; it addresses criminal procedure rather than taxation, spending, regulation of markets, or resource distribution.",
+    "socialReasoning": "The amendment increases judicial authority to deny bail for serious violent crimes, reflecting a tough-on-crime posture that restricts individual liberty in service of public safety and institutional authority over criminal defendants.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "al-2026-3",
@@ -39,7 +51,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-05-19"
+    "electionDate": "2026-05-19",
+    "econScore": 0.35,
+    "socialScore": 0.55,
+    "econReasoning": "This measure protects public sector compensation from legislative reduction, which represents a constraint on government's fiscal flexibility and budgeting discretion. While it doesn't involve taxation or redistribution directly, it limits the state's ability to manage public employee costs, leaning slightly toward restricting government's economic authority.",
+    "socialReasoning": "The measure strengthens job security and institutional protections for a law enforcement official, reflecting conservative deference to institutional authority and established roles. However, it is primarily structural rather than ideologically charged on social issues like criminal justice philosophy or individual liberties.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "ak-2026-1",
@@ -53,7 +71,13 @@
     "conservativeDirection": true,
     "type": "Indirect Initiative State Statute",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "This measure has no meaningful economic dimension; it addresses voting eligibility requirements rather than taxation, spending, regulation, or market policy.",
+    "socialReasoning": "Restricting voting rights to citizens only reflects a conservative/authoritarian position that enforces institutional and legal boundaries on political participation, limiting access to a fundamental civic right.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "ak-2026-2",
@@ -67,7 +91,13 @@
     "conservativeDirection": true,
     "type": "Indirect Initiative State Statute",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": -0.15,
+    "socialScore": -0.45,
+    "econReasoning": "Campaign contribution limits represent mild economic regulation of political financing mechanisms, but do not directly address taxation, redistribution, or market structure; the economic dimension is secondary to the measure's primary governance purpose.",
+    "socialReasoning": "Contribution limits reflect a progressive/civil liberties view that reducing concentrated money in politics enhances democratic participation and reduces potential corruption, though this also involves restricting a form of political expression that libertarians view as a liberty right.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a straightforward campaign finance reform, but contribution limits structurally shift power away from wealthy donors and potentially toward other political actors (parties, grassroots movements, incumbents with name recognition), which is a material institutional effect not immediately obvious from the neutral framing."
   },
   {
     "id": "ak-2026-3",
@@ -81,7 +111,13 @@
     "conservativeDirection": true,
     "type": "Indirect Initiative State Statute",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.55,
+    "econReasoning": "This measure has no direct economic dimension; it concerns electoral mechanics rather than taxation, spending, or market regulation.",
+    "socialReasoning": "Repealing ranked-choice voting restores a simpler plurality system and reflects conservative preference for traditional electoral procedures, though the measure does not directly involve restrictions on individual rights or civil liberties. The effect is institutional rather than libertarian or authoritarian in a personal freedoms sense.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a simple repeal of a voting system, but repealing RCV structurally shifts voting power dynamics by changing which candidates and voter coalitions are favored under the electoral rules\u2014a material procedural change that may not be immediately transparent to voters unfamiliar with voting system effects."
   },
   {
     "id": "az-2026-1",
@@ -95,7 +131,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred State Statute",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.85,
+    "econReasoning": "The measure has no significant economic dimension; it addresses law enforcement classification and organizational authority rather than taxation, spending, regulation of markets, or resource distribution.",
+    "socialReasoning": "This measure is strongly authoritarian, expanding state enforcement power by designating entities as terrorist organizations and requiring state action against perceived threats. This reflects tough-on-crime, law-and-order positioning that prioritizes state security authority over civil liberties concerns.",
+    "framingFlag": "scope_expansion",
+    "framingNote": "The measure uses 'drug cartels as terrorists' framing to justify expanded state enforcement powers and DHS authority that could extend well beyond traditional cartel-related law enforcement into broader border security and immigration enforcement mechanisms."
   },
   {
     "id": "az-2026-2",
@@ -109,7 +151,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred State Statute",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.72,
+    "socialScore": -0.15,
+    "econReasoning": "This measure reduces taxation and limits government revenue authority, reflecting free-market principles by constraining local fiscal power and requiring voter approval for tax increases. The 2% cap represents a significant restriction on government's ability to fund local services through taxation.",
+    "socialReasoning": "The measure includes a procedural democratic requirement (voter approval) which has a mildly libertarian/anti-authoritarian dimension by restricting unilateral government power, though this is modest and not the primary thrust. The focus is primarily economic rather than social.",
+    "framingFlag": "revenue_impact",
+    "framingNote": "The measure frames itself as 'grocery tax relief' but structurally functions as a constraint on local government revenue and spending capacity; the fiscal consequences for local services and their funding mechanisms may not be transparent to voters focused on the grocery tax benefit."
   },
   {
     "id": "az-2026-3",
@@ -123,7 +171,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.75,
+    "socialScore": -0.65,
+    "econReasoning": "This measure opposes new taxes and fees, reflecting a free-market position against government revenue expansion. However, it does not deregulate existing systems or mandate privatization, placing it in the moderate-to-strong free-market range rather than the extreme.",
+    "socialReasoning": "The measure protects individual choice and privacy by prohibiting government monitoring of vehicle miles traveled without consent, reflecting libertarian/progressive values. This anti-surveillance and anti-government-control dimension is partially offset by being framed as a tax/fiscal measure rather than a direct civil liberties cause.",
+    "framingFlag": "rights_framing",
+    "framingNote": "The measure uses 'prohibit' and 'consent' language to frame a tax prevention measure as a personal freedom/privacy rights issue, which may inflate its perceived civil liberties dimension beyond the structural fiscal policy effect."
   },
   {
     "id": "ar-2026-1",
@@ -137,7 +191,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "This measure has no direct economic dimension\u2014it does not involve taxation, spending, regulation of markets, or redistribution of resources.",
+    "socialReasoning": "This measure restricts voting rights to U.S. citizens, which reflects a conservative/authoritarian posture prioritizing institutional membership requirements and traditional civic boundaries over expansive individual political participation rights.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "ar-2026-2",
@@ -151,7 +211,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred State Statute",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": -0.55,
+    "socialScore": 0.0,
+    "econReasoning": "This measure authorizes $500 million in public debt issuance for government-funded infrastructure, reflecting collectivist economic policy through direct public investment rather than market-driven or private solutions. The use of general obligation bonds represents a substantial role for government in directing capital toward water infrastructure.",
+    "socialReasoning": "The measure addresses water infrastructure and environmental management with no direct implications for individual freedoms, civil liberties, criminal justice, or traditional social values.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "ar-2026-3",
@@ -165,7 +231,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": -0.65,
+    "econReasoning": "This measure has no direct economic dimension\u2014it does not address taxation, regulation, public spending, or market mechanisms.",
+    "socialReasoning": "This measure expands individual rights to keep and bear arms by constitutionally protecting gun ownership as a 'natural, fundamental, and individual right,' reflecting a libertarian-progressive stance on personal freedoms and resistance to government restriction of civil liberties.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "ca-2026-1",
@@ -179,7 +251,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred State Statute",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": -0.72,
+    "socialScore": -0.65,
+    "econReasoning": "Public financing of campaigns requires government expenditure and regulatory infrastructure to administer eligibility rules and spending limits, reflecting collectivist economic principles. However, it stops short of comprehensive redistribution or heavy taxation, moderating the score from more extreme positions.",
+    "socialReasoning": "The measure expands individual candidates' access to electoral participation by reducing reliance on private wealthy donors, advancing democratic participation and reducing wealth-based barriers to political speech. This reflects progressive values emphasizing broader individual political rights and reduced dependence on private power structures.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a campaign finance reform procedure, but structurally shifts power by redistributing electoral advantage from privately-funded to publicly-funded candidates and potentially altering which candidates become viable, though this effect is reasonably transparent to informed voters."
   },
   {
     "id": "ca-2026-2",
@@ -193,7 +271,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": -0.35,
+    "econReasoning": "This measure concerns recall election procedures rather than taxation, spending, regulation, or market mechanisms, placing it outside the economic axis.",
+    "socialReasoning": "The measure enhances democratic accountability and voter power by eliminating a successor election (reducing institutional gatekeeping), aligning with progressive/libertarian values of individual political voice, though the effect is moderate rather than transformative.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The title frames this as a simple procedural elimination, but it structurally shifts power from voters (who currently choose a successor) to unelected officials or legislative processes that would fill the vacancy under state law."
   },
   {
     "id": "ca-2026-3",
@@ -207,7 +291,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": -0.15,
+    "socialScore": -0.35,
+    "econReasoning": "The measure has a modest economic dimension by making it harder to pass initiatives that raise tax thresholds, slightly favoring status quo fiscal structures. However, the effect is primarily procedural rather than directly redistributive or market-oriented.",
+    "socialReasoning": "The measure restricts the direct democracy mechanism available to voters, reducing individual power to initiate ballot measures through a standard majority process. This constitutes a mild restriction on populist democratic participation, though it does not restrict fundamental civil liberties.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The title frames this as a neutral 'vote requirements' amendment, but it structurally shifts power by making it significantly harder for citizens to use ballot initiatives to change tax/spending thresholds\u2014effectively privileging legislative and institutional control over direct democracy."
   },
   {
     "id": "co-2026-1",
@@ -221,7 +311,13 @@
     "conservativeDirection": true,
     "type": "Citizen-Initiated Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "This measure has no significant economic dimension\u2014it does not alter taxation, regulation of markets, or redistribution of resources.",
+    "socialReasoning": "The measure expands law enforcement authority and government surveillance by mandating notification to federal immigration authorities based on criminal charges, reflecting a tough-on-crime and pro-law enforcement stance that restricts individual privacy and autonomy.",
+    "framingFlag": "scope_expansion",
+    "framingNote": "The title's reference to 'crimes of violence' anchors the measure to a serious category, but the structural requirement applies to anyone charged (not convicted) with a crime of violence or who has any prior felony, substantially expanding the scope of mandatory federal notification beyond the implied focus."
   },
   {
     "id": "co-2026-2",
@@ -235,7 +331,13 @@
     "conservativeDirection": true,
     "type": "Citizen-Initiated State Statute",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.85,
+    "econReasoning": "The measure has no significant economic dimension, as it addresses criminal penalties rather than taxation, regulation, or market mechanisms.",
+    "socialReasoning": "The measure exemplifies conservative criminal justice policy through increased penalties for drug offenses, mandatory treatment requirements, and restrictions on judicial sentencing discretion in fentanyl-related deaths, reflecting tough-on-crime authoritarianism rather than criminal justice reform.",
+    "framingFlag": "mandatory_minimum",
+    "framingNote": "The measure's public health framing around fentanyl deaths obscures its core structural effect of limiting judicial discretion and imposing stricter sentencing requirements in drug-related offenses."
   },
   {
     "id": "co-2026-3",
@@ -249,7 +351,13 @@
     "conservativeDirection": true,
     "type": "Citizen-Initiated State Statute",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "The measure has no significant economic dimension; it addresses healthcare regulation without affecting taxation, redistribution, or market structure.",
+    "socialReasoning": "This measure restricts individual medical choices and parental decision-making authority, reflecting a conservative position that prioritizes institutional/state authority over personal autonomy in healthcare decisions. It aligns with conservative approaches to limiting individual behavioral choices.",
+    "framingFlag": "rights_framing",
+    "framingNote": "The title frames the measure protectively (prohibiting surgeries) but omits that it restricts minors' and parents' access to medical treatment options, which could be reframed as limiting healthcare rights and medical decision-making autonomy."
   },
   {
     "id": "co-2026-4",
@@ -263,7 +371,13 @@
     "conservativeDirection": true,
     "type": "Citizen-Initiated State Statute",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.85,
+    "econReasoning": "This measure has no direct economic dimension\u2014it does not address taxation, regulation, market mechanisms, or resource allocation. It is purely a criminal justice policy.",
+    "socialReasoning": "This measure exemplifies conservative/authoritarian social policy by imposing a mandatory minimum sentence (life without parole) with no judicial discretion, reflecting a tough-on-crime stance that restricts individual liberty and prioritizes state punishment authority over rehabilitation or case-by-case mitigation.",
+    "framingFlag": "mandatory_minimum",
+    "framingNote": "The emotionally compelling framing around child protection and human trafficking obscures the core structural effect: elimination of judicial sentencing discretion and imposition of a non-negotiable life sentence regardless of circumstances, which represents a significant restriction on judicial authority."
   },
   {
     "id": "co-2026-5",
@@ -277,7 +391,13 @@
     "conservativeDirection": true,
     "type": "Citizen-Initiated State Statute",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "This measure has no significant economic dimension, as it does not address taxation, spending, regulation of markets, or resource distribution.",
+    "socialReasoning": "The measure restricts individual choice by mandating sex-based classification in athletics, enforcing a traditional institutional framework that limits personal autonomy in team selection. This aligns with conservative/authoritarian positions that prioritize traditional categorical norms and institutional authority over individual preference.",
+    "framingFlag": "rights_framing",
+    "framingNote": "The title uses 'Requirement' language to describe what is structurally a restriction on athlete eligibility and team participation options based on biological sex, rather than a protection or expansion of rights."
   },
   {
     "id": "fl-2026-1",
@@ -291,7 +411,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.55,
+    "socialScore": 0.0,
+    "econReasoning": "This measure increases the budget stabilization fund cap from 10% to 25% of net general revenue, enabling the state to retain more funds rather than spend or distribute them. This reflects a fiscally conservative approach favoring reserves and constrained spending over immediate redistribution or public program expansion.",
+    "socialReasoning": "The measure addresses budget mechanics and fund retention with no direct implications for individual rights, criminal justice, personal freedoms, or social regulation.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "fl-2026-2",
@@ -305,7 +431,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.72,
+    "socialScore": 0.0,
+    "econReasoning": "This measure reduces tax burden on agricultural property owners by exempting tangible farm equipment and tools from property taxation, which aligns with free-market principles of lower taxes and private property incentives. The exemption represents a direct reduction in government revenue collection and is consistent with supply-side economic policy favoring business and agricultural interests.",
+    "socialReasoning": "The measure has no significant social dimension; it is purely a fiscal/tax policy affecting agricultural property classification and does not address social issues, civil liberties, criminal justice, or cultural matters.",
+    "framingFlag": "revenue_impact",
+    "framingNote": "The title emphasizes the benefit to farmers (exemption from taxes) but does not disclose that this foregoes state/local tax revenue, shifting the tax burden to other property taxpayers or requiring alternative revenue sources."
   },
   {
     "id": "ga-2026-1",
@@ -319,7 +451,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": -0.35,
+    "socialScore": 0.0,
+    "econReasoning": "The measure authorizes dedicated public funding for emergency services infrastructure (9-1-1 systems), representing government investment in a collective public good rather than market-driven or private solutions. However, it is a narrow fiscal mechanism without broader redistribution or regulatory implications, moderating the collectivist lean.",
+    "socialReasoning": "This measure has no meaningful social dimension; it addresses emergency communications infrastructure and does not implicate personal freedoms, criminal justice, civil liberties, or traditional/authoritarian social values.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "ga-2026-2",
@@ -333,7 +471,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.72,
+    "socialScore": 0.0,
+    "econReasoning": "This measure reduces tax burden on agricultural and timber property owners by doubling the acreage eligible for preferential tax treatment (40% of value), which is a tax reduction favoring private landowners and market-driven agricultural/forestry operations. The policy incentivizes private conservation through tax benefits rather than regulation or public acquisition.",
+    "socialReasoning": "The measure has no significant social dimension; it addresses property tax classification for land use without touching civil liberties, criminal justice, personal freedoms, or social conservatism.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "ga-2026-3",
@@ -347,7 +491,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": -0.3,
+    "econReasoning": "Nonpartisan elections for probate judges have no direct economic impact regarding taxation, spending, regulation, or market mechanisms. This is primarily a structural governance question rather than an economic policy question.",
+    "socialReasoning": "Nonpartisan elections reduce partisan polarization in judicial selection and can enhance judicial independence from party pressures, which moderately aligns with civil liberty interests in fair, impartial adjudication. However, the effect is modest and procedural rather than substantively expanding personal freedoms or individual rights.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as electoral reform for objectivity, but structurally shifts power from partisan political machines to nonpartisan selection processes, which could alter who influences judicial appointments and how."
   },
   {
     "id": "hi-2026-1",
@@ -361,7 +511,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": -0.35,
+    "econReasoning": "This measure addresses procedural timelines for judicial appointments and has no direct economic impact on taxation, spending, or market regulation.",
+    "socialReasoning": "The measure extends deliberative time for Senate review of judicial appointments, which slightly favors institutional checks and procedural deliberation over expedited decision-making. This modest institutional constraint reflects a modest conservative/authoritarian lean toward institutional process, partially offset by the procedural nature being neutral on direct civil liberties.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a technical adjustment to appointment timelines, but it structurally shifts power by constraining the Senate's ability to act quickly on judicial appointments during specific legislative periods, which affects the appointment process without being immediately obvious as a power reallocation."
   },
   {
     "id": "id-2026-1",
@@ -375,7 +531,13 @@
     "conservativeDirection": false,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.85,
+    "econReasoning": "The measure does not directly address taxation, regulation of markets, or redistribution of economic resources. It is primarily a jurisdictional/procedural question rather than an economic policy question.",
+    "socialReasoning": "This measure restricts individual choice and personal freedom by centralizing authority over drug legalization exclusively with the state legislature, preventing voter initiatives or local control. It reflects a conservative/authoritarian preference for institutional gatekeeping over citizen-driven policy decisions on personal drug use.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a simple jurisdictional clarification, but structurally removes the citizenry's direct democratic power (via initiative/referendum) to legalize substances and concentrates that authority solely in the legislature."
   },
   {
     "id": "id-2026-2",
@@ -389,7 +551,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "This measure has no direct fiscal, tax, or economic policy dimension. It is a symbolic constitutional designation with minimal economic impact.",
+    "socialReasoning": "Designating an official language is a conservative cultural/social policy that asserts state authority over language norms and potentially restricts multilingual accommodation, reflecting traditional institutional preferences over individual linguistic liberty. This aligns with social conservatism though falls short of the most authoritarian policies.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "id-2026-3",
@@ -403,7 +571,13 @@
     "conservativeDirection": true,
     "type": "Legislative Advisory Question",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.0,
+    "econReasoning": "Designating an official state gun has no economic policy implications regarding taxation, regulation, or market mechanisms.",
+    "socialReasoning": "This is a symbolic designation with no substantive policy effect on individual rights, criminal justice, or social freedoms. It does not restrict or expand any actual liberties.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "in-2026-1",
@@ -417,7 +591,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.85,
+    "econReasoning": "This measure has no direct economic dimension; it addresses criminal procedure and bail policy rather than taxation, regulation, or market mechanisms.",
+    "socialReasoning": "Denying bail based on risk assessment is a tough-on-crime, public safety-oriented policy that restricts individual liberty (the right to bail) in favor of government authority and crime prevention, aligning with conservative/authoritarian criminal justice positions.",
+    "framingFlag": "mandatory_minimum",
+    "framingNote": "The measure frames bail denial around protecting 'another person' from substantial risk, which appeals emotionally to public safety concerns while structurally removing judicial discretion in bail decisions and limiting the presumption of pretrial liberty."
   },
   {
     "id": "in-2026-2",
@@ -431,7 +611,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.35,
+    "econReasoning": "This measure has no direct fiscal or economic dimension; it addresses judicial residency requirements rather than taxation, spending, or market regulation.",
+    "socialReasoning": "The measure imposes a residency restriction on judges, which represents a modest constraint on individual freedom of choice regarding where judges can live and work. However, it can be justified as a governance structure intended to ensure local accountability and connection to the community being served.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "ks-2026-1",
@@ -445,7 +631,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "This measure has no direct economic dimension; it addresses voting eligibility criteria rather than taxation, regulation, or resource allocation.",
+    "socialReasoning": "The amendment restricts voting rights to U.S. citizens, embodying a conservative/authoritarian approach to citizenship and electoral participation by narrowing the franchise and reinforcing institutional/legal gatekeeping.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "ks-2026-2",
@@ -459,7 +651,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-08-04"
+    "electionDate": "2026-08-04",
+    "econScore": 0.0,
+    "socialScore": 0.55,
+    "econReasoning": "This measure concerns judicial selection procedures rather than taxation, spending, regulation, or market mechanisms. It has no direct economic dimension.",
+    "socialReasoning": "Shifting from merit-based commission appointment to direct electoral selection of judges typically reflects conservative preference for democratic accountability and reducing institutional insulation, though it can reduce judicial independence. This leans moderately conservative on the social axis.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure frames itself neutrally as an election reform, but structurally shifts significant power from a nominating commission (insulated from electoral pressure) to popular election, which can materially alter judicial outcomes on social issues\u2014a non-obvious structural consequence for typical voters."
   },
   {
     "id": "ky-2026-1",
@@ -473,7 +671,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.65,
+    "econReasoning": "This measure has no meaningful economic dimension; it addresses procedural restrictions on executive power rather than taxation, spending, regulation, or market policy.",
+    "socialReasoning": "The measure restricts gubernatorial discretion in criminal justice matters (pardons and commutations) during election periods, reflecting a conservative/authoritarian preference for limiting executive power to grant clemency and reducing individualized justice outcomes.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as election integrity reform, but its structural effect is to remove judicial and executive discretion in criminal justice by creating a blanket prohibition on clemency acts during a defined period, shifting power away from the governor's pardoning authority."
   },
   {
     "id": "la-2026-1",
@@ -487,7 +691,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.65,
+    "socialScore": 0.0,
+    "econReasoning": "This measure reduces tax burden on higher-income earners by raising the income threshold for special property tax assessment, aligning with free-market principles of lower taxation and reduced government revenue collection. The policy favors individual wealth retention over public revenue generation.",
+    "socialReasoning": "The measure contains no social policy dimension; it is purely a fiscal/tax policy affecting property tax classifications and does not address social issues, civil liberties, or cultural norms.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "la-2026-2",
@@ -501,7 +711,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-05-16"
+    "electionDate": "2026-05-16",
+    "econScore": 0.15,
+    "socialScore": 0.25,
+    "econReasoning": "This measure allows legislative expansion of unclassified civil service positions, which slightly increases government employment flexibility and administrative efficiency rather than directly promoting market-driven or redistributive economic policies. The effect is managerial rather than ideologically significant on the economic axis.",
+    "socialReasoning": "Expanding unclassified positions weakens civil service protections and merit-based hiring requirements, concentrating personnel authority with the legislature in a way that favors institutional/governmental control over individual employment protections. This represents a modest shift toward hierarchical authority.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The title frames this as administrative modernization, but the structural effect is a meaningful shift of hiring and employment authority from merit-based civil service rules to direct legislative control, which expands executive/legislative discretion at the cost of employee protections."
   },
   {
     "id": "la-2026-3",
@@ -515,7 +731,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-05-16"
+    "electionDate": "2026-05-16",
+    "econScore": 0.0,
+    "socialScore": 0.0,
+    "econReasoning": "This measure is a technical administrative change that designates St. George Community School System with the same operational status as parish school systems. It has no direct impact on taxation, spending levels, regulation, or market mechanisms.",
+    "socialReasoning": "The measure addresses school system governance structure and does not engage with social policy dimensions such as civil liberties, criminal justice, personal freedoms, or traditional values.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "la-2026-4",
@@ -529,7 +751,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-05-16"
+    "electionDate": "2026-05-16",
+    "econScore": -0.35,
+    "socialScore": 0.0,
+    "econReasoning": "This measure redirects existing education revenue funds toward pension obligations rather than creating new revenue or expanding programs, representing a reallocation within public sector spending. The shift from general education funding to retirement system solvency reflects a collectivist approach to public employee benefits while reducing discretionary education spending.",
+    "socialReasoning": "This measure has no direct social dimension\u2014it is purely a fiscal reallocation between two public sector budget categories without affecting civil liberties, criminal justice, personal freedoms, or social regulation.",
+    "framingFlag": "revenue_impact",
+    "framingNote": "The title frames this as applying money 'to' the Teachers' Retirement System (benefit framing), but obscures that this requires repealing dedicated education revenue funds, effectively reducing education funding to address pension liabilities\u2014shifting the fiscal burden from the retirement system to K-12 education programs."
   },
   {
     "id": "la-2026-5",
@@ -543,7 +771,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-05-16"
+    "electionDate": "2026-05-16",
+    "econScore": 0.72,
+    "socialScore": 0.0,
+    "econReasoning": "This measure reduces the tax burden on business inventory by allowing parishes to grant exemptions, which aligns with free-market principles of lower business taxation and reduced government revenue collection. It prioritizes private capital retention over public redistribution.",
+    "socialReasoning": "The measure has no significant social dimension, as it addresses tax policy rather than issues of personal freedoms, criminal justice, individual rights, or social authority.",
+    "framingFlag": "revenue_impact",
+    "framingNote": "The measure's framing as allowing parishes to 'exempt' business inventory obscures that this reduces tax revenue and shifts the tax burden to other property classes or increases the tax rate on remaining taxable property."
   },
   {
     "id": "la-2026-6",
@@ -557,7 +791,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-05-16"
+    "electionDate": "2026-05-16",
+    "econScore": 0.0,
+    "socialScore": 0.0,
+    "econReasoning": "The measure adjusts the mandatory retirement age for state judges, which has minimal direct economic impact. It does not involve taxation, spending, regulation of markets, or resource redistribution.",
+    "socialReasoning": "This is a straightforward administrative change to judicial personnel policy with no clear connection to personal freedoms, civil liberties, criminal justice philosophy, or traditional/progressive values.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "md-2026-1",
@@ -571,7 +811,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.0,
+    "econReasoning": "This measure addresses judicial administration procedures and does not involve taxation, spending, regulation of markets, or redistribution of resources. It has no discernible economic ideology component.",
+    "socialReasoning": "The measure concerns internal procedural mechanisms for filling vacancies on a judicial disciplinary commission and does not substantively affect individual rights, criminal justice policy, personal freedoms, or social norms. It is administratively neutral on the social axis.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "ma-2026-1",
@@ -585,7 +831,13 @@
     "conservativeDirection": true,
     "type": "Voter Referendum",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": -0.15,
+    "socialScore": 0.65,
+    "econReasoning": "The measure involves regulatory compliance costs on firearm manufacturers and dealers, representing modest government intervention in the market. However, it does not substantially redistribute wealth or fundamentally alter economic structures.",
+    "socialReasoning": "H. 4885 modernizes firearm regulations through restrictions on access (licensing requirements, waiting periods, ammunition regulations) framed as public safety measures. This reflects an authoritarian/conservative approach that restricts individual liberty in service of collective safety priorities.",
+    "framingFlag": "scope_expansion",
+    "framingNote": "The measure is framed narrowly as 'modernizing firearm laws' but H. 4885 significantly expands regulatory scope to include ammunition sales tracking, possession limits, and licensing that extend government authority well beyond traditional firearm commerce regulation."
   },
   {
     "id": "mi-2026-1",
@@ -599,7 +851,13 @@
     "conservativeDirection": true,
     "type": "Advisory Constitutional Convention Question",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.0,
+    "econReasoning": "A constitutional convention question is a procedural mechanism that does not inherently favor either collectivist or free-market economic approaches; the actual economic effects would depend entirely on what a convention might propose.",
+    "socialReasoning": "The measure itself is neutral on social policy dimensions; whether a convention would advance progressive or conservative social goals cannot be determined from the procedural question alone.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a simple yes/no question about holding a convention, but structurally initiates a process that could substantially shift power by enabling wholesale constitutional revision, which voters may not fully appreciate as a consequential institutional change."
   },
   {
     "id": "mo-2026-1",
@@ -613,7 +871,13 @@
     "conservativeDirection": true,
     "type": "Annual Budget Renewal",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": -0.45,
+    "socialScore": 0.0,
+    "econReasoning": "This measure renews a modest dedicated tax (0.1%) for public environmental and recreational goods, reflecting a collectivist approach to funding via taxation rather than market mechanisms. However, the tax is narrow, time-limited, and non-redistributive, moderating the leftward lean.",
+    "socialReasoning": "The measure has no material social policy dimension; it does not address personal freedoms, criminal justice, traditional norms, or individual rights restrictions.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "mo-2026-2",
@@ -627,7 +891,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": -0.35,
+    "econReasoning": "The measure does not significantly impact taxation, redistribution, regulation, or market mechanisms; it is primarily a structural governance change with minimal direct economic consequences.",
+    "socialReasoning": "Electing rather than appointing the assessor increases democratic accountability and reduces concentrated institutional power, which aligns with anti-authoritarian preferences, though the effect is modest and structural rather than rights-oriented.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a simple election requirement but structurally shifts power from the county executive/appointing authority to the electorate, changing the institutional control mechanism of a fiscal office."
   },
   {
     "id": "mo-2026-3",
@@ -641,7 +911,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.85,
+    "econReasoning": "This measure has no significant economic dimension, as it does not address taxation, redistribution, regulation of markets, or public spending.",
+    "socialReasoning": "The measure restricts individual reproductive and medical autonomy by prohibiting abortion and gender transition procedures for minors, reflecting conservative social values that prioritize traditional norms and institutional/governmental authority over personal choice. This represents a high degree of restriction on individual freedoms in healthcare decisions.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "mo-2026-4",
@@ -655,7 +931,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.65,
+    "econReasoning": "The measure does not substantively address taxation, spending, regulation of markets, or distribution of economic resources. It is primarily procedural in nature.",
+    "socialReasoning": "The measure restricts direct democracy mechanisms (requiring supermajority district approval for constitutional initiatives) and imposes restrictions on campaign participation (foreign national contributions), both of which limit individual rights to petition and participate in political discourse.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a process reform protecting electoral integrity, but structurally shifts power from voters statewide to geographically distributed districts and restricts citizen initiative rights, which is a material constraint on popular sovereignty not obviously conveyed by the title."
   },
   {
     "id": "ne-2026-1",
@@ -669,7 +951,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.0,
+    "econReasoning": "Term limit changes do not directly affect taxation, spending, regulation, or market mechanisms. The measure has no meaningful economic dimension.",
+    "socialReasoning": "This measure addresses legislative structure and tenure rules rather than individual rights, civil liberties, criminal justice, or social values. It is neutral on the social axis.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The amendment is framed as a simple term limit adjustment, but extending terms from 8 to 12 years structurally increases incumbent advantage and reduces electoral turnover, shifting power toward sitting legislators and potentially reducing voter ability to enforce accountability."
   },
   {
     "id": "nv-2026-1",
@@ -683,7 +971,13 @@
     "conservativeDirection": false,
     "type": "Citizen-Initiated Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": -0.85,
+    "econReasoning": "This measure does not significantly address taxation, regulation, public spending, or market mechanisms. It is focused on a social policy question rather than economic policy.",
+    "socialReasoning": "This measure expands individual reproductive autonomy by establishing a constitutional right to abortion before fetal viability, which is a core progressive/libertarian position prioritizing personal freedom over state restriction of individual choice. The -0.85 score reflects strong alignment with the progressive/libertarian end of the social axis, similar to positions held by Warren and Sanders on social liberties.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "nv-2026-2",
@@ -697,7 +991,13 @@
     "conservativeDirection": true,
     "type": "Citizen-Initiated Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "This measure has no direct economic impact regarding taxation, spending, regulation of markets, or redistribution of resources. It is a procedural election administration policy.",
+    "socialReasoning": "Photo ID requirements and identity verification restrict ballot access and individual voting convenience, representing an authoritarian/conservative approach to election administration that prioritizes fraud prevention over accessibility. This aligns with conservative positions on institutional control and procedural restrictions on participation.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "nh-2026-1",
@@ -711,7 +1011,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.65,
+    "socialScore": 0.0,
+    "econReasoning": "Eliminating a government office reduces bureaucratic infrastructure and administrative costs, reflecting a free-market preference for smaller government and reduced public sector spending. This aligns with deregulation and efficiency-driven fiscal conservatism.",
+    "socialReasoning": "The measure has no significant social dimension; it addresses administrative structure rather than personal freedoms, traditional norms, criminal justice, or individual rights.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "nm-2026-1",
@@ -725,7 +1031,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.35,
+    "econReasoning": "This measure addresses governance structure of a public university board rather than taxation, spending, or market regulation, making it economically neutral.",
+    "socialReasoning": "The measure combines elements that pull in different social directions: nominating committees and party affiliation restrictions reflect procedural/institutional control tendencies (+), while student appointment rights from student-selected lists reflect inclusive democratic participation (-). The net effect modestly favors institutional authority over pure individual choice.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The amendment is framed as technical governance reform but structurally shifts appointment power from the Board itself toward nominating committees and student governing bodies, materially altering institutional decision-making authority."
   },
   {
     "id": "nm-2026-2",
@@ -739,7 +1051,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": -0.65,
+    "econReasoning": "This measure has no direct economic dimension regarding taxation, spending, regulation, or market mechanisms. It is purely procedural in nature.",
+    "socialReasoning": "This measure increases constraints on executive power and requires transparency in gubernatorial decision-making, which reflects anti-authoritarian principles and aligns with civil liberties and checks-and-balances governance.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a technical procedural reform about pocket vetoes, but it materially shifts power from the executive branch to the legislature by eliminating a governor's ability to indefinitely withhold action on legislation."
   },
   {
     "id": "nm-2026-3",
@@ -753,7 +1071,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": -0.35,
+    "socialScore": 0.0,
+    "econReasoning": "The measure increases public sector compensation funded through the state budget, reflecting a modest redistribution from general revenues to legislators. However, the modest scope (tied to median household income rather than substantial increases) and the procedural nature of establishing compensation through democratic amendment limits the collectivist character.",
+    "socialReasoning": "This measure addresses legislative compensation structure and has no direct bearing on personal freedoms, civil liberties, criminal justice, or traditional social values.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "nm-2026-4",
@@ -767,7 +1091,13 @@
     "conservativeDirection": true,
     "type": "Bond Issue",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": -0.72,
+    "socialScore": 0.0,
+    "econReasoning": "This measure funds public higher education and schools through general obligation bonds backed by property taxation, reflecting a collectivist approach to education investment and public goods provision. The reliance on broad-based property tax funding and public institution strengthening aligns with progressive economic frameworks, though it is not as redistributive as direct income tax measures.",
+    "socialReasoning": "The measure has no direct social policy dimension; it addresses capital infrastructure rather than questions of personal freedom, civil liberties, criminal justice, or traditional values.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "nm-2026-5",
@@ -781,7 +1111,13 @@
     "conservativeDirection": true,
     "type": "Bond Issue",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": -0.72,
+    "socialScore": 0.0,
+    "econReasoning": "This measure authorizes $20 million in public debt funded by statewide property taxation to support public goods (libraries), reflecting collectivist economic policy favoring public investment and progressive funding mechanisms. The approach uses government borrowing and taxation rather than market-driven or private solutions.",
+    "socialReasoning": "Library access and resource acquisition do not inherently implicate social policy dimensions such as personal freedoms, civil liberties, criminal justice, or traditional/progressive cultural norms.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "nm-2026-6",
@@ -795,7 +1131,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.15,
+    "socialScore": -0.35,
+    "econReasoning": "This measure has minimal direct economic impact, as it concerns election administration procedures rather than taxation or spending. The slight positive score reflects a modest efficiency gain from consolidating elections, which could reduce administrative costs.",
+    "socialReasoning": "Combining school and partisan elections could increase voter participation in school board races by piggybacking on higher partisan election turnout, expanding democratic participation. However, it may also subject school governance decisions to partisan political dynamics, which could be viewed as constraining institutional autonomy and introducing partisan pressures into education policy.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a simple procedural change to election timing, but it structurally shifts influence over school governance by embedding school elections within partisan electoral cycles, potentially altering the relative power of partisan versus education-focused voting considerations."
   },
   {
     "id": "nm-2026-7",
@@ -809,7 +1151,13 @@
     "conservativeDirection": true,
     "type": "Bond Issue",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": -0.75,
+    "socialScore": 0.0,
+    "econReasoning": "This measure funds public infrastructure through general obligation bonds backed by progressive property taxation, reflecting collectivist redistribution principles. The reliance on statewide property tax to support senior services is characteristic of public program financing rather than market-driven or privatized approaches.",
+    "socialReasoning": "Senior facility improvement is a neutral social policy with no material connection to civil liberties, criminal justice, traditional norms, or individual rights restrictions. The measure addresses service provision rather than any dimension of social control or personal freedom.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "nc-2026-1",
@@ -823,7 +1171,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "Voter ID requirements have minimal direct economic impact as they involve procedural administration rather than taxation, spending, or market regulation.",
+    "socialReasoning": "This measure restricts individual voting access by adding a procedural barrier (photographic ID requirement), reflecting conservative/authoritarian preferences for institutional control and stricter voter eligibility standards, while progressive/libertarian perspectives prioritize expansive voting access and oppose such restrictions.",
+    "framingFlag": "rights_framing",
+    "framingNote": "The measure uses 'Require Voter Identification' framing that emphasizes election security, but structurally restricts voting access\u2014a civil/political right\u2014by creating barriers that disproportionately affect certain voters, a gap that may not be obvious to typical voters."
   },
   {
     "id": "nd-2026-1",
@@ -837,7 +1191,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.35,
+    "econReasoning": "Term limits for legislators have minimal direct economic impact and do not substantially alter taxation, regulation, or market mechanisms. The measure is primarily structural rather than fiscal despite its categorization.",
+    "socialReasoning": "Term limits reflect a conservative institutional concern about entrenched power and governmental continuity, favoring fresh cycles and limiting career politicians. However, this is modest compared to strong authoritarian positions, as term limits also serve anti-establishment goals across the ideological spectrum.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as establishing term limits but structurally shifts power by removing the 2022 constitutional protection that required term limits to be amended only by initiative petition, allowing the legislature to unilaterally modify future term limit provisions."
   },
   {
     "id": "nd-2026-2",
@@ -851,7 +1211,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.65,
+    "econReasoning": "This measure addresses the procedural threshold for constitutional amendments rather than economic policy, taxation, or spending. It has no direct impact on markets, regulation, redistribution, or fiscal management.",
+    "socialReasoning": "Requiring a 60% supermajority for constitutional amendments raises the barrier to institutional change and restricts the ease with which the constitution can be amended, reflecting a conservative preference for maintaining existing institutional structures and limiting rapid democratic reform.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a neutral procedural requirement but structurally shifts power by making constitutional amendments significantly harder to achieve, effectively privileging the status quo and those opposed to constitutional change over those seeking to reform the constitution."
   },
   {
     "id": "nd-2026-3",
@@ -865,7 +1231,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-06-09"
+    "electionDate": "2026-06-09",
+    "econScore": 0.0,
+    "socialScore": 0.35,
+    "econReasoning": "This measure establishes procedural requirements for constitutional amendments rather than addressing taxation, spending, or economic regulation, so it has no direct economic dimension.",
+    "socialReasoning": "A single-subject requirement for constitutional amendments serves to constrain the scope of ballot initiatives and legislative amendments, reducing the ease with which broad constitutional changes can be enacted\u2014a structural restraint on direct democracy that slightly favors institutional conservatism and procedural stability.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a neutral procedural reform, but it functionally restricts the ability of voters to bundle related constitutional changes together, potentially shifting power toward institutional gatekeepers and away from direct democratic amendment mechanisms."
   },
   {
     "id": "ok-2026-1",
@@ -879,7 +1251,13 @@
     "conservativeDirection": false,
     "type": "Citizen-Initiated State Statute",
     "status": "Qualified",
-    "electionDate": "2026-06-16"
+    "electionDate": "2026-06-16",
+    "econScore": -0.78,
+    "socialScore": 0.0,
+    "econReasoning": "Mandating a $15 minimum wage is a regulatory intervention that redistributes income from employers to workers, reflecting collectivist economic policy. This represents significant government intervention in labor markets to address wage inequality, consistent with progressive economic approaches.",
+    "socialReasoning": "Minimum wage policy has no inherent connection to social conservatism or progressivism on issues like civil liberties, criminal justice, personal freedoms, or traditional values. The measure is purely economic in its social dimension.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "or-2026-1",
@@ -893,7 +1271,13 @@
     "conservativeDirection": true,
     "type": "Voter Referendum",
     "status": "Qualified",
-    "electionDate": "2026-05-19"
+    "electionDate": "2026-05-19",
+    "econScore": 0.72,
+    "socialScore": 0.0,
+    "econReasoning": "This measure opposes tax increases (gas tax, payroll tax, vehicle registration fees), reflecting a free-market preference for lower taxation and reduced government revenue. Repealing these fiscal measures aligns with market-oriented economic conservatism.",
+    "socialReasoning": "The measure focuses on taxation and fiscal policy with no substantive component addressing social issues, criminal justice, civil liberties, or traditional/progressive values.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "sd-2026-1",
@@ -907,7 +1291,13 @@
     "conservativeDirection": false,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.72,
+    "socialScore": 0.15,
+    "econReasoning": "This measure constrains public healthcare spending by making Medicaid expansion conditional on sustained federal funding levels, reflecting a fiscally conservative approach that limits redistribution and public program expansion. It prioritizes budgetary constraint and reduces state fiscal exposure, consistent with free-market skepticism of open-ended entitlement programs.",
+    "socialReasoning": "The measure has minimal direct social dimension; it is primarily fiscal and administrative. The modest positive score reflects a conservative preference for conditional rather than unconditional public benefits, which aligns slightly with conservative principles of limited government obligation.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "sd-2026-2",
@@ -921,7 +1311,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "This measure has no direct economic dimension; it addresses voting eligibility criteria rather than taxation, regulation, or market mechanisms.",
+    "socialReasoning": "The amendment restricts voting rights based on citizenship status, reflecting a conservative/authoritarian approach that prioritizes institutional gatekeeping and traditional membership criteria over expanding individual political participation rights.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "sd-2026-3",
@@ -935,7 +1331,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.15,
+    "socialScore": 0.0,
+    "econReasoning": "This measure establishes a trust fund for unclaimed property, a neutral fiscal mechanism that preserves state custody of unclaimed funds rather than returning them immediately or allowing private disposition. The measure has modest free-market leaning insofar as it clarifies property rights and fund management, but it primarily represents technical fiscal administration without significant ideological economic content.",
+    "socialReasoning": "The measure addresses property administration and fund stewardship with no direct bearing on individual rights, criminal justice, personal freedoms, or social norms.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "sd-2026-4",
@@ -949,7 +1351,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.65,
+    "econReasoning": "This measure has no direct economic dimension regarding taxation, spending, regulation, or market structures; it is procedural in nature.",
+    "socialReasoning": "Raising the threshold for constitutional amendments to 60% makes structural changes to governance more difficult and favors the status quo, reflecting a conservative institutional preference that constrains majoritarian change.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a neutral procedural requirement, but it structurally shifts power by making constitutional amendments substantially harder to pass, protecting existing constitutional arrangements against change and potentially benefiting those who oppose reform."
   },
   {
     "id": "tn-2026-1",
@@ -963,7 +1371,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "Marsy's Law has no significant economic dimension; it addresses procedural rights in criminal justice rather than taxation, spending, or market regulation.",
+    "socialReasoning": "This measure strengthens victims' rights protections in the state constitution, reflecting a tough-on-crime, law-and-order orientation consistent with conservative criminal justice policy that prioritizes victim interests over defendant procedural protections.",
+    "framingFlag": "rights_framing",
+    "framingNote": "The measure uses 'rights' language to describe expanded victim protections that may structurally limit defendant rights and judicial discretion in ways not immediately apparent from the victims' rights framing alone."
   },
   {
     "id": "tn-2026-2",
@@ -977,7 +1391,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.82,
+    "socialScore": 0.0,
+    "econReasoning": "This measure prohibits state property taxes, a core free-market position favoring reduced taxation and limitation of government revenue-raising authority. It aligns with classical conservative/libertarian economic ideology prioritizing lower taxes and constrained government fiscal power.",
+    "socialReasoning": "The measure has no direct social dimension; it is purely a fiscal/tax policy question without implications for personal freedoms, criminal justice, traditional norms, or civil liberties.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "tn-2026-3",
@@ -991,7 +1411,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.85,
+    "econReasoning": "This measure has no meaningful economic dimension, as it does not address taxation, regulation, redistribution, or market mechanisms.",
+    "socialReasoning": "Removing the right to bail for specified offenses is a tough-on-crime measure that restricts individual liberty and judicial discretion, aligning strongly with conservative/authoritarian criminal justice positions.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "ut-2026-1",
@@ -1005,7 +1431,13 @@
     "conservativeDirection": false,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.72,
+    "socialScore": 0.15,
+    "econReasoning": "This measure makes it harder to raise taxes through citizen initiatives by imposing a 60% supermajority requirement, which aligns with free-market ideology favoring lower taxes and reduced government revenue. The supermajority threshold structurally protects against tax increases and reflects a preference for limiting public spending.",
+    "socialReasoning": "The measure has a modest conservative dimension by restricting a direct democratic mechanism (citizen initiatives), which reflects conservative preference for institutional constraints on majoritarian decision-making, though this is not a primary social axis concern.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a voting requirement reform, but it structurally shifts power by making citizen-initiated tax legislation substantially harder to pass while leaving legislative-referred taxes unaffected, effectively privileging the legislature over direct democracy."
   },
   {
     "id": "ut-2026-2",
@@ -1019,7 +1451,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": -0.25,
+    "econReasoning": "This measure has no direct economic impact on taxation, spending, or market regulation. It is a procedural requirement for constitutional amendments with no fiscal consequences.",
+    "socialReasoning": "The measure slightly favors individual liberties and transparency by requiring a 60-day publication period before constitutional amendments appear on ballots, enhancing citizen awareness and deliberative democracy. However, it could also be viewed as a constraint on the speed of democratic processes, hence a modest negative score reflecting a mild libertarian lean.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a transparency/publication requirement, but structurally shifts power by creating a mandatory delay that could affect the timing and sequencing of constitutional initiatives, potentially benefiting or disadvantaging different political actors depending on political momentum."
   },
   {
     "id": "vt-2026-1",
@@ -1033,7 +1471,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": -0.78,
+    "socialScore": -0.72,
+    "econReasoning": "Establishing a constitutional right to collective bargaining strengthens worker organization and negotiating power against employers, reducing employer flexibility and supporting wage/benefit redistribution through collective agreements rather than market mechanisms. This aligns with collectivist economic policy favoring labor power over capital.",
+    "socialReasoning": "Expanding constitutional rights to organize and collectively bargain reflects progressive values of expanding individual freedoms and civil liberties, particularly for workers to associate and advocate for their interests. This opposes authoritarian control over labor organizing and reflects anti-institutional-power sentiments.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "va-2026-1",
@@ -1047,7 +1491,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": -0.85,
+    "econReasoning": "This measure has no significant economic dimension, as it addresses civil rights and marriage law rather than taxation, regulation, or resource distribution.",
+    "socialReasoning": "The measure expands individual rights by removing state-imposed restrictions on marriage based on sex and gender, reflecting progressive/libertarian values that prioritize personal freedom over traditional institutional authority. The repeal of a constitutional ban on same-sex marriage represents a clear movement toward broader civil liberties and individual choice in intimate decisions.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "va-2026-2",
@@ -1061,7 +1511,13 @@
     "conservativeDirection": false,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": -0.85,
+    "econReasoning": "This measure addresses reproductive rights and does not involve taxation, regulation of markets, public spending, or economic redistribution. It has no significant economic dimension.",
+    "socialReasoning": "This amendment expands individual liberty by protecting personal reproductive autonomy and limiting government restriction of private decisions about pregnancy. It is strongly aligned with progressive/libertarian positions on personal freedom and individual choice against institutional or state authority.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "va-2026-3",
@@ -1075,7 +1531,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": -0.85,
+    "econReasoning": "This measure has no significant economic dimension, as it does not address taxation, regulation, public spending, or market mechanisms.",
+    "socialReasoning": "This measure strongly expands individual civil rights and liberties by restoring voting rights to formerly incarcerated persons, representing a major criminal justice reform aligned with progressive and libertarian values that prioritize personal freedoms and reduce state restrictions on citizenship rights.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "va-2026-4",
@@ -1089,7 +1551,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-04-21"
+    "electionDate": "2026-04-21",
+    "econScore": 0.0,
+    "socialScore": 0.65,
+    "econReasoning": "Congressional redistricting has no direct economic dimension regarding taxation, regulation, or market mechanisms. The measure is procedural and does not alter fiscal policy.",
+    "socialReasoning": "Returning redistricting authority to the legislature from an independent commission represents a shift toward institutional/governmental control over electoral processes, which favors partisan power consolidation over voter choice protections\u2014a conservative institutional position.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed neutrally as a procedural amendment, but structurally transfers power from an independent redistricting body back to partisan legislators, which materially affects electoral competition and representation."
   },
   {
     "id": "wa-2026-1",
@@ -1103,7 +1571,13 @@
     "conservativeDirection": true,
     "type": "Indirect Initiative State Statute",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "This measure does not directly address taxation, spending, redistribution, or market regulation. It concerns procedural rights in education rather than economic policy.",
+    "socialReasoning": "The measure expands parental authority to restrict children's access to sexual-health education and requires schools to notify parents and grant opt-outs, reflecting conservative/authoritarian preferences for institutional gatekeeping and parental control over individual educational exposure rather than expanding personal freedoms.",
+    "framingFlag": "rights_framing",
+    "framingNote": "The title frames parental oversight as affirmative 'rights to review and receive notifications,' but the structural effect is restricting children's access to curriculum and information, which is a limitation rather than an expansion of individual autonomy."
   },
   {
     "id": "wa-2026-2",
@@ -1117,7 +1591,13 @@
     "conservativeDirection": true,
     "type": "Indirect Initiative State Statute",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "This measure does not engage with taxation, redistribution, regulation of markets, or public spending levels. It has no meaningful economic dimension.",
+    "socialReasoning": "This measure restricts individual choice and personal freedom by mandating biological sex-based categorization in athletics, reflecting conservative prioritization of traditional institutional structures and categorical rules over individual autonomy. It represents a restriction on personal liberty and an assertion of traditional organizational norms.",
+    "framingFlag": "rights_framing",
+    "framingNote": "The title uses 'sex verification requirements' (procedural language) to frame what is structurally a restriction on which students can participate in certain athletic categories, obscuring that the policy limits individual choice and eligibility rather than establishing a verification process as a neutral mechanism."
   },
   {
     "id": "wv-2026-1",
@@ -1131,7 +1611,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "This measure has no direct economic dimension; it addresses voting eligibility requirements rather than taxation, regulation, or market policy.",
+    "socialReasoning": "The measure restricts voting rights to citizens only, reflecting a conservative/authoritarian position on defining political membership and enforcing institutional eligibility boundaries. This aligns with social conservatism's emphasis on formal institutional rules and membership restrictions.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "wi-2026-1",
@@ -1145,7 +1631,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": -0.65,
+    "econReasoning": "This measure has no direct economic impact regarding taxation, spending, regulation of markets, or resource distribution. It is primarily a civil liberties constraint on emergency government authority.",
+    "socialReasoning": "The measure protects individual liberty and religious freedom from government restriction during emergencies, reflecting a libertarian/anti-authoritarian position. However, it does so by constraining government emergency powers rather than expanding personal choice broadly, placing it moderately rather than strongly on the progressive side.",
+    "framingFlag": "rights_framing",
+    "framingNote": "The measure frames a restriction on government power as a 'prohibition' protecting religious worship rights, which accurately reflects the structural effect, but the religious/institutional authority dimension complicates the libertarian framing\u2014it protects a specific institutional class (places of worship) from emergency closure rather than addressing individual liberty to assemble generally."
   },
   {
     "id": "wi-2026-2",
@@ -1159,7 +1651,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.65,
+    "econReasoning": "The measure has no direct economic dimension regarding taxation, spending, regulation, or market structure. It addresses civil rights policy rather than fiscal or economic organization.",
+    "socialReasoning": "This measure restricts affirmative action and race/sex-conscious policies, which aligns with conservative positions on limiting government-directed remedies for historical discrimination and preferring colorblind/merit-based approaches. However, it stops short of authoritarian conservatism on criminal justice or personal freedoms, yielding a moderate-to-strong conservative score rather than an extreme one.",
+    "framingFlag": "rights_framing",
+    "framingNote": "The measure uses 'prohibit discrimination' language\u2014typically associated with expanding protections\u2014to structurally restrict government remedial programs, which reverses the common progressive use of anti-discrimination framing."
   },
   {
     "id": "wi-2026-3",
@@ -1173,7 +1671,13 @@
     "conservativeDirection": true,
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.72,
+    "socialScore": 0.0,
+    "econReasoning": "This measure restricts executive power to increase taxes or fees through partial veto, which aligns with free-market principles favoring lower taxation and limiting government revenue-raising capacity. It reflects a preference for fiscal constraint and limited taxation authority.",
+    "socialReasoning": "The measure addresses procedural governance and executive power allocation rather than social policy, civil liberties, or cultural issues, making it neutral on the social axis.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a tax limitation but structurally reallocates veto power between the governor and legislature, shifting fiscal authority away from executive discretion rather than directly reducing taxes."
   },
   {
     "id": "wy-2026-1",
@@ -1187,6 +1691,12 @@
     "conservativeDirection": true,
     "type": "Citizen-Initiated State Statute",
     "status": "Qualified",
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.72,
+    "socialScore": 0.0,
+    "econReasoning": "This measure reduces property tax revenue and decreases the tax burden on homeowners, reflecting free-market principles favoring lower taxation and private property retention. The exemption shifts fiscal burden away from individual property owners, consistent with tax-reduction conservatism.",
+    "socialReasoning": "The measure has no meaningful social dimension\u2014it addresses property taxation policy rather than issues of civil liberties, criminal justice, traditional norms, or individual freedoms.",
+    "framingFlag": "revenue_impact",
+    "framingNote": "The title emphasizes homeowner benefit but obscures that a 50% exemption on primary residences materially reduces municipal/state tax revenue, shifting fiscal burden to renters, non-primary property owners, and other taxpayers."
   }
 ]

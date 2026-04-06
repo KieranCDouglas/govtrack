@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { getQuizResult, type QuizResult } from "@/lib/quizStore";
 import { Button } from "@/components/ui/button";
-import { ScrollText, HelpCircle, ChevronDown } from "lucide-react";
+import { ScrollText, HelpCircle, ChevronDown, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Matches the category weights from QuizPage.tsx — dominant axis determines lean label
@@ -44,6 +44,13 @@ interface BallotMeasure {
   type: string;
   status: string;
   electionDate: string;
+  // Enrichment fields (added by enrich_ballot_measures.py)
+  econScore?: number | null;
+  socialScore?: number | null;
+  econReasoning?: string | null;
+  socialReasoning?: string | null;
+  framingFlag?: string | null;
+  framingNote?: string | null;
 }
 
 function getDataBase(): string {
@@ -71,13 +78,48 @@ function getAlignment(
 ): { label: string; match: boolean | null } | null {
   if (!quizResult) return null;
 
+  // Use two-axis ideology scores when available
+  if (measure.econScore != null && measure.socialScore != null) {
+    const econDiff   = quizResult.dim1 - measure.econScore;
+    const socialDiff = quizResult.dim2 - measure.socialScore;
+
+    // Weight the primary axis for this category more heavily
+    const econWeight   = CATEGORY_AXIS[measure.category] === "economic" ? 1.0 : 0.4;
+    const socialWeight = CATEGORY_AXIS[measure.category] === "social"   ? 1.0 : 0.4;
+
+    // Weighted Euclidean distance, normalized so max possible = 1.0
+    const raw = Math.sqrt(
+      (econDiff * econWeight) ** 2 + (socialDiff * socialWeight) ** 2
+    );
+    const maxRaw = Math.sqrt(
+      (2 * econWeight) ** 2 + (2 * socialWeight) ** 2
+    );
+    const distance = raw / maxRaw; // 0 = perfect match, 1 = max opposition
+
+    if (!measure.partisan) {
+      // For nonpartisan measures use category priority logic as before
+      const categoryScore = quizResult.categoryScores?.[measure.category];
+      const axisScore = CATEGORY_AXIS[measure.category] === "economic"
+        ? quizResult.dim1 : quizResult.dim2;
+      const score = categoryScore !== undefined ? categoryScore : axisScore;
+      if (Math.abs(score) >= PRIORITY_THRESHOLD) {
+        return { label: "Aligns with your priorities", match: true };
+      }
+      return { label: "Outside your core priorities", match: null };
+    }
+
+    if (distance < 0.35) return { label: "Based on your views: YES", match: true };
+    if (distance > 0.65) return { label: "Based on your views: NO",  match: false };
+    return { label: "You may be split on this", match: null };
+  }
+
+  // Fallback: original binary logic for measures not yet enriched
   const categoryScore = quizResult.categoryScores?.[measure.category];
   const axisScore = CATEGORY_AXIS[measure.category] === "economic"
     ? quizResult.dim1
     : quizResult.dim2;
   const score = categoryScore !== undefined ? categoryScore : axisScore;
 
-  // Nonpartisan measures: nudge based on how strongly the user cares about this category
   if (!measure.partisan) {
     if (Math.abs(score) >= PRIORITY_THRESHOLD) {
       return { label: "Aligns with your priorities", match: true };
@@ -85,7 +127,6 @@ function getAlignment(
     return { label: "Outside your core priorities", match: null };
   }
 
-  // Partisan measures: direction-based alignment
   const THRESHOLD = 0.15;
   if (Math.abs(score) < THRESHOLD) {
     return { label: "You may be split on this", match: null };
@@ -93,6 +134,50 @@ function getAlignment(
   const userConservative = score > 0;
   const match = userConservative === measure.conservativeDirection;
   return { label: match ? "Aligns with your views" : "Opposes your views", match };
+}
+
+function FramingDisclosure({ measure }: { measure: BallotMeasure }) {
+  const [open, setOpen] = useState(false);
+
+  // Pick the reasoning text most relevant to this measure's primary axis
+  const reasoning = CATEGORY_AXIS[measure.category] === "economic"
+    ? (measure.econReasoning || measure.socialReasoning)
+    : (measure.socialReasoning || measure.econReasoning);
+
+  if (!reasoning) return null;
+
+  const hasGap = !!measure.framingFlag;
+
+  return (
+    <div className="mt-2 mb-1">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors group"
+        aria-expanded={open}
+      >
+        {hasGap ? (
+          <Info className="w-3 h-3 text-amber-500/70 group-hover:text-amber-500 flex-shrink-0 transition-colors" />
+        ) : (
+          <ChevronDown className={cn("w-3 h-3 flex-shrink-0 transition-transform", open && "rotate-180")} />
+        )}
+        <span className={cn("transition-colors", hasGap && "text-amber-500/80 group-hover:text-amber-500")}>
+          {hasGap ? "Note on framing" : "What this changes"}
+        </span>
+        {hasGap && (
+          <ChevronDown className={cn("w-3 h-3 flex-shrink-0 transition-transform", open && "rotate-180")} />
+        )}
+      </button>
+
+      {open && (
+        <div className="mt-1.5 pl-4 border-l border-border space-y-1.5">
+          <p className="text-[12px] text-muted-foreground leading-relaxed">{reasoning}</p>
+          {measure.framingNote && (
+            <p className="text-[11px] text-muted-foreground/70 italic leading-relaxed">{measure.framingNote}</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function BallotPage() {
@@ -238,6 +323,9 @@ export default function BallotPage() {
 
                 {/* Summary */}
                 <p className="text-sm text-muted-foreground leading-relaxed mb-3">{measure.summary}</p>
+
+                {/* Framing / mechanical effect disclosure */}
+                <FramingDisclosure measure={measure} />
 
                 {/* Footer row */}
                 <div className="flex items-center gap-3 flex-wrap">
