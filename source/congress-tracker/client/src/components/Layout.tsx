@@ -31,7 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <img src="./civicism-logo.png" alt="Civicism logo" style={{width:"300px",height:"auto", display:"block", filter: theme === "dark" ? "brightness(0) saturate(100%) invert(90%) sepia(18%) saturate(400%) hue-rotate(163deg) brightness(103%) contrast(92%)" : "none"}} />
           </Link>
           {/* Controls pinned to bottom of bar */}
-          <div className="absolute bottom-1 flex items-center gap-1">
+          <div className="absolute bottom-3 flex items-center gap-1">
             <Button variant="ghost" size="icon" className="h-8 w-8 min-[1100px]:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu">
               {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </Button>
