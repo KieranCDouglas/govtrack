@@ -43,7 +43,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
         {/* ── Desktop header: logo left, nav center, toggle right ── */}
         <div className="hidden min-[1100px]:flex w-full pl-0 pr-4 items-center" style={{height:"120px"}}>
-          <Link href="/" className="shrink-0 inline-flex items-center" style={{width:"300px", marginLeft:"8px"}}>
+          <Link href="/" className="shrink-0 inline-flex items-center" style={{width:"300px", marginLeft:"8px", position:"relative", zIndex:10}}>
             <img src="./civicism-logo.png" alt="Civicism logo" style={{width:"300px",height:"auto",maxWidth:"none",objectFit:"contain", filter: theme === "dark" ? "brightness(0) saturate(100%) invert(90%) sepia(18%) saturate(400%) hue-rotate(163deg) brightness(103%) contrast(92%)" : "none"}} />
           </Link>
           <nav className="flex flex-1 items-center justify-center gap-0.5 flex-nowrap min-w-0" style={{marginLeft:"-200px", marginTop:"12px"}}>
