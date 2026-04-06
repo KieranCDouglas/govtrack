@@ -8,15 +8,15 @@ const STORAGE_KEY = "civicism_quiz_result";
 
 export function saveQuizResult(result: QuizResult) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(result));
   } catch {
-    // localStorage unavailable (private browsing restrictions etc.)
+    // sessionStorage unavailable (private browsing restrictions etc.)
   }
 }
 
 export function getQuizResult(): QuizResult | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     // Invalidate old results that don't have categoryScores
@@ -29,7 +29,7 @@ export function getQuizResult(): QuizResult | null {
 
 export function clearQuizResult() {
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(STORAGE_KEY);
   } catch {
     // ignore
   }
