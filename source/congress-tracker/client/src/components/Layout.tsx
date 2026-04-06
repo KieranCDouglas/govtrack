@@ -26,14 +26,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <header className="z-50 border-b border-border/60 backdrop-blur-md bg-background/80" style={{overflow:"visible"}}>
 
         {/* ── Mobile header: compact bar, logo overflows, controls in bar ── */}
-        <div className="min-[850px]:hidden relative flex flex-col items-center" style={{height:"140px"}}>
+        <div className="min-[1100px]:hidden relative flex flex-col items-center" style={{height:"140px"}}>
           {/* Logo centered, overflows bar above and below */}
-          <Link href="/" className="absolute" style={{top:"40%", transform:"translateY(-50%)"}}>
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{width:"393px",height:"auto", filter: theme === "dark" ? "brightness(0) saturate(100%) invert(90%) sepia(18%) saturate(400%) hue-rotate(163deg) brightness(103%) contrast(92%)" : "none"}} />
+          <Link href="/" className="absolute" style={{top:"40%", transform:"translateY(-50%)", display:"block"}}>
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{width:"300px",height:"auto", display:"block", filter: theme === "dark" ? "brightness(0) saturate(100%) invert(90%) sepia(18%) saturate(400%) hue-rotate(163deg) brightness(103%) contrast(92%)" : "none"}} />
           </Link>
           {/* Controls pinned to bottom of bar */}
           <div className="absolute bottom-1 flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8 min-[850px]:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu">
+            <Button variant="ghost" size="icon" className="h-8 w-8 min-[1100px]:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu">
               {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </Button>
             <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8">
@@ -43,9 +43,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* ── Desktop header: logo left, nav center, toggle right ── */}
-        <div className="hidden min-[850px]:flex w-full pl-0 pr-4 items-center" style={{height:"100px"}}>
-          <Link href="/" className="shrink-0 flex items-center" style={{maxWidth:"40%"}}>
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"clamp(393px, 28vw, 403px)",width:"auto",maxWidth:"100%",objectFit:"contain",marginTop:"-92px",marginBottom:"-108px",marginLeft:"-67px", filter: theme === "dark" ? "brightness(0) saturate(100%) invert(90%) sepia(18%) saturate(400%) hue-rotate(163deg) brightness(103%) contrast(92%)" : "none"}} />
+        <div className="hidden min-[1100px]:flex w-full pl-0 pr-4 items-center" style={{height:"100px"}}>
+          <Link href="/" className="shrink-0 inline-flex items-center">
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"100px",width:"auto",maxWidth:"none",objectFit:"contain",marginLeft:"4px", pointerEvents:"none", filter: theme === "dark" ? "brightness(0) saturate(100%) invert(90%) sepia(18%) saturate(400%) hue-rotate(163deg) brightness(103%) contrast(92%)" : "none"}} />
           </Link>
           <nav className="flex flex-1 items-center justify-center gap-0.5 flex-nowrap min-w-0" style={{marginLeft:"-200px", marginTop:"18px"}}>
             {NAV_ITEMS.map((item) => (
@@ -70,7 +70,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
         {/* Dropdown nav for mobile/narrow */}
         {mobileOpen && (
-          <div className="min-[850px]:hidden border-t border-border/60 bg-background/95 px-4 py-3 flex flex-col gap-1">
+          <div className="min-[1100px]:hidden border-t border-border/60 bg-background/95 px-4 py-3 flex flex-col gap-1">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
