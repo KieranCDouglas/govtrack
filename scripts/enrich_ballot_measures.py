@@ -61,23 +61,41 @@ MEASURE:
 
 ─── SCORING INSTRUCTIONS ───────────────────────────────────────────────────────
 
+Score each measure based on how it aligns with the American political spectrum —
+specifically, which side of the U.S. political divide (Democrat vs. Republican,
+left vs. right) would predominantly back this measure if it appeared on a ballot.
+
 ECONOMIC AXIS (-1.0 to +1.0):
-  -1.0 = Collectivist (redistribution, public programs, heavy regulation, progressive taxation)
-  +1.0 = Free-Market (deregulation, private ownership, low taxes, market-driven solutions)
+  -1.0 = Left / Democrat-aligned (redistribution, public programs, regulation, progressive taxation)
+  +1.0 = Right / Republican-aligned (tax cuts, deregulation, private ownership, market-driven)
   0.0  = Neutral / no significant economic dimension
 
 SOCIAL AXIS (-1.0 to +1.0):
-  -1.0 = Progressive / Libertarian (personal freedoms, civil liberties, criminal justice reform,
-         anti-authoritarian, expand individual rights)
-  +1.0 = Conservative / Authoritarian (traditional norms, tough-on-crime, mandatory minimums,
-         restrict individual choices, religious/institutional authority)
+  -1.0 = Left / Democrat-aligned (abortion rights, LGBTQ+ protections, criminal justice reform,
+         voting rights expansion, drug legalization, separation of church and state)
+  +1.0 = Right / Republican-aligned (gun rights, abortion restrictions, anti-drug-legalization,
+         mandatory minimums, voter ID, immigration restriction, religious exemptions,
+         traditional family definitions, anti-trans policies)
   0.0  = Neutral / no significant social dimension
+
+CRITICAL GUIDANCE — common scoring mistakes to avoid:
+  - Gun rights amendments score POSITIVE (conservative/right), even if framed as "individual rights"
+  - Voter ID requirements score POSITIVE (conservative/right)
+  - Citizenship voting requirements score POSITIVE (conservative/right)
+  - Drug legalization restrictions score POSITIVE (conservative/right)
+  - Same-sex marriage protections score NEGATIVE (progressive/left)
+  - Abortion rights protections score NEGATIVE (progressive/left)
+  - Voting rights restoration for felons scores NEGATIVE (progressive/left)
+  - Religious exemption expansions score POSITIVE (conservative/right)
+  - Do NOT conflate libertarian philosophy with left/progressive — gun rights and
+    religious exemptions are conservative positions in the U.S. political context
+    even when framed as "freedom" or "individual rights"
 
 Calibration anchors for reference:
   Bernie Sanders:    economic=-0.90, social=-0.80
   Elizabeth Warren:  economic=-0.82, social=-0.75
   Brian Fitzpatrick: economic=+0.20, social=+0.10  (moderate centrist)
-  Rand Paul:         economic=+0.65, social=+0.10  (libertarian)
+  Rand Paul:         economic=+0.65, social=+0.10  (libertarian — note: gun rights etc. still +)
   Ted Cruz:          economic=+0.88, social=+0.88  (hard conservative)
 
 ─── FRAMING ANALYSIS ───────────────────────────────────────────────────────────
