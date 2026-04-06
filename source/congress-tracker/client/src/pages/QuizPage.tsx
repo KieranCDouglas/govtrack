@@ -476,7 +476,7 @@ export default function QuizPage() {
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight mb-4">Political Placement Quiz</h1>
         <p className="text-muted-foreground text-lg mb-6 leading-relaxed">
-          32 questions across 9 policy areas. Your results will be plotted on the same two-axis compass as every member of Congress.
+          {QUESTIONS.length} questions across 9 policy areas. Your results will be plotted on the same two-axis compass as every member of Congress.
         </p>
         <div className="border border-border rounded-xl p-5 mb-8 text-left text-sm space-y-4" style={{ background: panelBg }}>
           <div className="grid sm:grid-cols-2 gap-4">

@@ -1,7 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useTheme } from "@/components/ThemeProvider";
-import PerplexityAttribution from "@/components/PerplexityAttribution";
-import { Sun, Moon, Menu, X, Vote, Map, HelpCircle, Users, Home, ScrollText, Info } from "lucide-react";
+import { Sun, Moon, Menu, X, Map, HelpCircle, Users, Home, ScrollText, Info } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -43,11 +42,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* ── Desktop header: logo left, nav center, toggle right ── */}
-        <div className="hidden min-[1100px]:flex w-full pl-0 pr-4 items-center" style={{height:"100px"}}>
+        <div className="hidden min-[1100px]:flex w-full pl-0 pr-4 items-center" style={{height:"120px"}}>
           <Link href="/" className="shrink-0 inline-flex items-center">
-            <img src="./civicism-logo.png" alt="Civicism logo" style={{height:"100px",width:"auto",maxWidth:"none",objectFit:"contain",marginLeft:"4px", pointerEvents:"none", filter: theme === "dark" ? "brightness(0) saturate(100%) invert(90%) sepia(18%) saturate(400%) hue-rotate(163deg) brightness(103%) contrast(92%)" : "none"}} />
+            <img src="./civicism-logo.png" alt="Civicism logo" style={{width:"300px",height:"auto",maxWidth:"none",objectFit:"contain",marginLeft:"8px", pointerEvents:"none", filter: theme === "dark" ? "brightness(0) saturate(100%) invert(90%) sepia(18%) saturate(400%) hue-rotate(163deg) brightness(103%) contrast(92%)" : "none"}} />
           </Link>
-          <nav className="flex flex-1 items-center justify-center gap-0.5 flex-nowrap min-w-0" style={{marginLeft:"-200px", marginTop:"18px"}}>
+          <nav className="flex flex-1 items-center justify-center gap-0.5 flex-nowrap min-w-0" style={{marginLeft:"-200px", marginTop:"12px"}}>
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
@@ -63,7 +62,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
-          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8 shrink-0" style={{marginTop:"18px"}}>
+          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" data-testid="button-theme-toggle" className="h-8 w-8 shrink-0" style={{marginTop:"12px"}}>
             {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </Button>
         </div>
@@ -83,7 +82,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                 )}
               >
-                <item.icon className="w-4 h-4" />
                 {item.label}
               </Link>
             ))}
