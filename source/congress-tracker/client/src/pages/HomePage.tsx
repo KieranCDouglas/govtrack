@@ -40,10 +40,10 @@ export default function HomePage() {
     <div className="max-w-7xl mx-auto px-4 py-12">
       {/* Hero */}
       <div className="text-center mb-16 max-w-3xl mx-auto">
-        <h1 className="text-4xl font-extrabold tracking-tight mb-4 text-foreground">
+        <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight mb-4 text-foreground">
           A Civic Engagement Tool
         </h1>
-        <p className="text-muted-foreground text-lg leading-relaxed">
+        <p className="text-muted-foreground text-sm md:text-lg leading-relaxed">
           Explore the ideological landscape of every current and historical member of the U.S. Congress. Discover where you fit on the American political spectrum, track your representatives' voting records, and see how your views align with local ballot initiatives.
         </p>
       </div>
@@ -52,7 +52,7 @@ export default function HomePage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-16">
         {/* Panel 1: Congress progress */}
         <div className="bg-card border border-border rounded-lg p-4 text-center">
-          <div className="text-2xl font-extrabold text-foreground mb-1">{CONGRESS_NUM}th Congress</div>
+          <div className="text-base md:text-xl font-extrabold text-foreground mb-1">{CONGRESS_NUM}th Congress</div>
           <div className="text-xs text-muted-foreground mb-3">Year {congressYear} of 2 · 2025–2027</div>
           <div className="w-full bg-muted/40 rounded-full h-2 mb-1.5">
             <div
@@ -66,7 +66,7 @@ export default function HomePage() {
         {/* Panel 2: House votes + party split */}
         <div className="bg-card border border-border rounded-lg p-4 text-center">
           <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-1">House</div>
-          <div className="text-2xl font-extrabold text-foreground mb-1">
+          <div className="text-lg md:text-2xl font-extrabold text-foreground mb-1">
             {voteCounts ? voteCounts.house.toLocaleString() : "—"}
           </div>
           <div className="text-xs text-muted-foreground mb-3">Roll call votes this Congress</div>
@@ -82,7 +82,7 @@ export default function HomePage() {
         {/* Panel 3: Senate votes + party split */}
         <div className="bg-card border border-border rounded-lg p-4 text-center">
           <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-1">Senate</div>
-          <div className="text-2xl font-extrabold text-foreground mb-1">
+          <div className="text-lg md:text-2xl font-extrabold text-foreground mb-1">
             {voteCounts ? voteCounts.senate.toLocaleString() : "—"}
           </div>
           <div className="text-xs text-muted-foreground mb-3">Roll call votes this Congress</div>
@@ -97,14 +97,14 @@ export default function HomePage() {
       </div>
 
       {/* Feature cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-16">
         <Link href="/members">
-          <div className="group bg-card border border-border rounded-xl p-6 cursor-pointer hover:border-primary/50 hover:bg-card/80 transition-colors h-full">
+          <div className="group bg-card border border-border rounded-xl p-4 md:p-6 cursor-pointer hover:border-primary/50 hover:bg-card/80 transition-colors h-full">
             <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center mb-4">
               <Users className="w-5 h-5 text-primary" />
             </div>
             <h3 className="font-bold text-foreground mb-2">Member Profiles</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
               Browse every current and historical member of Congress. Filter by party, state, or chamber. View full voting histories for recent members, consequential votes for earlier members, and each member's ideology score and key issue positions.
             </p>
             <div className="flex items-center gap-1 mt-4 text-xs text-primary font-semibold group-hover:gap-2 transition-all">
@@ -114,12 +114,12 @@ export default function HomePage() {
         </Link>
 
         <Link href="/compass">
-          <div className="group bg-card border border-border rounded-xl p-6 cursor-pointer hover:border-primary/50 hover:bg-card/80 transition-colors h-full">
+          <div className="group bg-card border border-border rounded-xl p-4 md:p-6 cursor-pointer hover:border-primary/50 hover:bg-card/80 transition-colors h-full">
             <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center mb-4">
               <Map className="w-5 h-5 text-primary" />
             </div>
             <h3 className="font-bold text-foreground mb-2">Political Compass</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
               Visualize ideological diversity by plotting each member of Congress on a two‑dimensional map, using scores derived from roll‑call voting patterns, interest‑group ratings, bill sponsorships, media behavior, and major campaign donors.
             </p>
             <div className="flex items-center gap-1 mt-4 text-xs text-primary font-semibold group-hover:gap-2 transition-all">
@@ -129,12 +129,12 @@ export default function HomePage() {
         </Link>
 
         <Link href="/quiz">
-          <div className="group bg-card border border-border rounded-xl p-6 cursor-pointer hover:border-primary/50 hover:bg-card/80 transition-colors h-full">
+          <div className="group bg-card border border-border rounded-xl p-4 md:p-6 cursor-pointer hover:border-primary/50 hover:bg-card/80 transition-colors h-full">
             <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center mb-4">
               <HelpCircle className="w-5 h-5 text-primary" />
             </div>
             <h3 className="font-bold text-foreground mb-2">Ideology Quiz</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
               Take a short quiz to see where you land on the same political compass as members of Congress, then discover your closest and furthest ideological matches.
             </p>
             <div className="flex items-center gap-1 mt-4 text-xs text-primary font-semibold group-hover:gap-2 transition-all">
@@ -144,12 +144,12 @@ export default function HomePage() {
         </Link>
 
         <Link href="/ballot">
-          <div className="group bg-card border border-border rounded-xl p-6 cursor-pointer hover:border-primary/50 hover:bg-card/80 transition-colors h-full">
+          <div className="group bg-card border border-border rounded-xl p-4 md:p-6 cursor-pointer hover:border-primary/50 hover:bg-card/80 transition-colors h-full">
             <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center mb-4">
               <ScrollText className="w-5 h-5 text-primary" />
             </div>
             <h3 className="font-bold text-foreground mb-2">Ballot Measures</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
               Browse a complete list of upcoming local ballot initiatives, see the ideological leaning of each measure, and receive voting recommendations based on your ideology score.
             </p>
             <div className="flex items-center gap-1 mt-4 text-xs text-primary font-semibold group-hover:gap-2 transition-all">
