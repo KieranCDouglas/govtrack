@@ -1,0 +1,50 @@
+name: Refresh Ballot Measures
+
+on:
+  schedule:
+    # Run on the 1st of every month at 7:00 AM UTC
+    - cron: '0 7 1 * *'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-ballot-measures:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Create data directories
+        run: mkdir -p data
+
+      - name: Fetch ballot measures from Ballotpedia
+        run: python3 scripts/fetch_ballot_measures.py
+
+      - name: Install enrichment dependencies
+        run: pip install anthropic
+
+      - name: Enrich ballot measures with ideology scoring
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python3 scripts/enrich_ballot_measures.py
+
+      - name: Commit updated ballot measures
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add --force data/ballot-measures.json
+          if git diff --cached --quiet; then
+            echo "No ballot measure changes to commit"
+          else
+            git commit -m "chore: refresh ballot measures [automated]"
+            git push
+          fi
