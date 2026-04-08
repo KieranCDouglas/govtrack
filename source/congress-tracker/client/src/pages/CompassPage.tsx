@@ -179,6 +179,9 @@ export default function CompassPage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Read theme directly from DOM at draw time — avoids any stale closure issues
+    const isLight = document.documentElement.classList.contains("light");
+
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
     const logW = rect.width  || 900;

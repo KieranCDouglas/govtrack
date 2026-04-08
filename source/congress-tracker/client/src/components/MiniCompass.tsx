@@ -44,6 +44,9 @@ export default function MiniCompass({ compassX, compassY, name, party, userX, us
 
     ctx.clearRect(0, 0, W, H);
 
+    // Read theme directly from DOM at draw time — avoids any stale closure issues
+    const isLight = document.documentElement.classList.contains("light");
+
     // ── Theme-aware colors ───────────────────────────────────────────────────
     const bg       = isLight ? "#fafaf8"               : "#0f1a1c";
     const quadTL   = isLight ? "rgba(241,232,227,0.55)" : "rgba(80,55,45,0.45)";
