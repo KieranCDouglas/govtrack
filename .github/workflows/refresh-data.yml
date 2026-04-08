@@ -64,13 +64,29 @@ jobs:
         with:
           ref: main
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: source/congress-tracker
+
+      - name: Build client
+        run: npx vite build
+        working-directory: source/congress-tracker
+
+      - name: Copy data into build output
+        run: cp -r data source/congress-tracker/dist/public/data
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: source/congress-tracker/dist/public
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
