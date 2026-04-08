@@ -9,6 +9,7 @@ import { Link } from "wouter";
 import { RotateCcw, HelpCircle } from "lucide-react";
 import { getQuizResult } from "@/lib/quizStore";
 import type { Member } from "@/lib/dataService";
+import { useTheme } from "@/components/ThemeProvider";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
@@ -136,12 +137,8 @@ export default function CompassPage() {
   const [location] = useLocation();
   const highlight = new URLSearchParams(location.split("?")[1] || "").get("highlight") || "";
 
-  const [isLight, setIsLight] = useState(() => document.documentElement.classList.contains("light"));
-  useEffect(() => {
-    const obs = new MutationObserver(() => setIsLight(document.documentElement.classList.contains("light")));
-    obs.observe(document.documentElement, { attributeFilter: ["class"] });
-    return () => obs.disconnect();
-  }, []);
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   const canvasRef  = useRef<HTMLCanvasElement>(null);
   const [chamber,   setChamber]   = useState("all");
   const [party,     setParty]     = useState("all");

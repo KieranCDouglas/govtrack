@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
+import { useTheme } from "@/components/ThemeProvider";
 
 interface Props {
   compassX: number;
@@ -17,12 +18,8 @@ const PARTY_RGB = {
 
 export default function MiniCompass({ compassX, compassY, name, party, userX, userY }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isLight, setIsLight] = useState(() => document.documentElement.classList.contains("light"));
-  useEffect(() => {
-    const obs = new MutationObserver(() => setIsLight(document.documentElement.classList.contains("light")));
-    obs.observe(document.documentElement, { attributeFilter: ["class"] });
-    return () => obs.disconnect();
-  }, []);
+  const { theme } = useTheme();
+  const isLight = theme === "light";
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
