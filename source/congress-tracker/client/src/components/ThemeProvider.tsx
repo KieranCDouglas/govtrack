@@ -9,6 +9,8 @@ const ThemeContext = createContext<{
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "light" || saved === "dark") return saved;
     return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
   });
 
@@ -21,7 +23,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   }, [theme]);
 
-  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+  const toggleTheme = () => setTheme((t) => {
+    const next = t === "dark" ? "light" : "dark";
+    localStorage.setItem("theme", next);
+    return next;
+  });
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
