@@ -77,8 +77,15 @@ jobs:
         run: npx vite build
         working-directory: source/congress-tracker
 
-      - name: Copy data into build output
-        run: cp -r data source/congress-tracker/dist/public/data
+      - name: Copy built assets to repo root assets/
+        run: cp source/congress-tracker/dist/public/assets/* assets/
+
+      - name: Update index.html asset references
+        run: |
+          NEW_JS=$(ls assets/index-*.js | xargs basename)
+          NEW_CSS=$(ls assets/index-*.css | xargs basename)
+          sed -i "s|assets/index-[^\"]*\.js|assets/${NEW_JS}|g" index.html
+          sed -i "s|assets/index-[^\"]*\.css|assets/${NEW_CSS}|g" index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -86,7 +93,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: source/congress-tracker/dist/public
+          path: .
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
