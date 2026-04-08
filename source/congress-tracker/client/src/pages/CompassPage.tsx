@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentMembers } from "@/lib/dataService";
 import { useLocation } from "wouter";
@@ -170,7 +170,10 @@ export default function CompassPage() {
 
   // ── Draw ──────────────────────────────────────────────────────────────────
 
-  const drawCompass = useCallback(() => {
+  // Always-current ref so ResizeObserver never captures a stale closure
+  const drawRef = useRef<() => void>(() => {});
+
+  drawRef.current = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -368,18 +371,21 @@ export default function CompassPage() {
     ctx.strokeStyle = borderCol;
     ctx.lineWidth = 1;
     ctx.stroke();
-  }, [members, hovered, userPos, highlight, colorMode, isLight]);
+  };
 
-  useEffect(() => { drawCompass(); }, [drawCompass]);
+  // Redraw whenever any dependency changes
+  useEffect(() => {
+    drawRef.current();
+  }, [members, hovered, userPos, highlight, colorMode, isLight]);
 
   // Redraw at native resolution whenever the canvas container is resized
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ro = new ResizeObserver(() => drawCompass());
+    const ro = new ResizeObserver(() => drawRef.current());
     ro.observe(canvas);
     return () => ro.disconnect();
-  }, [drawCompass]);
+  }, []);
 
   // ── Interaction ───────────────────────────────────────────────────────────
 
