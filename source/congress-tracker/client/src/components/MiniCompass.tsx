@@ -20,6 +20,8 @@ export default function MiniCompass({ compassX, compassY, name, party, userX, us
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { theme } = useTheme();
   const isLight = theme === "light";
+  const isLightRef = useRef(isLight);
+  isLightRef.current = isLight;
 
   // Always-current ref so ResizeObserver never captures a stale closure
   const drawRef = useRef<() => void>(() => {});
@@ -44,19 +46,18 @@ export default function MiniCompass({ compassX, compassY, name, party, userX, us
 
     ctx.clearRect(0, 0, W, H);
 
-    // Read theme directly from DOM at draw time — avoids any stale closure issues
-    const isLight = document.documentElement.classList.contains("light");
+    const isLight = isLightRef.current;
 
     // ── Theme-aware colors ───────────────────────────────────────────────────
-    const bg       = isLight ? "#fafaf8"               : "#0f1a1c";
-    const quadTL   = isLight ? "rgba(241,232,227,0.55)" : "rgba(80,55,45,0.45)";
-    const quadTR   = isLight ? "rgba(237,232,245,0.55)" : "rgba(60,50,85,0.45)";
-    const quadBL   = isLight ? "rgba(195,227,232,0.55)" : "rgba(30,75,85,0.45)";
-    const quadBR   = isLight ? "rgba(201,214,235,0.55)" : "rgba(35,60,90,0.45)";
-    const gridCol  = isLight ? "rgba(100,110,120,0.10)" : "rgba(180,200,210,0.08)";
-    const axisCol  = isLight ? "rgba(80,90,100,0.30)"   : "rgba(180,200,210,0.25)";
-    const labelCol = isLight ? "rgba(60,70,80,0.50)"    : "rgba(160,180,190,0.55)";
-    const borderCol= isLight ? "rgba(0,0,0,0.30)"       : "rgba(255,255,255,0.12)";
+    const bg       = isLight ? "#fafaf8"               : "#071a1c";
+    const quadTL   = isLight ? "rgba(241,232,227,0.55)" : "rgba(239,123,69,0.10)";
+    const quadTR   = isLight ? "rgba(237,232,245,0.55)" : "rgba(205,237,246,0.06)";
+    const quadBL   = isLight ? "rgba(195,227,232,0.55)" : "rgba(94,177,191,0.10)";
+    const quadBR   = isLight ? "rgba(201,214,235,0.55)" : "rgba(94,177,191,0.14)";
+    const gridCol  = isLight ? "rgba(100,110,120,0.10)" : "rgba(94,177,191,0.15)";
+    const axisCol  = isLight ? "rgba(80,90,100,0.30)"   : "rgba(94,177,191,0.55)";
+    const labelCol = isLight ? "rgba(60,70,80,0.50)"    : "rgba(205,237,246,0.55)";
+    const borderCol= isLight ? "rgba(0,0,0,0.30)"       : "rgba(94,177,191,0.20)";
 
     // ── Background (rounded rect, clipped) ───────────────────────────────────
     const r = 8;
