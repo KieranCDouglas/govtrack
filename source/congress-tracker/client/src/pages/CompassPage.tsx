@@ -202,30 +202,41 @@ export default function CompassPage() {
     // Pre-compute party stats for deviation normalization (also stored for hover bar)
     partyStatsRef.current = colorMode !== "none" ? buildPartyStats(members, colorMode) : {};
 
+    // ── Theme-aware colors ─────────────────────────────────────────────────
+    const canvasBg  = isLight ? "#fafaf8"              : "#0f1a1c";
+    const quadTL    = isLight ? QUAD_COLORS.topLeft     : "rgba(80,55,45,0.45)";
+    const quadTR    = isLight ? QUAD_COLORS.topRight    : "rgba(60,50,85,0.45)";
+    const quadBL    = isLight ? QUAD_COLORS.bottomLeft  : "rgba(30,75,85,0.45)";
+    const quadBR    = isLight ? QUAD_COLORS.bottomRight : "rgba(35,60,90,0.45)";
+    const gridCol   = isLight ? "rgba(100,110,120,0.10)" : "rgba(180,200,210,0.08)";
+    const axisCol   = isLight ? "rgba(80,90,100,0.30)"  : "rgba(180,200,210,0.25)";
+    const labelCol  = isLight ? "rgba(60,70,80,0.55)"   : "rgba(160,180,190,0.55)";
+    const borderCol = isLight ? "rgba(0,0,0,0.30)"      : "rgba(255,255,255,0.12)";
+
     // ── Canvas background ──────────────────────────────────────────────────
     const r = 8;
     ctx.beginPath();
     ctx.roundRect(pad, pad, W - 2 * pad, H - 2 * pad, r);
-    ctx.fillStyle = "#fafaf8";
+    ctx.fillStyle = canvasBg;
     ctx.fill();
     ctx.clip();
 
     // ── Quadrant fills ─────────────────────────────────────────────────────
-    // Top-left: populist left (#f1e8e3)
-    ctx.fillStyle = QUAD_COLORS.topLeft;
+    // Top-left: populist left
+    ctx.fillStyle = quadTL;
     ctx.fillRect(pad, pad, rw, rh);
-    // Top-right: traditional conservative (#ede8f5)
-    ctx.fillStyle = QUAD_COLORS.topRight;
+    // Top-right: traditional conservative
+    ctx.fillStyle = quadTR;
     ctx.fillRect(cx, pad, rw, rh);
-    // Bottom-left: progressive left (#c3e3e8)
-    ctx.fillStyle = QUAD_COLORS.bottomLeft;
+    // Bottom-left: progressive left
+    ctx.fillStyle = quadBL;
     ctx.fillRect(pad, cy, rw, rh);
-    // Bottom-right: libertarian (#c9d6eb)
-    ctx.fillStyle = QUAD_COLORS.bottomRight;
+    // Bottom-right: libertarian
+    ctx.fillStyle = quadBR;
     ctx.fillRect(cx, cy, rw, rh);
 
     // ── Subtle grid ────────────────────────────────────────────────────────
-    ctx.strokeStyle = "rgba(100,110,120,0.10)";
+    ctx.strokeStyle = gridCol;
     ctx.lineWidth = 0.75;
     for (let i = -0.75; i <= 0.75; i += 0.25) {
       if (Math.abs(i) < 0.01) continue;
@@ -236,14 +247,14 @@ export default function CompassPage() {
     }
 
     // ── Main axes ──────────────────────────────────────────────────────────
-    ctx.strokeStyle = "rgba(80,90,100,0.30)";
+    ctx.strokeStyle = axisCol;
     ctx.lineWidth = 1.0;
     ctx.beginPath(); ctx.moveTo(pad, cy); ctx.lineTo(W - pad, cy); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(cx, pad); ctx.lineTo(cx, H - pad); ctx.stroke();
 
     // ── Axis labels ────────────────────────────────────────────────────────
     ctx.font = "500 10px 'Inter', 'Helvetica Neue', sans-serif";
-    ctx.fillStyle = "rgba(60,70,80,0.55)";
+    ctx.fillStyle = labelCol;
     ctx.textAlign = "left";
     ctx.fillText("← Economic Left", pad + 6, cy - 6);
     ctx.textAlign = "right";
@@ -317,7 +328,7 @@ export default function CompassPage() {
         ctx.textAlign = textAlign;
         const tw = ctx.measureText(lastName).width;
         const px2 = textAlign === "right" ? labelX - tw - 6 : labelX - 4;
-        ctx.fillStyle = "rgba(255,255,255,0.88)";
+        ctx.fillStyle = isLight ? "rgba(255,255,255,0.88)" : "rgba(15,26,28,0.85)";
         ctx.beginPath();
         ctx.roundRect(px2, labelY - 11, tw + 10, 14, 4);
         ctx.fill();
@@ -347,7 +358,7 @@ export default function CompassPage() {
       ctx.beginPath(); ctx.arc(ux, uy, uDotR, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
 
       ctx.font = "700 10px 'Inter', sans-serif";
-      ctx.fillStyle = "rgb(100,60,160)";
+      ctx.fillStyle = isLight ? "rgb(100,60,160)" : "rgb(180,140,230)";
       ctx.textAlign = ux > cx ? "right" : "left";
       ctx.fillText("You", ux + (ux > cx ? -13 : 13), uy - 12);
     }
@@ -357,10 +368,10 @@ export default function CompassPage() {
     // ── Rounded border drawn on top of all content ──────────────────────────
     ctx.beginPath();
     ctx.roundRect(pad, pad, W - 2 * pad, H - 2 * pad, r);
-    ctx.strokeStyle = "rgba(0,0,0,0.30)";
+    ctx.strokeStyle = borderCol;
     ctx.lineWidth = 1;
     ctx.stroke();
-  }, [members, hovered, userPos, highlight, colorMode]);
+  }, [members, hovered, userPos, highlight, colorMode, isLight]);
 
   useEffect(() => { drawCompass(); }, [drawCompass]);
 

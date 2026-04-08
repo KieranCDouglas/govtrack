@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 interface Props {
   compassX: number;
@@ -17,6 +17,12 @@ const PARTY_RGB = {
 
 export default function MiniCompass({ compassX, compassY, name, party, userX, userY }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isLight, setIsLight] = useState(() => document.documentElement.classList.contains("light"));
+  useEffect(() => {
+    const obs = new MutationObserver(() => setIsLight(document.documentElement.classList.contains("light")));
+    obs.observe(document.documentElement, { attributeFilter: ["class"] });
+    return () => obs.disconnect();
+  }, []);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -38,11 +44,22 @@ export default function MiniCompass({ compassX, compassY, name, party, userX, us
 
     ctx.clearRect(0, 0, W, H);
 
+    // ── Theme-aware colors ───────────────────────────────────────────────────
+    const bg       = isLight ? "#fafaf8"              : "#0f1a1c";
+    const quadTL   = isLight ? "rgba(241,232,227,0.55)" : "rgba(80,55,45,0.45)";
+    const quadTR   = isLight ? "rgba(237,232,245,0.55)" : "rgba(60,50,85,0.45)";
+    const quadBL   = isLight ? "rgba(195,227,232,0.55)" : "rgba(30,75,85,0.45)";
+    const quadBR   = isLight ? "rgba(201,214,235,0.55)" : "rgba(35,60,90,0.45)";
+    const gridCol  = isLight ? "rgba(100,110,120,0.10)" : "rgba(180,200,210,0.08)";
+    const axisCol  = isLight ? "rgba(80,90,100,0.30)"  : "rgba(180,200,210,0.25)";
+    const labelCol = isLight ? "rgba(60,70,80,0.50)"   : "rgba(160,180,190,0.55)";
+    const borderCol= isLight ? "rgba(0,0,0,0.30)"      : "rgba(255,255,255,0.12)";
+
     // ── Background (rounded rect, clipped — matches full compass) ────────────
     const r = 8;
     ctx.beginPath();
     ctx.roundRect(pad, pad, W - 2 * pad, H - 2 * pad, r);
-    ctx.fillStyle = "#fafaf8";
+    ctx.fillStyle = bg;
     ctx.fill();
     ctx.save();
     ctx.beginPath();
@@ -51,10 +68,10 @@ export default function MiniCompass({ compassX, compassY, name, party, userX, us
 
     // ── Quadrant fills (same palette as main compass) ────────────────────────
     const quads = [
-      { x: pad, y: pad, fill: "rgba(241,232,227,0.55)" },  // TL: populist
-      { x: cx,  y: pad, fill: "rgba(237,232,245,0.55)" },  // TR: traditional right
-      { x: pad, y: cy,  fill: "rgba(195,227,232,0.55)" },  // BL: progressive
-      { x: cx,  y: cy,  fill: "rgba(201,214,235,0.55)" },  // BR: libertarian
+      { x: pad, y: pad, fill: quadTL },  // TL: populist
+      { x: cx,  y: pad, fill: quadTR },  // TR: traditional right
+      { x: pad, y: cy,  fill: quadBL },  // BL: progressive
+      { x: cx,  y: cy,  fill: quadBR },  // BR: libertarian
     ];
     quads.forEach(q => {
       ctx.fillStyle = q.fill;
@@ -62,7 +79,7 @@ export default function MiniCompass({ compassX, compassY, name, party, userX, us
     });
 
     // ── Subtle grid ──────────────────────────────────────────────────────────
-    ctx.strokeStyle = "rgba(100,110,120,0.10)";
+    ctx.strokeStyle = gridCol;
     ctx.lineWidth = 0.5;
     for (let i = -0.5; i <= 0.5; i += 0.5) {
       if (Math.abs(i) < 0.01) continue;
@@ -73,14 +90,14 @@ export default function MiniCompass({ compassX, compassY, name, party, userX, us
     }
 
     // ── Main axes ────────────────────────────────────────────────────────────
-    ctx.strokeStyle = "rgba(80,90,100,0.30)";
+    ctx.strokeStyle = axisCol;
     ctx.lineWidth = 1.0;
     ctx.beginPath(); ctx.moveTo(pad, cy); ctx.lineTo(W - pad, cy); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(cx, pad); ctx.lineTo(cx, H - pad); ctx.stroke();
 
     // ── Axis labels ──────────────────────────────────────────────────────────
     ctx.font = "500 7px 'Inter', 'Helvetica Neue', sans-serif";
-    ctx.fillStyle = "rgba(60,70,80,0.50)";
+    ctx.fillStyle = labelCol;
     ctx.textAlign = "left";  ctx.fillText("← Econ Left",  pad + 3, cy - 4);
     ctx.textAlign = "right"; ctx.fillText("Econ Right →", W - pad - 3, cy - 4);
     ctx.textAlign = "center";
@@ -129,7 +146,7 @@ export default function MiniCompass({ compassX, compassY, name, party, userX, us
       ctx.beginPath(); ctx.arc(ux, uy, 5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
 
       ctx.font = "600 8px 'Inter', sans-serif";
-      ctx.fillStyle = "rgb(100,60,160)";
+      ctx.fillStyle = isLight ? "rgb(100,60,160)" : "rgb(180,140,230)";
       ctx.textAlign = ux > cx ? "right" : "left";
       ctx.fillText("You", ux + (ux > cx ? -9 : 9), uy - 8);
     }
@@ -139,10 +156,10 @@ export default function MiniCompass({ compassX, compassY, name, party, userX, us
     // ── Border stroke drawn on top (matches full compass) ─────────────────
     ctx.beginPath();
     ctx.roundRect(pad, pad, W - 2 * pad, H - 2 * pad, r);
-    ctx.strokeStyle = "rgba(0,0,0,0.30)";
+    ctx.strokeStyle = borderCol;
     ctx.lineWidth = 1;
     ctx.stroke();
-  }, [compassX, compassY, name, party, userX, userY]);
+  }, [compassX, compassY, name, party, userX, userY, isLight]);
 
   useEffect(() => { draw(); }, [draw]);
 
