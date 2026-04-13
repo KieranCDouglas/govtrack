@@ -328,7 +328,7 @@ function computeScores(answers: Record<string, number>): QuizResult {
 }
 
 function getQuadrantLabel(x: number, y: number): string {
-  if (x < -0.15 && y >  0.15) return "Populist";
+  if (x < -0.15 && y >  0.15) return "Communitarian Conservative";
   if (x >  0.15 && y >  0.15) return "American Right";
   if (x < -0.15 && y < -0.15) return "American Left";
   if (x >  0.15 && y < -0.15) return "Libertarian";
@@ -341,7 +341,7 @@ function getQuadrantLabel(x: number, y: number): string {
 
 function getQuadrantDescription(x: number, y: number): string {
   if (x < -0.15 && y >  0.15)
-    return "You sit in the Populist quadrant: state-directed economics combined with socially conservative or nationalist values. This maps to economic nationalism — tariffs, industrial policy, strict immigration controls — alongside traditional or majoritarian social views.";
+    return "You sit in the Communitarian Conservative quadrant: state-directed economics combined with socially conservative or nationalist values. This maps to economic nationalism — tariffs, industrial policy, strict immigration controls — alongside traditional or majoritarian social views.";
   if (x >  0.15 && y >  0.15)
     return "You sit in the American Right quadrant: free market economics alongside socially conservative values. This is the classic conservative position — lower taxes, less regulation, free trade, and traditional social norms including religion in public life.";
   if (x < -0.15 && y < -0.15)
@@ -483,13 +483,13 @@ export default function QuizPage() {
             {[
               {
                 axis: "↔\uFE0E Economic Axis",
-                left: "Left: state ownership, redistribution, tariffs, industrial policy, public services",
-                right: "Right: free markets, deregulation, free trade, private enterprise, low taxes",
+                left: "Left: state ownership, redistribution, industrial policy, public services",
+                right: "Right: free markets, deregulation, free trade, low taxes",
               },
               {
                 axis: "↕\uFE0E Social Axis",
-                left: "Bottom: socially progressive — individual autonomy, LGBTQ+ rights, open society, secularism",
-                right: "Top: socially conservative — traditional values, cultural nationalism, religion in public life",
+                left: "Bottom: individual autonomy, LGBTQ+ rights, open society, secularism",
+                right: "Top: traditional values, cultural nationalism, religion in public life",
               },
             ].map(({ axis, left, right }) => (
               <div key={axis} className="border border-border/60 rounded-lg p-3">
@@ -503,7 +503,7 @@ export default function QuizPage() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
             {[
-              { q: "Top-Left",  label: "Populist",            c: "rgba(239,123,69,0.15)",                   lc: "rgba(239,123,69,0.15)",  b: "rgba(239,123,69,0.4)",  lb: "rgba(239,123,69,0.4)" },
+              { q: "Top-Left",  label: "Communitarian Conservative", c: "rgba(239,123,69,0.15)",                   lc: "rgba(239,123,69,0.15)",  b: "rgba(239,123,69,0.4)",  lb: "rgba(239,123,69,0.4)" },
               { q: "Top-Right", label: "American Right",       c: "rgba(205,237,246,0.08)",                  lc: "#eff0f9",                b: "rgba(205,237,246,0.3)", lb: "#d7d1ea" },
               { q: "Bot-Left",  label: "American Left",        c: "rgba(94,177,191,0.12)",                   lc: "#d9eef2",                b: "rgba(94,177,191,0.5)",  lb: "#b3d7df" },
               { q: "Bot-Right", label: "Libertarian",         c: "rgba(94,177,191,0.18)",                   lc: "#dce6f4",                b: "rgba(94,177,191,0.6)",  lb: "#bbcce4" },
@@ -522,7 +522,7 @@ export default function QuizPage() {
           className="text-base px-8 py-3 h-auto bg-primary text-primary-foreground hover:bg-primary/90"
           onClick={() => setStep("quiz")}
         >
-          Start — 32 Questions
+          Start
         </Button>
       </div>
     );
