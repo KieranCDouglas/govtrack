@@ -91,11 +91,7 @@ export default function MembersPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-extrabold tracking-tight mb-1">Members of Congress</h1>
-        <p className="text-muted-foreground text-sm">
-          {total > 0 ? `${total.toLocaleString()} members` : "Loading…"}
-          {current === "current" ? " currently serving" : " (all historical)"}
-        </p>
+        <h1 className="text-2xl font-extrabold tracking-tight">Members of Congress</h1>
       </div>
 
       {/* Filters */}

@@ -24,9 +24,11 @@ export default function HomePage() {
   const chamberCounts = allMembers ? (() => {
     const hd = allMembers.filter(m => m.chamber === "House"   && m.party === "Democrat").length;
     const hr = allMembers.filter(m => m.chamber === "House"   && m.party === "Republican").length;
+    const hi = allMembers.filter(m => m.chamber === "House"   && m.party !== "Democrat" && m.party !== "Republican").length;
     const sd = allMembers.filter(m => m.chamber === "Senate"  && m.party === "Democrat").length;
     const sr = allMembers.filter(m => m.chamber === "Senate"  && m.party === "Republican").length;
-    return { hd, hr, sd, sr };
+    const si = allMembers.filter(m => m.chamber === "Senate"  && m.party !== "Democrat" && m.party !== "Republican").length;
+    return { hd, hr, hi, sd, sr, si };
   })() : null;
 
   // Congress progress (0–100)
@@ -75,6 +77,12 @@ export default function HomePage() {
               <span className="font-semibold" style={{ color: "rgb(94,177,191)" }}>{chamberCounts.hd} Dem</span>
               <span className="text-muted-foreground/40">·</span>
               <span className="font-semibold" style={{ color: "rgb(216,71,39)" }}>{chamberCounts.hr} Rep</span>
+              {chamberCounts.hi > 0 && (
+                <>
+                  <span className="text-muted-foreground/40">·</span>
+                  <span className="font-semibold" style={{ color: "rgb(160,160,160)" }}>{chamberCounts.hi} Ind</span>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -91,6 +99,12 @@ export default function HomePage() {
               <span className="font-semibold" style={{ color: "rgb(94,177,191)" }}>{chamberCounts.sd} Dem</span>
               <span className="text-muted-foreground/40">·</span>
               <span className="font-semibold" style={{ color: "rgb(216,71,39)" }}>{chamberCounts.sr} Rep</span>
+              {chamberCounts.si > 0 && (
+                <>
+                  <span className="text-muted-foreground/40">·</span>
+                  <span className="font-semibold" style={{ color: "rgb(160,160,160)" }}>{chamberCounts.si} Ind</span>
+                </>
+              )}
             </div>
           )}
         </div>

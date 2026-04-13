@@ -199,9 +199,10 @@ def update_members_index(congress):
     return output
 
 
-# Members to exclude from current congress (e.g. VP, resigned before being sworn in)
+# Members to exclude from current congress (e.g. VP, resigned to join Cabinet)
 EXCLUDE_CURRENT = {
     "V000137",  # JD Vance — elected VP, never served in 119th Congress
+    "R000595",  # Marco Rubio — resigned from Senate Jan 20, 2025 to become Secretary of State
 }
 
 
