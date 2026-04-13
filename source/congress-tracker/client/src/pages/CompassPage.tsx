@@ -426,7 +426,7 @@ export default function CompassPage() {
         <p className="text-muted-foreground text-sm max-w-2xl">
           Every current member of Congress placed by their{" "}
           <strong className="text-foreground">economic views</strong> (horizontal) and{" "}
-          <strong className="text-foreground">social views</strong> (vertical), scored by AI
+          <strong className="text-foreground">social views</strong> (vertical), scored by an
           analysis of voting records, sponsored legislation, interest-group ratings, and donor
           industries. Use <em>Color by</em> to reveal how much each member breaks with their
           party on a specific issue.
@@ -591,10 +591,10 @@ export default function CompassPage() {
       {/* ── Quadrant legend cards ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5 text-xs">
         {[
-          { bg: QUAD_COLORS.topLeft,     darkBg: "#35382e", border: "rgba(196,140,110,0.25)", darkBorder: "rgba(196,140,110,0.20)", label: "Populist",       sub: "Economic left + socially conservative. State nationalism, protectionism, cultural restriction." },
-          { bg: QUAD_COLORS.topRight,    darkBg: "#1b3b3d", border: "rgba(140,110,190,0.25)", darkBorder: "rgba(140,110,190,0.20)", label: "American Right", sub: "Economic right + socially conservative. Free markets, traditional values, low taxes." },
-          { bg: QUAD_COLORS.bottomLeft,  darkBg: "#103c3f", border: "rgba(79,160,180,0.30)",  darkBorder: "rgba(79,160,180,0.20)",  label: "American Left",  sub: "Economic left + socially progressive. Redistribution, public programs, individual autonomy." },
-          { bg: QUAD_COLORS.bottomRight, darkBg: "#174648", border: "rgba(80,120,180,0.25)",  darkBorder: "rgba(80,120,180,0.20)",  label: "Libertarian",    sub: "Economic right + socially progressive. Free markets, open society, minimal government." },
+          { bg: QUAD_COLORS.topLeft,     darkBg: "#35382e", border: "rgba(196,140,110,0.25)", darkBorder: "rgba(196,140,110,0.20)", label: "Communitarian Conservative", sub: "Economic left + socially conservative. State nationalism, protectionism, cultural restriction." },
+          { bg: QUAD_COLORS.topRight,    darkBg: "#1b3b3d", border: "rgba(140,110,190,0.25)", darkBorder: "rgba(140,110,190,0.20)", label: "American Right",              sub: "Economic right + socially conservative. Free markets, traditional values, low taxes." },
+          { bg: QUAD_COLORS.bottomLeft,  darkBg: "#103c3f", border: "rgba(79,160,180,0.30)",  darkBorder: "rgba(79,160,180,0.20)",  label: "American Left",               sub: "Economic left + socially progressive. Redistribution, public programs, individual autonomy." },
+          { bg: QUAD_COLORS.bottomRight, darkBg: "#174648", border: "rgba(80,120,180,0.25)",  darkBorder: "rgba(80,120,180,0.20)",  label: "Libertarian",                 sub: "Economic right + socially progressive. Free markets, open society, minimal government." },
         ].map(q => (
           <div
             key={q.label}
