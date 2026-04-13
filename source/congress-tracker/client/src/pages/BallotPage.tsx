@@ -235,7 +235,7 @@ export default function BallotPage() {
           Ballot Measures
         </h1>
         <p className="text-muted-foreground leading-relaxed max-w-2xl">
-          Upcoming statewide ballot initiatives for 2026. Each measure is tagged with its ideological lean —
+          Upcoming statewide ballot initiatives. Each measure is tagged with its ideological leaning —
           and if you've taken the quiz, you'll see how it aligns with your own political profile.
         </p>
       </div>
