@@ -583,7 +583,7 @@ export default function CompassPage() {
           </div>
         ) : (
           <p className="text-xs text-muted-foreground">
-            Hover to identify members · click to view profile · drag to pan · scroll to zoom
+            Hover to identify members · click to view profile
           </p>
         )}
       </div>
@@ -635,7 +635,7 @@ export default function CompassPage() {
           <div>
             <div className="font-semibold text-foreground mb-1">See where you land on this compass</div>
             <p className="text-sm text-muted-foreground">
-              Take the 30-question quiz to place yourself on the same chart as every member of Congress.
+              Take a short quiz to place yourself on the same chart as every member of Congress.
             </p>
           </div>
           <Link href="/quiz">
