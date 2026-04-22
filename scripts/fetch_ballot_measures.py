@@ -665,6 +665,8 @@ def main():
 
     scraped_keys = set()
     merged = []
+    preserved_ids: set[str] = set()
+    new_measures: list[dict] = []  # measures without a preserved id
 
     for m in measures:
         key = _stable_key(m["state"], m["title"], m["electionDate"])
@@ -674,8 +676,33 @@ def main():
             for field in ENRICHMENT_FIELDS:
                 if field in prev:
                     m[field] = prev[field]
-            m["id"] = prev["id"]  # keep stable id to avoid JSON diff churn
+            m["id"] = prev["id"]
+            preserved_ids.add(prev["id"])
+        else:
+            new_measures.append(m)
         merged.append(m)
+
+    # Collect all IDs already claimed (preserved matches + archived removed measures)
+    # so new measures can be assigned non-colliding IDs
+    taken_ids: set[str] = set(preserved_ids)
+    for key, prev in existing.items():
+        if key not in scraped_keys:
+            taken_ids.add(prev["id"])  # removed/archived measures keep their IDs
+
+    state_max: dict[str, int] = {}
+    for mid in taken_ids:
+        parts = mid.rsplit("-", 1)
+        if len(parts) == 2 and parts[1].isdigit():
+            prefix = parts[0]  # e.g. "al-2026"
+            state_max[prefix] = max(state_max.get(prefix, 0), int(parts[1]))
+
+    for m in new_measures:
+        if m["id"] in taken_ids:
+            prefix = m["id"].rsplit("-", 1)[0]
+            n = state_max.get(prefix, 0) + 1
+            state_max[prefix] = n
+            m["id"] = f"{prefix}-{n}"
+            taken_ids.add(m["id"])
 
     removed_count = 0
     for key, prev in existing.items():

@@ -42,7 +42,7 @@
     "framingNote": null
   },
   {
-    "id": "al-2026-1",
+    "id": "al-2026-4",
     "state": "Alabama",
     "stateCode": "AL",
     "year": 2026,
@@ -54,7 +54,13 @@
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
     "result": null,
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.75,
+    "econReasoning": "This measure has no meaningful economic dimension\u2014it mandates a procedural requirement for schools without addressing taxation, spending levels, regulation, or market structures.",
+    "socialReasoning": "Mandatory patriotic observance in public schools aligns with conservative social positions favoring traditional nationalism, religious/civic expression in public institutions, and state-directed cultural messaging rather than individual choice or secular neutrality.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "al-2026-1",
@@ -78,7 +84,7 @@
     "framingNote": "The measure is framed as a routine election requirement but structurally shifts power from gubernatorial appointment authority to the electorate, a non-obvious institutional effect that merits disclosure."
   },
   {
-    "id": "al-2026-3",
+    "id": "al-2026-5",
     "state": "Alabama",
     "stateCode": "AL",
     "year": 2026,
@@ -90,7 +96,13 @@
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
     "result": null,
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.85,
+    "econReasoning": "This measure has no significant economic dimension; it addresses curricular and religious practice requirements in public schools rather than taxation, spending, or market regulation.",
+    "socialReasoning": "The measure combines two traditionally conservative social positions: mandatory patriotic observance (Pledge of Allegiance) and religious expression in schools (student-led prayer). Both align strongly with right-wing social priorities that emphasize traditional values, religious accommodation, and nationalist symbolism.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "ak-2026-1",
@@ -324,7 +336,7 @@
     "framingNote": "The title frames this as a technical 'elimination' of a successor election, but the structural effect materially shifts power by removing voters' ability to select a replacement and instead deferring to state law succession procedures, which typically vest appointment authority in remaining executive officials rather than the electorate."
   },
   {
-    "id": "ca-2026-3",
+    "id": "ca-2026-4",
     "state": "California",
     "stateCode": "CA",
     "year": 2026,
@@ -336,10 +348,16 @@
     "type": "Citizen-Initiated State Statute",
     "status": "Qualified",
     "result": null,
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": -0.65,
+    "socialScore": 0.0,
+    "econReasoning": "This measure establishes a government-backed homeownership program targeting lower-to-middle income households, representing progressive fiscal intervention through a public loan program funded by revenue bonds. The program redistributes public resources to expand homeownership access for income-qualified families, aligning with left-leaning economic policy approaches.",
+    "socialReasoning": "The measure contains no provisions related to social issues such as abortion, LGBTQ+ rights, gun rights, criminal justice, drug policy, or religious exemptions. It is purely economic in character.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
-    "id": "ca-2026-4",
+    "id": "ca-2026-5",
     "state": "California",
     "stateCode": "CA",
     "year": 2026,
@@ -351,7 +369,13 @@
     "type": "Citizen-Initiated Constitutional Amendment",
     "status": "Qualified",
     "result": null,
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.75,
+    "socialScore": 0.0,
+    "econReasoning": "This measure raises the threshold for enacting special taxes via citizen initiative from a simple majority to two-thirds, making tax increases more difficult to implement. This aligns with right-leaning fiscal conservatism favoring lower taxes and reduced government revenue.",
+    "socialReasoning": "The measure has no substantive social policy dimension; it is purely procedural regarding tax approval mechanisms and contains no provisions affecting civil rights, identity, or social issues.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a voting requirement rule but structurally shifts power by making it substantially harder for citizens to enact tax policy through direct democracy, effectively privileging the status quo and constraining the initiative process itself."
   },
   {
     "id": "ca-2026-3",
@@ -912,10 +936,16 @@
     "type": "Indirect Initiative State Statute",
     "status": "Qualified",
     "result": null,
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.85,
+    "econReasoning": "This measure has no significant economic dimension. It addresses school sports eligibility rules without affecting taxation, regulation of markets, or public spending priorities.",
+    "socialReasoning": "This measure restricts transgender and non-binary students' participation in sports aligned with their gender identity, requiring alignment with biological sex at birth. This aligns strongly with conservative social positions on traditional definitions of sex and gender, similar to other anti-trans policies that score on the right side of the social axis.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
-    "id": "md-2026-1",
+    "id": "md-2026-2",
     "state": "Maryland",
     "stateCode": "MD",
     "year": 2026,
@@ -927,7 +957,13 @@
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
     "result": null,
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": -0.72,
+    "socialScore": 0.0,
+    "econReasoning": "This measure strengthens collective bargaining rights for state employees and mandates budget provisions for union-negotiated wages and benefits, which aligns with progressive labor policies and public sector worker protections. The arbitration requirement and statutory protections for collective bargaining reflect left-leaning support for unionization and worker power against management.",
+    "socialReasoning": "This measure has no material social dimension; it addresses labor relations and fiscal procedures rather than social values, identity issues, or cultural conflicts.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
     "id": "md-2026-1",
@@ -1089,7 +1125,13 @@
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
     "result": null,
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.85,
+    "socialScore": 0.0,
+    "econReasoning": "This measure phases out individual income tax and adjusts sales tax structures, representing a significant tax cut and shift away from progressive income taxation toward consumption-based taxation. These are core conservative fiscal positions aligned with Republican tax policy preferences.",
+    "socialReasoning": "This amendment addresses only tax policy and revenue structures with no provisions affecting social issues, abortion, gun rights, criminal justice, voting access, LGBTQ+ protections, or other socially-divisive policy domains.",
+    "framingFlag": "revenue_impact",
+    "framingNote": "The title emphasizes income tax elimination while downplaying that the mechanism relies on contingent revenue growth triggers and includes sales tax changes that may increase effective tax burden on lower-income households, obscuring the actual distributional impact of the tax restructuring."
   },
   {
     "id": "ne-2026-1",
@@ -1428,7 +1470,7 @@
     "framingNote": null
   },
   {
-    "id": "ok-2026-2",
+    "id": "ok-2026-3",
     "state": "Oklahoma",
     "stateCode": "OK",
     "year": 2026,
@@ -1440,10 +1482,16 @@
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
     "result": null,
-    "electionDate": "2026-08-25"
+    "electionDate": "2026-08-25",
+    "econScore": -0.45,
+    "socialScore": 0.0,
+    "econReasoning": "This measure requires the state to reimburse local entities for revenue losses from manufacturing tax exemptions, effectively limiting the fiscal benefit of those exemptions and shifting costs toward the state budget. While manufacturing tax exemptions themselves are business-friendly (conservative), this measure constrains their implementation by imposing a compensatory funding requirement, reflecting a more cautious fiscal approach aligned with protecting public revenues.",
+    "socialReasoning": "",
+    "framingFlag": "revenue_impact",
+    "framingNote": null
   },
   {
-    "id": "ok-2026-3",
+    "id": "ok-2026-4",
     "state": "Oklahoma",
     "stateCode": "OK",
     "year": 2026,
@@ -1455,10 +1503,16 @@
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
     "result": null,
-    "electionDate": "2026-08-25"
+    "electionDate": "2026-08-25",
+    "econScore": 0.0,
+    "socialScore": 0.85,
+    "econReasoning": "Voter ID requirements have no direct economic dimension\u2014they do not involve taxation, spending, regulation of markets, or redistribution of resources.",
+    "socialReasoning": "Voter ID requirements are a signature conservative/Republican priority, typically supported by the right as an election security measure and opposed by the left as a voting rights restriction. This measure aligns with the conservative social agenda on voting procedure.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
-    "id": "ok-2026-1",
+    "id": "ok-2026-2",
     "state": "Oklahoma",
     "stateCode": "OK",
     "year": 2026,
@@ -1470,7 +1524,13 @@
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
     "result": null,
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.55,
+    "econReasoning": "This measure concerns judicial appointment procedures and does not directly address taxation, spending, regulation, or market mechanisms, placing it outside the economic axis.",
+    "socialReasoning": "The measure shifts judicial nominating commission appointments to congressional district-based selection, a procedural change that Republicans typically favor as it can increase political influence over judicial selection and reduce centralized appointing authority. This aligns with conservative preferences for greater electoral/political influence over courts.",
+    "framingFlag": "procedural_power_shift",
+    "framingNote": "The measure is framed as a technical change to appointment procedures, but structurally shifts power over judicial selection from a nominating commission toward partisan congressional district representation, which increases direct political control over the judiciary."
   },
   {
     "id": "or-2026-1",
@@ -1578,7 +1638,7 @@
     "framingNote": "The measure is framed as a neutral 'supermajority requirement' for constitutional amendments, but it structurally shifts power by raising the voter threshold needed to amend the state constitution, making it harder for future ballot initiatives to succeed regardless of their content\u2014an effect that benefits those seeking to block constitutional change."
   },
   {
-    "id": "tn-2026-1",
+    "id": "tn-2026-4",
     "state": "Tennessee",
     "stateCode": "TN",
     "year": 2026,
@@ -1590,10 +1650,16 @@
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
     "result": null,
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.85,
+    "econReasoning": "This measure has no direct economic dimension; it does not involve taxation, spending, regulation of markets, or redistribution of resources.",
+    "socialReasoning": "Removing bail rights for specified offenses aligns with conservative criminal justice positions favoring stricter detention policies and reduced judicial discretion. This reflects a rightward stance on law-and-order criminal justice reform, which is predominantly a Republican/conservative priority.",
+    "framingFlag": "mandatory_minimum",
+    "framingNote": "The measure is framed as a constitutional amendment to 'remove the right to bail' but structurally functions as a mandatory detention provision that eliminates judicial discretion over bail decisions for certain offenses, masking the removal of judicial flexibility behind constitutional language."
   },
   {
-    "id": "tn-2026-2",
+    "id": "tn-2026-5",
     "state": "Tennessee",
     "stateCode": "TN",
     "year": 2026,
@@ -1605,10 +1671,16 @@
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
     "result": null,
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.85,
+    "socialScore": 0.0,
+    "econReasoning": "This measure prohibits property taxation by the state legislature, a core tax-cut and anti-government-revenue position strongly aligned with Republican/right fiscal ideology. Removing a major revenue source constrains government spending and reflects market-oriented tax policy preferences.",
+    "socialReasoning": "The measure addresses taxation and revenue mechanisms with no direct connection to social policy dimensions such as abortion, LGBTQ+ rights, gun rights, criminal justice, or other cultural issues.",
+    "framingFlag": null,
+    "framingNote": null
   },
   {
-    "id": "tn-2026-3",
+    "id": "tn-2026-6",
     "state": "Tennessee",
     "stateCode": "TN",
     "year": 2026,
@@ -1620,7 +1692,13 @@
     "type": "Legislatively Referred Constitutional Amendment",
     "status": "Qualified",
     "result": null,
-    "electionDate": "2026-11-03"
+    "electionDate": "2026-11-03",
+    "econScore": 0.0,
+    "socialScore": 0.65,
+    "econReasoning": "This measure addresses constitutional rights enumeration for crime victims and has no direct economic dimension regarding taxation, spending, or market regulation.",
+    "socialReasoning": "Expanding crime victims' rights in the constitution aligns with conservative criminal justice priorities that emphasize victim protections and support for law enforcement, positions typically associated with the political right.",
+    "framingFlag": "rights_framing",
+    "framingNote": "The measure uses 'victims' rights' language to frame what is structurally an expansion of procedural and substantive protections that shift the balance toward prosecution and victim involvement in criminal proceedings, rather than a neutral enumeration of pre-existing rights."
   },
   {
     "id": "ut-2026-1",

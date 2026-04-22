@@ -222,20 +222,25 @@ export default function BallotPage() {
     ? ["All", ...Array.from(new Set(measures.filter((m) => m.status !== "Removed").map((m) => m.state))).sort()]
     : ["All"];
 
+  const today = new Date().toISOString().slice(0, 10);
+
+  const isPast = (m: BallotMeasure) =>
+    m.status !== "Removed" && m.electionDate < today;
+
   const hasResults = measures
-    ? measures.some((m) => m.result === "Passed" || m.result === "Failed")
+    ? measures.some((m) => m.result === "Passed" || m.result === "Failed" || isPast(m))
     : false;
 
   const upcoming = measures
     ? measures.filter(
-        (m) => m.status !== "Removed" && !m.result &&
+        (m) => m.status !== "Removed" && !isPast(m) && !m.result &&
         (selectedState === "All" || m.state === selectedState)
       )
     : [];
 
   const results = measures
     ? measures.filter(
-        (m) => (m.result === "Passed" || m.result === "Failed") &&
+        (m) => (m.result === "Passed" || m.result === "Failed" || isPast(m)) &&
         (selectedState === "All" || m.state === selectedState)
       )
     : [];
@@ -363,7 +368,7 @@ export default function BallotPage() {
                       </span>
                       <span className="text-[11px] text-muted-foreground">{measure.type}</span>
                       <span className="text-[11px] text-muted-foreground">· {measure.status}</span>
-                      {measure.result && (
+                      {measure.result ? (
                         <span className={cn(
                           "text-[11px] font-bold px-2 py-0.5 rounded border",
                           measure.result === "Passed"
@@ -372,7 +377,11 @@ export default function BallotPage() {
                         )}>
                           {measure.result === "Passed" ? "✓ Passed" : "✗ Failed"}
                         </span>
-                      )}
+                      ) : isPast(measure) ? (
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded border bg-muted/40 border-border text-muted-foreground">
+                          Pending Results
+                        </span>
+                      ) : null}
                     </div>
                     <h3 className="text-sm font-bold text-foreground leading-snug">{measure.title}</h3>
                   </div>
