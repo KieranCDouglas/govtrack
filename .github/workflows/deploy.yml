@@ -38,12 +38,14 @@ jobs:
         working-directory: source/congress-tracker
 
       - name: Copy built assets to repo root assets/
-        run: cp source/congress-tracker/dist/public/assets/* assets/
+        run: |
+          rm -f assets/index-*.js assets/index-*.css
+          cp source/congress-tracker/dist/public/assets/* assets/
 
       - name: Update index.html asset references
         run: |
-          NEW_JS=$(ls assets/index-*.js | xargs basename)
-          NEW_CSS=$(ls assets/index-*.css | xargs basename)
+          NEW_JS=$(ls assets/index-*.js | head -1 | xargs basename)
+          NEW_CSS=$(ls assets/index-*.css | head -1 | xargs basename)
           sed -i "s|assets/index-[^\"]*\.js|assets/${NEW_JS}|g" index.html
           sed -i "s|assets/index-[^\"]*\.css|assets/${NEW_CSS}|g" index.html
 
