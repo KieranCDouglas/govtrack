@@ -44,6 +44,8 @@ interface BallotMeasure {
   type: string;
   status: string;
   electionDate: string;
+  result?: "Passed" | "Failed" | null;
+  removedAt?: string | null;
   // Enrichment fields (added by enrich_ballot_measures.py)
   econScore?: number | null;
   socialScore?: number | null;
@@ -197,6 +199,7 @@ function FramingDisclosure({ measure }: { measure: BallotMeasure }) {
 
 export default function BallotPage() {
   const [selectedState, setSelectedState] = useState<string>("All");
+  const [activeTab, setActiveTab] = useState<"upcoming" | "results">("upcoming");
   const [quizResult, setQuizResult] = useState<QuizResult | null>(() => getQuizResult());
 
   // Re-read quiz result on window focus (user may have just taken quiz in another tab)
@@ -216,12 +219,28 @@ export default function BallotPage() {
   });
 
   const states = measures
-    ? ["All", ...Array.from(new Set(measures.map((m) => m.state))).sort()]
+    ? ["All", ...Array.from(new Set(measures.filter((m) => m.status !== "Removed").map((m) => m.state))).sort()]
     : ["All"];
 
-  const filtered = measures
-    ? measures.filter((m) => selectedState === "All" || m.state === selectedState)
+  const hasResults = measures
+    ? measures.some((m) => m.result === "Passed" || m.result === "Failed")
+    : false;
+
+  const upcoming = measures
+    ? measures.filter(
+        (m) => m.status !== "Removed" && !m.result &&
+        (selectedState === "All" || m.state === selectedState)
+      )
     : [];
+
+  const results = measures
+    ? measures.filter(
+        (m) => (m.result === "Passed" || m.result === "Failed") &&
+        (selectedState === "All" || m.state === selectedState)
+      )
+    : [];
+
+  const filtered = activeTab === "upcoming" ? upcoming : results;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -258,6 +277,34 @@ export default function BallotPage() {
         </div>
       )}
 
+      {/* Tabs */}
+      <div className="flex gap-1 mb-4 border-b border-border">
+        <button
+          onClick={() => setActiveTab("upcoming")}
+          className={cn(
+            "px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
+            activeTab === "upcoming"
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          Upcoming
+        </button>
+        {hasResults && (
+          <button
+            onClick={() => setActiveTab("results")}
+            className={cn(
+              "px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
+              activeTab === "results"
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Results
+          </button>
+        )}
+      </div>
+
       {/* State filter */}
       <div className="flex items-center gap-3 mb-6">
         <label className="text-sm text-muted-foreground font-medium flex-shrink-0">Filter by state:</label>
@@ -289,7 +336,9 @@ export default function BallotPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground text-sm">
-          No measures found for {selectedState}.
+          {activeTab === "upcoming"
+            ? `No upcoming measures found${selectedState !== "All" ? ` for ${selectedState}` : ""}.`
+            : `No results found${selectedState !== "All" ? ` for ${selectedState}` : ""}.`}
         </div>
       ) : (
         <div className="space-y-3">
@@ -314,6 +363,16 @@ export default function BallotPage() {
                       </span>
                       <span className="text-[11px] text-muted-foreground">{measure.type}</span>
                       <span className="text-[11px] text-muted-foreground">· {measure.status}</span>
+                      {measure.result && (
+                        <span className={cn(
+                          "text-[11px] font-bold px-2 py-0.5 rounded border",
+                          measure.result === "Passed"
+                            ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                            : "bg-red-500/10 border-red-500/30 text-red-400"
+                        )}>
+                          {measure.result === "Passed" ? "✓ Passed" : "✗ Failed"}
+                        </span>
+                      )}
                     </div>
                     <h3 className="text-sm font-bold text-foreground leading-snug">{measure.title}</h3>
                   </div>

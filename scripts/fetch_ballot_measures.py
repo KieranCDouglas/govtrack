@@ -9,6 +9,7 @@ Run manually or via GitHub Actions (refresh-data.yml).
 Usage: python3 scripts/fetch_ballot_measures.py
 """
 
+import datetime
 import json
 import re
 import ssl
@@ -134,6 +135,11 @@ PROGRESSIVE_SUBJECTS = {
     "healthcare",        # expand coverage = progressive
 }
 
+ENRICHMENT_FIELDS = (
+    "econScore", "socialScore", "econReasoning",
+    "socialReasoning", "framingFlag", "framingNote",
+)
+
 
 ctx = ssl.create_default_context()
 ctx.check_hostname = False
@@ -254,6 +260,39 @@ def parse_date(month_day: str, year: int = YEAR) -> str:
 
 def expand_type(abbr: str) -> str:
     return TYPE_MAP.get(abbr.strip(), abbr.strip())
+
+
+def _parse_result(raw: str) -> str | None:
+    """Parse Ballotpedia result column. Returns 'Passed', 'Failed', or None."""
+    text = raw.strip().lower()
+    if any(w in text for w in ("passed", "approved", "yes", "enacted")):
+        return "Passed"
+    if any(w in text for w in ("failed", "rejected", "defeated", "no")):
+        return "Failed"
+    return None
+
+
+def _stable_key(state: str, title: str, election_date: str) -> tuple:
+    """Build a stable match key resilient to minor title edits and id sequence shifts."""
+    normalized = re.sub(r"[^a-z0-9]", "", title.lower())
+    return (state, normalized, election_date)
+
+
+def _load_existing() -> dict:
+    """Load existing ballot-measures.json keyed by stable key. Returns {} on missing/corrupt file."""
+    if not OUTPUT_FILE.exists():
+        return {}
+    try:
+        with open(OUTPUT_FILE) as f:
+            existing = json.load(f)
+        return {
+            _stable_key(m["state"], m["title"], m["electionDate"]): m
+            for m in existing
+            if isinstance(m, dict) and "state" in m and "title" in m and "electionDate" in m
+        }
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        print(f"WARNING: could not load existing {OUTPUT_FILE}: {e} — starting fresh", file=sys.stderr)
+        return {}
 
 
 def strip_tags(html_fragment: str) -> str:
@@ -385,15 +424,17 @@ def scrape_measures() -> list:
                 col0 = cols[0].strip()
 
                 if col0 in TYPE_ABBRS:
-                    mtype_raw = col0
-                    title     = cols[1] if len(cols) > 1 else ""
-                    subject   = cols[2] if len(cols) > 2 else ""
-                    desc      = cols[3] if len(cols) > 3 else ""
+                    mtype_raw  = col0
+                    title      = cols[1] if len(cols) > 1 else ""
+                    subject    = cols[2] if len(cols) > 2 else ""
+                    desc       = cols[3] if len(cols) > 3 else ""
+                    result_raw = cols[4] if len(cols) > 4 else ""
                 else:
-                    title     = col0
-                    mtype_raw = cols[1] if len(cols) > 1 else ""
-                    subject   = cols[2] if len(cols) > 2 else ""
-                    desc      = cols[3] if len(cols) > 3 else ""
+                    title      = col0
+                    mtype_raw  = cols[1] if len(cols) > 1 else ""
+                    subject    = cols[2] if len(cols) > 2 else ""
+                    desc       = cols[3] if len(cols) > 3 else ""
+                    result_raw = cols[4] if len(cols) > 4 else ""
 
                 title = title.strip()
                 if not title or title in TYPE_ABBRS:
@@ -404,6 +445,7 @@ def scrape_measures() -> list:
                 if any(k in title.lower() for k in skip_kw):
                     continue
 
+                result    = _parse_result(result_raw)
                 category  = classify_subject(subject)
                 partisan  = infer_partisan(title, desc, mtype_raw)
                 conservative = infer_conservative_direction(title, desc, category) if partisan else True
@@ -426,7 +468,8 @@ def scrape_measures() -> list:
                     "partisan":              partisan,
                     "conservativeDirection": conservative,
                     "type":                  mtype,
-                    "status":                "Qualified",
+                    "status":                result if result else "Qualified",
+                    "result":                result,
                     "electionDate":          current_date,
                 })
 
@@ -617,15 +660,46 @@ def main():
         print("ERROR: No measures scraped — check page structure", file=sys.stderr)
         sys.exit(1)
 
+    existing = _load_existing()
+    today = datetime.date.today().isoformat()
+
+    scraped_keys = set()
+    merged = []
+
+    for m in measures:
+        key = _stable_key(m["state"], m["title"], m["electionDate"])
+        scraped_keys.add(key)
+        prev = existing.get(key)
+        if prev:
+            for field in ENRICHMENT_FIELDS:
+                if field in prev:
+                    m[field] = prev[field]
+            m["id"] = prev["id"]  # keep stable id to avoid JSON diff churn
+        merged.append(m)
+
+    removed_count = 0
+    for key, prev in existing.items():
+        if key not in scraped_keys and prev.get("status") not in ("Removed", "Passed", "Failed"):
+            prev["status"] = "Removed"
+            prev["removedAt"] = today
+            merged.append(prev)
+            removed_count += 1
+            print(f"  Marked as Removed: {prev['state']} — {prev['title']}")
+
+    active  = [m for m in merged if m.get("status") != "Removed"]
+    removed = [m for m in merged if m.get("status") == "Removed"]
+    active.sort(key=lambda m: (m["state"], m["electionDate"]))
+    removed.sort(key=lambda m: (m["state"], m.get("removedAt", "")))
+    final = active + removed
+
     OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT_FILE, "w") as f:
-        json.dump(measures, f, indent=2)
+        json.dump(final, f, indent=2)
 
-    print(f"Wrote {OUTPUT_FILE}")
+    print(f"Wrote {OUTPUT_FILE}  ({len(active)} active, {removed_count} newly removed, {len(removed)} total removed)")
 
-    # Summary by state
     from collections import Counter
-    by_state = Counter(m["state"] for m in measures)
+    by_state = Counter(m["state"] for m in active)
     for state, count in sorted(by_state.items()):
         print(f"  {state}: {count}")
 
