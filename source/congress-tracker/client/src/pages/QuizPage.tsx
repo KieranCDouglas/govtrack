@@ -445,12 +445,10 @@ export default function QuizPage() {
     setResult(scores);
     setStep("result");
     saveQuizResult(scores);
-    window.plausible?.("quiz_completed", {
-      props: {
-        quadrant: getQuadrantLabel(scores.dim1, scores.dim2),
-        economic: scores.dim1 > 0.1 ? "right" : scores.dim1 < -0.1 ? "left" : "center",
-        social: scores.dim2 > 0.1 ? "conservative" : scores.dim2 < -0.1 ? "progressive" : "center",
-      },
+    window.umami?.track("quiz_completed", {
+      quadrant: getQuadrantLabel(scores.dim1, scores.dim2),
+      economic: scores.dim1 > 0.1 ? "right" : scores.dim1 < -0.1 ? "left" : "center",
+      social: scores.dim2 > 0.1 ? "conservative" : scores.dim2 < -0.1 ? "progressive" : "center",
     });
   }
 
@@ -701,7 +699,7 @@ export default function QuizPage() {
     } finally {
       sharingRef.current = false;
     }
-    window.plausible?.("quiz_shared", { props: { quadrant, method } });
+    window.umami?.track("quiz_shared", { quadrant, method });
   }
 
   function getRankedMembers(): { closest: Member[]; furthest: Member[] } {
