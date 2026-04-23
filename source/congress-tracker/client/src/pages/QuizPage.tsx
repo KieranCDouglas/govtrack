@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentMembers } from "@/lib/dataService";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, ArrowRight, RotateCcw, Map } from "lucide-react";
+import { ArrowLeft, ArrowRight, RotateCcw, Map, Share2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { saveQuizResult, type QuizResult } from "@/lib/quizStore";
 import type { Member } from "@/lib/dataService";
@@ -445,10 +445,263 @@ export default function QuizPage() {
     setResult(scores);
     setStep("result");
     saveQuizResult(scores);
+    window.plausible?.("quiz_completed", {
+      props: {
+        quadrant: getQuadrantLabel(scores.dim1, scores.dim2),
+        economic: scores.dim1 > 0.1 ? "right" : scores.dim1 < -0.1 ? "left" : "center",
+        social: scores.dim2 > 0.1 ? "conservative" : scores.dim2 < -0.1 ? "progressive" : "center",
+      },
+    });
   }
 
   function restart() {
     setStep("intro"); setCurrent(0); setAnswers({}); setResult(null);
+  }
+
+  const [downloaded, setDownloaded] = useState(false);
+  const sharingRef = useRef(false);
+
+  async function buildShareImage(): Promise<Blob> {
+    // Canvas is 2× for sharpness on retina screens
+    const W = 1200, H = 560;
+    const canvas = document.createElement("canvas");
+    canvas.width = W * 2; canvas.height = H * 2;
+    const ctx = canvas.getContext("2d")!;
+    ctx.scale(2, 2);
+
+    // ── Palette ───────────────────────────────────────────────────────
+    const bg        = isLight ? "#cdedf6"              : "#083f41";
+    const panelBg   = isLight ? "#f2fafd"              : "rgba(4,42,43,0.85)";
+    const panelBdr  = isLight ? "rgba(9,91,93,0.18)"   : "rgba(94,177,191,0.22)";
+    const fg        = isLight ? "#083f41"              : "#cdedf6";
+    const fgMuted   = isLight ? "rgba(8,63,65,0.55)"   : "rgba(205,237,246,0.55)";
+    const fgDim     = isLight ? "rgba(8,63,65,0.35)"   : "rgba(205,237,246,0.35)";
+    const axisColor = isLight ? "rgba(9,91,93,0.5)"    : "rgba(94,177,191,0.6)";
+    const gridColor = isLight ? "rgba(9,91,93,0.1)"    : "rgba(94,177,191,0.13)";
+    const rowBg     = isLight ? "rgba(9,91,93,0.05)"   : "rgba(94,177,191,0.07)";
+    const divider   = isLight ? "rgba(9,91,93,0.15)"   : "rgba(94,177,191,0.25)";
+    const brand     = isLight ? "rgba(9,91,93,0.3)"    : "rgba(94,177,191,0.4)";
+
+    function roundRect(x: number, y: number, w: number, h: number, r: number, fill?: string, stroke?: string) {
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, r);
+      if (fill)   { ctx.fillStyle = fill;     ctx.fill();   }
+      if (stroke) { ctx.strokeStyle = stroke; ctx.stroke(); }
+    }
+
+    // Background
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Header bar
+    const HDR = 44;
+    ctx.fillStyle = isLight ? "rgba(9,91,93,0.06)" : "rgba(4,42,43,0.5)";
+    ctx.fillRect(0, 0, W, HDR);
+    ctx.font = "bold 12px sans-serif"; ctx.fillStyle = brand; ctx.textAlign = "left";
+    ctx.fillText("CIVICISM  ·  POLITICAL PLACEMENT QUIZ", 24, 27);
+    ctx.textAlign = "right"; ctx.fillText("civicism.us", W - 24, 27);
+
+    // Thin header bottom border
+    ctx.strokeStyle = divider; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, HDR); ctx.lineTo(W, HDR); ctx.stroke();
+
+    // ── Layout: two panels side by side ───────────────────────────────
+    const PAD = 20;           // outer padding
+    const GAP = 16;           // gap between panels
+    const PY  = HDR + PAD;   // panel top y
+    const PH  = H - PY - PAD; // panel height
+    const PW  = (W - PAD * 2 - GAP) / 2; // each panel width
+    const LX  = PAD;          // left panel x
+    const RX  = PAD + PW + GAP; // right panel x
+    const R   = 10;           // corner radius
+
+    // Panel backgrounds
+    roundRect(LX, PY, PW, PH, R, panelBg, panelBdr);
+    roundRect(RX, PY, PW, PH, R, panelBg, panelBdr);
+
+    // ── LEFT PANEL: Compass ───────────────────────────────────────────
+    const INNER_PAD = 16;
+    const CX = LX + INNER_PAD, CY = PY + INNER_PAD;
+    const CW = PW - INNER_PAD * 2, CH = PH - INNER_PAD * 2;
+    const ccx = CX + CW / 2, ccy = CY + CH / 2;
+    const scaleX = CW / 2 * 0.86, scaleY = CH / 2 * 0.86;
+    const toX = (v: number) => Math.max(CX + 6, Math.min(CX + CW - 6, ccx + v * scaleX));
+    const toY = (v: number) => Math.max(CY + 6, Math.min(CY + CH - 6, ccy - v * scaleY));
+
+    // Clip compass drawing to panel
+    ctx.save();
+    ctx.beginPath(); ctx.roundRect(LX + 1, PY + 1, PW - 2, PH - 2, R - 1); ctx.clip();
+
+    // Quadrant fills
+    const qa = isLight ? 0.16 : 0.12;
+    ctx.fillStyle = `rgba(239,123,69,${qa})`;   ctx.fillRect(CX, CY, CW/2, CH/2);
+    ctx.fillStyle = isLight ? "rgba(9,91,93,0.07)" : "rgba(205,237,246,0.06)";
+                                                 ctx.fillRect(ccx, CY, CW/2, CH/2);
+    ctx.fillStyle = `rgba(94,177,191,${qa})`;   ctx.fillRect(CX, ccy, CW/2, CH/2);
+    ctx.fillStyle = isLight ? "rgba(94,177,191,0.2)" : "rgba(94,177,191,0.16)";
+                                                 ctx.fillRect(ccx, ccy, CW/2, CH/2);
+
+    // Grid
+    ctx.strokeStyle = gridColor; ctx.lineWidth = 0.6;
+    [-0.75,-0.5,-0.25,0.25,0.5,0.75].forEach(v => {
+      ctx.beginPath(); ctx.moveTo(toX(v), CY+4); ctx.lineTo(toX(v), CY+CH-4); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(CX+4, toY(v)); ctx.lineTo(CX+CW-4, toY(v)); ctx.stroke();
+    });
+
+    // Axes
+    ctx.strokeStyle = axisColor; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(CX+6, ccy); ctx.lineTo(CX+CW-6, ccy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ccx, CY+6); ctx.lineTo(ccx, CY+CH-6); ctx.stroke();
+
+    // Corner labels
+    const quadLabelColor = isLight ? "rgba(9,91,93,0.65)" : "rgba(94,177,191,0.7)";
+    ctx.font = "bold 8px sans-serif";
+    ctx.fillStyle = "rgba(239,123,69,0.8)"; ctx.textAlign = "left";  ctx.fillText("POPULIST LEFT",  CX+6, CY+12);
+    ctx.fillStyle = fgMuted;                ctx.textAlign = "right"; ctx.fillText("TRAD. RIGHT",    CX+CW-6, CY+12);
+    ctx.fillStyle = quadLabelColor;         ctx.textAlign = "left";  ctx.fillText("PROG. LEFT",     CX+6, CY+CH-4);
+    ctx.fillStyle = quadLabelColor;         ctx.textAlign = "right"; ctx.fillText("LIBERTARIAN",    CX+CW-6, CY+CH-4);
+
+    // Axis labels
+    ctx.font = "8px sans-serif"; ctx.fillStyle = fgMuted;
+    ctx.textAlign = "left";   ctx.fillText("← Econ Left",    CX+8,    ccy-3);
+    ctx.textAlign = "right";  ctx.fillText("Econ Right →",   CX+CW-8, ccy-3);
+    ctx.textAlign = "center"; ctx.fillText("↑ Conservative", ccx,     CY+22);
+    ctx.textAlign = "center"; ctx.fillText("↓ Progressive",  ccx,     CY+CH-6);
+
+    // Member dots
+    if (allMembers) {
+      allMembers.slice(0, 100).forEach(m => {
+        if (m.compassX == null || m.compassY == null) return;
+        const rgb = m.party === "Democrat" ? "94,177,191" : m.party === "Republican" ? "216,71,39" : "239,123,69";
+        ctx.beginPath(); ctx.arc(toX(m.compassX), toY(m.compassY), 2.5, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(${rgb},0.42)`; ctx.fill();
+      });
+    }
+
+    // User dot
+    const ux = toX(result!.dim1), uy = toY(result!.dim2);
+    ctx.beginPath(); ctx.arc(ux, uy, 14, 0, Math.PI*2);
+    ctx.fillStyle = "rgba(239,123,69,0.2)"; ctx.fill();
+    ctx.beginPath(); ctx.arc(ux, uy, 6, 0, Math.PI*2);
+    ctx.fillStyle = "#ef7b45"; ctx.fill();
+    ctx.strokeStyle = isLight ? "rgba(8,63,65,0.75)" : "rgba(205,237,246,0.9)";
+    ctx.lineWidth = 2; ctx.stroke();
+    ctx.font = "bold 10px sans-serif"; ctx.fillStyle = "#ef7b45";
+    ctx.textAlign = ux > ccx ? "right" : "left";
+    ctx.fillText("You", ux + (ux > ccx ? -10 : 10), uy - 10);
+
+    ctx.restore(); // end compass clip
+
+    // Left panel title
+    ctx.font = "bold 11px sans-serif"; ctx.fillStyle = fgDim; ctx.textAlign = "left";
+    ctx.fillText("YOUR POSITION", LX + INNER_PAD, PY + PH - 10);
+
+    // ── RIGHT PANEL: Results ──────────────────────────────────────────
+    const quadrant  = getQuadrantLabel(result!.dim1, result!.dim2);
+    const econDir   = result!.dim1 > 0.1 ? "Right" : result!.dim1 < -0.1 ? "Left" : "Center";
+    const socialDir = result!.dim2 > 0.1 ? "Conservative" : result!.dim2 < -0.1 ? "Progressive" : "Center";
+    const econVal   = `${result!.dim1 > 0 ? "+" : ""}${result!.dim1.toFixed(2)}`;
+    const socialVal = `${result!.dim2 > 0 ? "+" : ""}${result!.dim2.toFixed(2)}`;
+
+    let ry = PY + INNER_PAD + 16;
+
+    // Quadrant label
+    ctx.font = "bold 26px sans-serif"; ctx.fillStyle = fg; ctx.textAlign = "left";
+    ctx.fillText(quadrant, RX + INNER_PAD, ry);
+    ry += 8;
+
+    // Score pills
+    const pills = [
+      { label: "Econ", dir: econDir, val: econVal },
+      { label: "Social", dir: socialDir, val: socialVal },
+    ];
+    pills.forEach(({ label, dir, val }) => {
+      ry += 26;
+      ctx.font = "11px sans-serif"; ctx.fillStyle = fgDim; ctx.textAlign = "left";
+      ctx.fillText(label, RX + INNER_PAD, ry);
+      ctx.font = "bold 11px sans-serif"; ctx.fillStyle = fg;
+      ctx.fillText(`${dir}  `, RX + INNER_PAD + 42, ry);
+      ctx.font = "11px sans-serif"; ctx.fillStyle = fgMuted;
+      const dirW = ctx.measureText(`${dir}  `).width;
+      ctx.fillText(val, RX + INNER_PAD + 42 + dirW, ry);
+    });
+
+    ry += 20;
+    ctx.strokeStyle = divider; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(RX + INNER_PAD, ry); ctx.lineTo(RX + PW - INNER_PAD, ry); ctx.stroke();
+    ry += 18;
+
+    // Section header
+    ctx.font = "bold 10px sans-serif"; ctx.fillStyle = fgDim; ctx.textAlign = "left";
+    ctx.fillText("CLOSEST MEMBERS OF CONGRESS", RX + INNER_PAD, ry);
+    ry += 14;
+
+    // Member rows
+    closestMembers.slice(0, 5).forEach((m, i) => {
+      const rowH = 36;
+      const rowY = ry + i * rowH;
+      const partyColor = m.party === "Democrat" ? "#5eb1bf" : m.party === "Republican" ? "#d84727" : "#ef7b45";
+      const partyLetter = m.party === "Democrat" ? "D" : m.party === "Republican" ? "R" : "I";
+      const dist = Math.sqrt((m.compassX! - result!.dim1)**2 + (m.compassY! - result!.dim2)**2).toFixed(3);
+
+      // Row bg
+      roundRect(RX + INNER_PAD - 4, rowY + 2, PW - INNER_PAD * 2 + 8, rowH - 4, 5, rowBg);
+
+      // Index
+      ctx.font = "11px sans-serif"; ctx.fillStyle = fgDim; ctx.textAlign = "right";
+      ctx.fillText(`${i+1}.`, RX + INNER_PAD + 14, rowY + 22);
+
+      // Party badge
+      roundRect(RX + INNER_PAD + 18, rowY + 9, 18, 18, 3, partyColor + "33");
+      ctx.font = "bold 10px sans-serif"; ctx.fillStyle = partyColor; ctx.textAlign = "center";
+      ctx.fillText(partyLetter, RX + INNER_PAD + 27, rowY + 22);
+
+      // Name + state
+      ctx.font = "bold 12px sans-serif"; ctx.fillStyle = fg; ctx.textAlign = "left";
+      ctx.fillText(m.displayName, RX + INNER_PAD + 42, rowY + 19);
+      ctx.font = "10px sans-serif"; ctx.fillStyle = fgMuted;
+      ctx.fillText(m.state, RX + INNER_PAD + 42, rowY + 31);
+
+      // Distance
+      ctx.font = "10px sans-serif"; ctx.fillStyle = fgDim; ctx.textAlign = "right";
+      ctx.fillText(dist, RX + PW - INNER_PAD, rowY + 22);
+    });
+
+    return new Promise(resolve => canvas.toBlob(b => resolve(b!), "image/png"));
+  }
+
+  async function handleShare() {
+    if (!result || sharingRef.current) return;
+    sharingRef.current = true;
+    const quadrant = getQuadrantLabel(result.dim1, result.dim2);
+    let method = "download";
+    try {
+      const blob = await buildShareImage();
+      // Only use native share on mobile where it works well with image files.
+      // navigator.canShare returns true on desktop Chrome but the UX is poor there.
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+      const file = new File([blob], "civicism-quiz-result.png", { type: "image/png" });
+      if (isMobile && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: "My Civicism Quiz Result", text: `I landed in the ${quadrant} quadrant — civicism.us` });
+        method = "native_share";
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "civicism-quiz-result.png";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        setDownloaded(true);
+        setTimeout(() => setDownloaded(false), 2500);
+      }
+    } catch {
+      // share dismissed or failed — no-op
+    } finally {
+      sharingRef.current = false;
+    }
+    window.plausible?.("quiz_shared", { props: { quadrant, method } });
   }
 
   function getRankedMembers(): { closest: Member[]; furthest: Member[] } {
@@ -622,6 +875,9 @@ export default function QuizPage() {
               <Map className="w-4 h-4 mr-1.5" /> See on Full Compass
             </Button>
           </Link>
+          <Button variant="outline" onClick={handleShare}>
+            <Share2 className="w-4 h-4 mr-1.5" /> {downloaded ? "Saved!" : "Share Result"}
+          </Button>
           <Button variant="outline" onClick={restart}>
             <RotateCcw className="w-4 h-4 mr-1.5" /> Retake
           </Button>
